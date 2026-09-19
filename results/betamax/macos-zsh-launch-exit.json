@@ -1,0 +1,14 @@
+{
+  "tool": "betamax",
+  "os": "macos",
+  "shell": "zsh",
+  "scenario": "launch-exit",
+  "verdict": "broken",
+  "reason": "no valid GIF produced in CI",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437247640",
+  "extra": {
+    "tool_version": "betamax-v0.1.21",
+    "omp_version": "omp/18.2.6"
+  }
+}
