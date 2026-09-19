@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/betamax/macos-zsh-help-tour.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35438136375",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35438572381",
   "extra": {
     "tool_version": "betamax-v0.1.21",
     "omp_version": "omp/18.2.6"
