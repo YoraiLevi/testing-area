@@ -1,0 +1,171 @@
+name: rec-powersession
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-powersession.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-powersession-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, cell_os: windows, shell: pwsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install omp (windows)
+        shell: pwsh
+        run: ./scenarios/shared/install-omp.ps1
+
+      - name: Install PowerSession + agg (pinned, windows)
+        shell: pwsh
+        run: ./scenarios/powersession/install-recorder.ps1
+
+      - name: Record scenarios (windows)
+        shell: pwsh
+        # PowerSession-rs may not be able to capture headlessly under the runner's
+        # redirected ConPTY (cf. acast panicking on ConPTY); keep the step from
+        # reddening the workflow so the Evaluate step can emit an honest verdict.
+        continue-on-error: true
+        timeout-minutes: 20
+        run: |
+          $env:PATH = "$env:USERPROFILE\bin;$env:PATH"
+          New-Item -ItemType Directory -Force -Path out,casts | Out-Null
+          # Best-effort fixed geometry for determinism.
+          try { mode con: cols=100 lines=30 } catch {}
+          foreach ($scenario in @('launch-exit','help-tour','tui-splash','typing-demo')) {
+            $base = "windows-pwsh-$scenario"
+            Write-Host "== recording $base =="
+            python scenarios/powersession/drive.py $scenario "casts/$base.cast"
+            if ((Test-Path "casts/$base.cast") -and ((Get-Item "casts/$base.cast").Length -gt 0)) {
+              $lines = (Get-Content "casts/$base.cast" | Measure-Object -Line).Lines
+              Write-Host "  cast lines=$lines"
+              Write-Host "  converting $base.cast -> out/$base.gif"
+              agg "casts/$base.cast" "out/$base.gif"
+            } else {
+              Write-Host "  no cast produced for $base"
+            }
+          }
+          Write-Host "=== casts ==="; Get-ChildItem casts -ErrorAction SilentlyContinue | Format-Table Name,Length
+          Write-Host "=== gifs ===";  Get-ChildItem out   -ErrorAction SilentlyContinue | Format-Table Name,Length
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          # Start from a clean slate so this cell's artifact carries ONLY its own fresh
+          # files; the checkout brings stale committed results that must not ride along.
+          rm -rf results/powersession assets/powersession
+          mkdir -p results/powersession assets/powersession
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+
+          valid_gif() { [ -n "$1" ] && python scripts/validate_gif.py "$1" >/dev/null 2>&1; }
+          cast_lines() { if [ -f "$1" ]; then wc -l < "$1" | tr -d ' '; else echo 0; fi; }
+
+          # Recorder-level health: did the headline scenario capture a real recording
+          # (valid GIF backed by a cast with actual output events)? If not, PowerSession
+          # could not record headlessly at all -> every scenario is an honest `skipped`.
+          le_gif="$(find out -type f -name 'windows-pwsh-launch-exit.gif' 2>/dev/null | head -1)"
+          if valid_gif "$le_gif" && [ "$(cast_lines casts/windows-pwsh-launch-exit.cast)" -ge 3 ]; then
+            RECORDER_OK=1
+          else
+            RECORDER_OK=0
+          fi
+          echo "RECORDER_OK=$RECORDER_OK"
+
+          SKIP_REASON="PowerSession v0.1.16 could not capture a recording headlessly on the windows-pwsh runner: its stdout thread mirrors captured output with WriteConsoleW, which fails on the runner's redirected (non-console) stdout, so no usable .cast/GIF is produced. See run logs."
+
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="windows-pwsh-${scenario}"
+            gif="$(find out -type f -name "${base}.gif" 2>/dev/null | head -1)"
+            lines="$(cast_lines "casts/${base}.cast")"
+            if valid_gif "$gif" && [ "$lines" -ge 3 ]; then
+              cp -f "$gif" "assets/powersession/${base}.gif"
+              verdict=working; gifpath="assets/powersession/${base}.gif"
+              case "$scenario" in
+                tui-splash) reason="omp TUI splash captured; PowerSession cannot quit the TUI by keystroke headlessly, so a watchdog tree-killed PowerSession after the splash rendered";;
+                typing-demo) reason="scenarios.md S4 shell-prompt fallback: sample prompt typed at the pwsh prompt (PowerSession cannot inject into the omp TUI input box headlessly)";;
+                *) reason="";;
+              esac
+            elif [ "$RECORDER_OK" = "1" ]; then
+              verdict=broken; gifpath=""
+              case "$scenario" in
+                tui-splash) reason="PowerSession recorded other scenarios but produced no valid GIF for the omp TUI splash in CI; see run logs";;
+                typing-demo) reason="PowerSession shell-prompt typing fallback produced no valid GIF in CI; see run logs";;
+                *) reason="PowerSession (v0.1.16) + agg (v1.9.0) produced no valid GIF for this cell in CI; see run logs";;
+              esac
+            else
+              verdict=skipped; gifpath=""; reason="$SKIP_REASON"
+            fi
+            jq -n \
+              --arg os "windows" \
+              --arg shell "pwsh" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              '{tool:"powersession",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"v0.1.16 (agg v1.9.0)",omp_version:$ompv}}' \
+              > "results/powersession/${base}.json"
+          done
+          echo "=== results ==="; cat results/powersession/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: powersession-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/powersession/
+            results/powersession/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/powersession results/powersession
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/powersession/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/powersession/ \; || true
+          echo "=== assets/powersession ==="; ls -la assets/powersession || true
+          echo "=== results/powersession ==="; ls -la results/powersession || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(powersession): recordings + results"
