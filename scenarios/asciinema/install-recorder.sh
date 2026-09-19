@@ -10,8 +10,11 @@ BIN_DIR="/usr/local/bin"
 uname_s="$(uname -s)"
 uname_m="$(uname -m)"
 
+# Linux: use the statically-linked musl builds so the binaries do not depend on the
+# runner's (older) glibc. ubuntu-22.04 ships glibc 2.35, but agg's -gnu build requires
+# GLIBC_2.38, so -gnu fails there while -musl runs everywhere.
 case "$uname_s" in
-  Linux)  triple_os="unknown-linux-gnu" ;;
+  Linux)  triple_os="unknown-linux-musl" ;;
   Darwin) triple_os="apple-darwin" ;;
   *) echo "install-recorder: unsupported OS $uname_s" >&2; exit 1 ;;
 esac
