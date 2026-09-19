@@ -1,0 +1,206 @@
+name: rec-acast
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-acast.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-acast-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: bash, shell_path: /bin/bash }
+          - { os: macos-latest,   cell_os: macos,   shell: zsh,  shell_path: /bin/zsh }
+          - { os: windows-latest, cell_os: windows, shell: pwsh, shell_path: pwsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install omp (unix)
+        if: runner.os != 'Windows'
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install omp (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scenarios/shared/install-omp.ps1
+
+      - name: Install acast + agg (unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # setup-python exports LD_LIBRARY_PATH to its own libdir, which breaks the
+          # dynamically linked agg/acast binaries at runtime; clear it here too.
+          unset LD_LIBRARY_PATH
+          mkdir -p "$HOME/bin"
+          case "$(uname -s)-$(uname -m)" in
+            Linux-x86_64)  ACAST=acast_linux-amd64;  AGG=agg-x86_64-unknown-linux-gnu ;;
+            Linux-aarch64) ACAST=acast_linux-arm64;  AGG=agg-aarch64-unknown-linux-gnu ;;
+            Darwin-arm64)  ACAST=acast_darwin-arm64; AGG=agg-aarch64-apple-darwin ;;
+            Darwin-x86_64) ACAST=acast_darwin-amd64; AGG=agg-x86_64-apple-darwin ;;
+            *) echo "unsupported platform $(uname -s)-$(uname -m)"; exit 1 ;;
+          esac
+          curl -fsSL -o acast.zip "https://github.com/gvcgo/asciinema/releases/download/v0.4.0/${ACAST}.zip"
+          unzip -o acast.zip -d acast_dl
+          install -m 0755 "$(find acast_dl -type f -name acast | head -1)" "$HOME/bin/acast"
+          curl -fsSL -o "$HOME/bin/agg" "https://github.com/asciinema/agg/releases/download/v1.9.0/${AGG}"
+          chmod +x "$HOME/bin/agg"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+          export PATH="$HOME/bin:$PATH"
+          echo "acast: $(command -v acast)"; acast version || true
+          echo "agg: $(command -v agg)"; agg --version
+
+      - name: Install acast + agg (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $bin = "$env:USERPROFILE\bin"
+          New-Item -ItemType Directory -Force -Path $bin | Out-Null
+          Invoke-WebRequest -Uri "https://github.com/gvcgo/asciinema/releases/download/v0.4.0/acast_windows-amd64.zip" -OutFile acast.zip
+          Expand-Archive -Path acast.zip -DestinationPath acast_dl -Force
+          $exe = (Get-ChildItem acast_dl -Recurse -Filter acast.exe | Select-Object -First 1).FullName
+          Copy-Item $exe "$bin\acast.exe" -Force
+          Invoke-WebRequest -Uri "https://github.com/asciinema/agg/releases/download/v1.9.0/agg-x86_64-pc-windows-msvc.exe" -OutFile "$bin\agg.exe"
+          Add-Content -Path $env:GITHUB_PATH -Value $bin
+          $env:PATH = "$bin;$env:PATH"
+          & "$bin\acast.exe" version
+          & "$bin\agg.exe" --version
+
+      - name: Record scenarios (unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        timeout-minutes: 20
+        run: |
+          set -uo pipefail
+          unset LD_LIBRARY_PATH
+          export LANG=C.UTF-8 LC_ALL=C.UTF-8
+          export PATH="$HOME/bin:$PATH"
+          mkdir -p out casts
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            echo "== recording ${base} =="
+            python scenarios/acast/drive.py "$scenario" "${{ matrix.shell_path }}" "casts/${base}.cast" || echo "  drive exit=$?"
+            if [ -s "casts/${base}.cast" ]; then
+              echo "  converting ${base}.cast -> out/${base}.gif"
+              agg "casts/${base}.cast" "out/${base}.gif" || echo "  agg exit=$?"
+            else
+              echo "  no cast produced for ${base}"
+            fi
+          done
+          echo "=== casts ==="; ls -la casts || true
+          echo "=== gifs ==="; ls -la out || true
+
+      - name: Record scenarios (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        timeout-minutes: 20
+        run: |
+          $env:PATH = "$env:USERPROFILE\bin;$env:PATH"
+          New-Item -ItemType Directory -Force -Path out,casts | Out-Null
+          foreach ($scenario in @('launch-exit','help-tour','tui-splash','typing-demo')) {
+            $base = "${{ matrix.cell_os }}-${{ matrix.shell }}-$scenario"
+            Write-Host "== recording $base =="
+            python scenarios/acast/drive.py $scenario "${{ matrix.shell_path }}" "casts/$base.cast"
+            if ((Test-Path "casts/$base.cast") -and ((Get-Item "casts/$base.cast").Length -gt 0)) {
+              Write-Host "  converting $base.cast -> out/$base.gif"
+              agg "casts/$base.cast" "out/$base.gif"
+            } else {
+              Write-Host "  no cast produced for $base"
+            }
+          }
+          Get-ChildItem out -ErrorAction SilentlyContinue | Format-Table Name,Length
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          unset LD_LIBRARY_PATH
+          # Clean slate so this cell's artifact carries ONLY its own fresh files;
+          # the checkout brings stale committed results that must not ride along.
+          rm -rf results/acast assets/acast
+          mkdir -p results/acast assets/acast
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            gif="$(find out -type f -name "${base}.gif" 2>/dev/null | head -1)"
+            if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/acast/${base}.gif"
+              verdict=working; reason=""; gifpath="assets/acast/${base}.gif"
+            else
+              verdict=broken
+              reason="acast (v0.4.0) + agg (v1.9.0) produced no valid GIF for this cell in CI; see run logs"
+              gifpath=""
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              '{tool:"acast",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"v0.4.0 (agg v1.9.0)",omp_version:$ompv}}' \
+              > "results/acast/${base}.json"
+          done
+          echo "=== results ==="; cat results/acast/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acast-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/acast/
+            results/acast/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/acast results/acast
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/acast/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/acast/ \; || true
+          echo "=== assets/acast ==="; ls -la assets/acast || true
+          echo "=== results/acast ==="; ls -la results/acast || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(acast): recordings + results"
