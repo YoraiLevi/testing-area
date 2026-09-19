@@ -1,0 +1,14 @@
+{
+  "tool": "foley",
+  "os": "macos",
+  "shell": "zsh",
+  "scenario": "help-tour",
+  "verdict": "working",
+  "reason": "",
+  "gif": "assets/foley/macos-zsh-help-tour.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436464978",
+  "extra": {
+    "tool_version": "foley v0.1.0",
+    "omp_version": "omp/18.2.6"
+  }
+}

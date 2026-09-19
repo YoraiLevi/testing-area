@@ -1,0 +1,14 @@
+{
+  "tool": "foley",
+  "os": "linux",
+  "shell": "bash",
+  "scenario": "typing-demo",
+  "verdict": "broken",
+  "reason": "foley typed the sample prompt into the omp TUI and sent Ctrl+C, but no valid GIF was captured in CI",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436464978",
+  "extra": {
+    "tool_version": "foley v0.1.0",
+    "omp_version": "omp/18.2.6"
+  }
+}
