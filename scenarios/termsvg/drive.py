@@ -79,11 +79,11 @@ def build_actions(scenario: str):
         run_line("exit")
         acts.append(("sleep", 0.6))
     elif scenario == "typing-demo":
-        run_line(omp_watchdog(9), delay=0.02)
+        run_line(omp_watchdog(8), delay=0.02)
         acts.append(("sleep", 3.5))          # let the TUI input box appear
         acts.append(("type", "explain what this repository does", 0.11))
-        acts.append(("sleep", 4.0))          # keep the typed (unsent) text visible
-        run_line("exit")                     # watchdog has killed omp by now (~11s)
+        acts.append(("sleep", 5.5))          # show typed text; watchdog kills omp ~10s
+        run_line("exit")                     # omp is dead well before this (margin ~2.5s)
         acts.append(("sleep", 0.6))
     else:
         raise SystemExit(f"drive.py: unknown scenario {scenario!r}")
