@@ -13,9 +13,9 @@ text { letter-spacing: 1px; fill: #dddddd;  }
 </style>
 <rect width="1340" height="688" fill="#171717"/>
 <animate id="t" attributeName="x" from="0" to="0" dur="4.38" begin="0s;t.end"/>
-<text y="41"><tspan x="20 33" class="h"><set attributeName="visibility" to="visible" begin="t.begin" end="t.begin+1.48"/>$ 
+<text y="41"><tspan x="20 33 46 59 72 85 98 111" class="h"><set attributeName="visibility" to="visible" begin="t.begin" end="t.begin+0.02"/>c$ clear
+</tspan><tspan x="20 33" class="h"><set attributeName="visibility" to="visible" begin="t.begin" end="t.begin+1.48"/>$ 
 </tspan><tspan x="20 33 46 59 72 85 98 111 124 137 150 163 176 189 202" class="h"><set attributeName="visibility" to="visible" begin="t.begin+1.48" end="t.end"/>$ omp --version
-</tspan><tspan x="46 59 72 85 98" class="h"><set attributeName="visibility" to="visible" begin="t.begin" end="t.begin+0.02"/>clear
 </tspan><tspan x="46" class="h"><set attributeName="visibility" to="visible" begin="t.begin+0.52" end="t.begin+1.48"/>o
 </tspan><tspan x="59" class="h"><set attributeName="visibility" to="visible" begin="t.begin+0.6" end="t.begin+1.48"/>m
 </tspan><tspan x="72" class="h"><set attributeName="visibility" to="visible" begin="t.begin+0.68" end="t.begin+1.48"/>p
@@ -35,7 +35,7 @@ text { letter-spacing: 1px; fill: #dddddd;  }
 </tspan><tspan x="59" class="h"><set attributeName="visibility" to="visible" begin="t.begin+4.14" end="t.begin+4.3"/>x
 </tspan><tspan x="72" class="h"><set attributeName="visibility" to="visible" begin="t.begin+4.22" end="t.begin+4.3"/>i
 </tspan></text><rect width="13" height="27" fill="#dddddd" fill-opacity="0.7" class="h">
-  <animate attributeName="x" calcMode="discrete" values="111;46;59;72;85;98;111;124;137;150;163;176;189;202;215;20;46;59;72;85;98" keyTimes="0;0.0046;0.1187;0.137;0.1553;0.1735;0.1918;0.21;0.2283;0.2466;0.2648;0.2831;0.3014;0.3196;0.3379;0.4703;0.4886;0.9269;0.9452;0.9635;0.9817" dur="4.38" begin="t.begin" fill="freeze"/>
+  <animate attributeName="x" calcMode="discrete" values="124;46;59;72;85;98;111;124;137;150;163;176;189;202;215;20;46;59;72;85;98" keyTimes="0;0.0046;0.1187;0.137;0.1553;0.1735;0.1918;0.21;0.2283;0.2466;0.2648;0.2831;0.3014;0.3196;0.3379;0.4703;0.4886;0.9269;0.9452;0.9635;0.9817" dur="4.38" begin="t.begin" fill="freeze"/>
   <animate attributeName="y" calcMode="discrete" values="20;47;74" keyTimes="0;0.4703;0.484" dur="4.38" begin="t.begin" fill="freeze"/>
   <animate attributeName="visibility" calcMode="discrete" values="visible;hidden;visible;hidden;visible;hidden;visible" keyTimes="0;0.6256;0.6941;0.7626;0.8311;0.8995;0.9269" dur="4.38" begin="t.begin" fill="freeze"/>
 </rect>
