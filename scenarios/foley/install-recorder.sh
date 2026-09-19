@@ -62,7 +62,7 @@ if [ "$(ffmpeg_major)" -lt 6 ]; then
     ff_tmp="$(mktemp -d)"
     curl -fsSL "$ff_url" -o "${ff_tmp}/ffmpeg.tar.xz"
     tar xJf "${ff_tmp}/ffmpeg.tar.xz" -C "${ff_tmp}"
-    ff_bin="$(find "${ff_tmp}" -maxdepth 2 -type f -name ffmpeg | head -1)"
+    ff_bin="$(find "${ff_tmp}" -type f -name ffmpeg | head -1)"
     sudo cp -f "$(dirname "$ff_bin")/ffmpeg" "$(dirname "$ff_bin")/ffprobe" "${BIN_DIR}/"
     sudo chmod +x "${BIN_DIR}/ffmpeg" "${BIN_DIR}/ffprobe"
   fi
