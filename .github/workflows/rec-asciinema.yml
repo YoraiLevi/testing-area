@@ -1,0 +1,154 @@
+name: rec-asciinema
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-asciinema.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-asciinema-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04, cell_os: linux, shell: bash }
+          - { os: ubuntu-22.04, cell_os: linux, shell: zsh }
+          - { os: macos-latest, cell_os: macos, shell: zsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install omp
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Install asciinema + agg (pinned)
+        run: bash scenarios/asciinema/install-recorder.sh
+
+      - name: Render scenarios
+        shell: bash
+        timeout-minutes: 20
+        run: |
+          # setup-python exports LD_LIBRARY_PATH to its own lib dir, which can break the
+          # shared libs the native asciinema/agg binaries load; clear it for the render.
+          unset LD_LIBRARY_PATH
+          set -u
+          mkdir -p out
+          SHELLBIN="$(command -v ${{ matrix.shell }})"
+          echo "shell=$SHELLBIN"
+          echo "asciinema=$(command -v asciinema) -> $(asciinema --version)"
+          echo "agg=$(command -v agg) -> $(agg --version)"
+          for f in scenarios/asciinema/0*.sh; do
+            s="$(basename "$f" .sh)"          # e.g. 01-launch-exit
+            scenario="${s#*-}"                # e.g. launch-exit
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            cast="out/${base}.cast"
+            gif="out/${base}.gif"
+            echo "== recording ${scenario} =="
+            asciinema rec --headless --overwrite --window-size 100x24 \
+              -c "$SHELLBIN $f" "$cast" || echo "  rec exit=$? for ${scenario}"
+            echo "  cast: $(ls -la "$cast" 2>/dev/null || echo MISSING)"
+            agg "$cast" "$gif" || echo "  agg exit=$? for ${scenario}"
+            echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"
+          done
+          echo "=== out ==="; ls -la out || true
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          # Start from a clean slate so this cell's artifact carries ONLY its own fresh
+          # files; the checkout brings stale committed results that must not ride along.
+          rm -rf results/asciinema assets/asciinema
+          mkdir -p results/asciinema assets/asciinema
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            gif="out/${base}.gif"
+            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/asciinema/${base}.gif"
+              verdict=working; gifpath="assets/asciinema/${base}.gif"
+              case "$scenario" in
+                typing-demo) reason="shell-prompt typing fallback: asciinema cannot inject keystrokes into the omp TUI headlessly (scenarios.md S4)";;
+                *) reason="";;
+              esac
+            else
+              verdict=broken; gifpath=""
+              case "$scenario" in
+                tui-splash) reason="asciinema rec -c runs a single command to completion and cannot send an interactive quit to the omp TUI headlessly; no valid GIF captured";;
+                typing-demo) reason="shell-prompt typing fallback produced no valid GIF in CI";;
+                *) reason="no valid GIF produced in CI";;
+              esac
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              '{tool:"asciinema",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"v3.2.1 + agg v1.9.0",omp_version:$ompv}}' \
+              > "results/asciinema/${base}.json"
+          done
+          echo "=== results ==="; cat results/asciinema/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: asciinema-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/asciinema/
+            results/asciinema/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/asciinema results/asciinema
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/asciinema/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/asciinema/ \; || true
+          echo "=== assets/asciinema ==="; ls -la assets/asciinema || true
+          echo "=== results/asciinema ==="; ls -la results/asciinema || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(asciinema): recordings + results"
