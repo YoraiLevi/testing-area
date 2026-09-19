@@ -54,23 +54,22 @@ def build_actions(scenario: str):
         run_line("exit")
         acts.append(("sleep", 0.6))
     elif scenario == "tui-splash":
-        run_line("omp --no-session")
-        acts.append(("sleep", 4.5))
-        acts.append(("key", b"\x03"))
-        acts.append(("sleep", 0.9))
-        acts.append(("key", b"\x03"))
-        acts.append(("sleep", 1.0))
+        # omp ignores SIGINT at the splash headlessly, so rely on its documented
+        # `--max-time` to self-terminate the TUI; the shell prompt then returns and
+        # we exit cleanly, letting termsvg save the cast (a killed termsvg saves none).
+        run_line("omp --no-session --max-time=6")
+        acts.append(("sleep", 8.5))          # splash renders ~6s, omp self-exits
+        acts.append(("key", b"\x03"))        # harmless if already at the prompt
+        acts.append(("sleep", 0.5))
         run_line("exit")
         acts.append(("sleep", 0.6))
     elif scenario == "typing-demo":
-        run_line("omp --no-session")
-        acts.append(("sleep", 3.5))
+        run_line("omp --no-session --max-time=12")
+        acts.append(("sleep", 3.5))          # let the TUI input box appear
         acts.append(("type", "explain what this repository does", 0.11))
-        acts.append(("sleep", 2.0))
-        acts.append(("key", b"\x03"))
-        acts.append(("sleep", 0.9))
-        acts.append(("key", b"\x03"))
-        acts.append(("sleep", 1.0))
+        acts.append(("sleep", 6.5))          # keep typed text visible; omp self-exits ~12s
+        acts.append(("key", b"\x03"))        # harmless if already at the prompt
+        acts.append(("sleep", 0.5))
         run_line("exit")
         acts.append(("sleep", 0.6))
     else:
