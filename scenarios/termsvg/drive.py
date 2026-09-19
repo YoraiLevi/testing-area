@@ -54,22 +54,26 @@ def build_actions(scenario: str):
         run_line("exit")
         acts.append(("sleep", 0.6))
     elif scenario == "tui-splash":
-        # omp ignores SIGINT at the splash headlessly, so rely on its documented
-        # `--max-time` to self-terminate the TUI; the shell prompt then returns and
-        # we exit cleanly, letting termsvg save the cast (a killed termsvg saves none).
-        run_line("omp --no-session --max-time=6")
-        acts.append(("sleep", 8.5))          # splash renders ~6s, omp self-exits
-        acts.append(("key", b"\x03"))        # harmless if already at the prompt
-        acts.append(("sleep", 0.5))
+        # The omp TUI runs in the alternate screen and ignores SIGINT at the splash;
+        # its documented interactive quit is the `/exit` slash command (scenarios.md
+        # S3). Submitting it returns us to the shell so termsvg saves the cast.
+        run_line("omp --no-session")
+        acts.append(("sleep", 4.5))          # let the splash / onboarding render
+        acts.append(("type", "/exit", 0.08))
+        acts.append(("key", b"\r"))
+        acts.append(("sleep", 1.8))          # omp tears down and returns to shell
         run_line("exit")
         acts.append(("sleep", 0.6))
     elif scenario == "typing-demo":
-        run_line("omp --no-session --max-time=12")
+        run_line("omp --no-session")
         acts.append(("sleep", 3.5))          # let the TUI input box appear
         acts.append(("type", "explain what this repository does", 0.11))
-        acts.append(("sleep", 6.5))          # keep typed text visible; omp self-exits ~12s
-        acts.append(("key", b"\x03"))        # harmless if already at the prompt
-        acts.append(("sleep", 0.5))
+        acts.append(("sleep", 2.0))          # keep the typed (unsent) text visible
+        acts.append(("key", b"\x7f" * 40))   # clear the input before the quit command
+        acts.append(("sleep", 0.4))
+        acts.append(("type", "/exit", 0.08))
+        acts.append(("key", b"\r"))
+        acts.append(("sleep", 1.8))
         run_line("exit")
         acts.append(("sleep", 0.6))
     else:
