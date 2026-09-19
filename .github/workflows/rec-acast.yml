@@ -114,6 +114,9 @@ jobs:
       - name: Record scenarios (windows)
         if: runner.os == 'Windows'
         shell: pwsh
+        # acast v0.4.0 `record` panics on the headless Windows runner (see Evaluate);
+        # this is an honest `skipped` outcome, so the step must not red the workflow.
+        continue-on-error: true
         timeout-minutes: 20
         run: |
           $env:PATH = "$env:USERPROFILE\bin;$env:PATH"
