@@ -81,13 +81,14 @@ def build_actions(scenario: str):
         run_line("exit")
         acts.append(("sleep", 0.6))
     elif scenario == "typing-demo":
-        # Wait for the input box to actually appear (~7s cold start) BEFORE typing, or
-        # the keystrokes leak past omp and land on the shell. Only send `exit` once the
-        # watchdog has killed omp, so it reaches the interactive shell cleanly.
-        run_line(omp_watchdog(17), delay=0.02)
-        acts.append(("sleep", 10.0))         # let the TUI input box appear
+        # omp's TUI input cannot be reached reliably headlessly: keystrokes race the
+        # ~8s cold start and, if the input widget isn't reading yet, leak through to
+        # the shell. Per scenarios.md S4, fall back to typing the sample prompt at the
+        # shell prompt (still exercises keystroke animation), then abandon the line.
         acts.append(("type", "explain what this repository does", 0.11))
-        acts.append(("sleep", 8.0))          # keep typed text visible; omp killed ~17-19s
+        acts.append(("sleep", 2.5))          # keep the typed (unsent) text visible
+        acts.append(("key", b"\x03"))        # abandon the line without executing it
+        acts.append(("sleep", 0.4))
         run_line("exit")
         acts.append(("sleep", 0.6))
     else:

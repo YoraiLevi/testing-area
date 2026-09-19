@@ -106,7 +106,12 @@ jobs:
             gif="out/${base}.gif"
             if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
               cp -f "$gif" "assets/termsvg/${base}.gif"
-              verdict=working; reason=""; gifpath="assets/termsvg/${base}.gif"
+              verdict=working; gifpath="assets/termsvg/${base}.gif"
+              if [ "$scenario" = "typing-demo" ]; then
+                reason="omp TUI input not reachable headlessly; per scenarios.md S4, sample prompt typed at the shell prompt (keystroke-animation fallback)"
+              else
+                reason=""
+              fi
             elif [ "$scenario" = "tui-splash" ] || [ "$scenario" = "typing-demo" ]; then
               verdict=broken; gifpath=""
               reason="omp TUI could not be driven/quit headlessly via termsvg PTY capture; no valid GIF produced"
