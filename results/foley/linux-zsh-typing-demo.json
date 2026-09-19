@@ -3,10 +3,10 @@
   "os": "linux",
   "shell": "zsh",
   "scenario": "typing-demo",
-  "verdict": "broken",
-  "reason": "foley typed the sample prompt into the omp TUI in realtime mode but no valid GIF was captured in CI; foley v0.1.0's vtengine cannot encode Ctrl+<letter> so no interactive quit could be sent",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436806818",
+  "verdict": "working",
+  "reason": "foley types the sample prompt straight into the omp TUI input box without sending it (no shell-prompt fallback needed), in realtime mode; foley finalizes the take at tape end (foley v0.1.0's vtengine cannot encode Ctrl+<letter>, so no Ctrl+C quit is sent)",
+  "gif": "assets/foley/linux-zsh-typing-demo.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436959873",
   "extra": {
     "tool_version": "foley v0.1.0",
     "omp_version": "omp/18.2.6"

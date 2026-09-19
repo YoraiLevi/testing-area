@@ -3,10 +3,10 @@
   "os": "linux",
   "shell": "zsh",
   "scenario": "help-tour",
-  "verdict": "broken",
-  "reason": "no valid GIF produced in CI",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436806818",
+  "verdict": "working",
+  "reason": "",
+  "gif": "assets/foley/linux-zsh-help-tour.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436959873",
   "extra": {
     "tool_version": "foley v0.1.0",
     "omp_version": "omp/18.2.6"
