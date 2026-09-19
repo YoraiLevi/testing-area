@@ -1,0 +1,14 @@
+{
+  "tool": "demotape",
+  "os": "linux",
+  "shell": "bash",
+  "scenario": "tui-splash",
+  "verdict": "broken",
+  "reason": "omp TUI did not render/quit cleanly under headless ttyd capture; no valid GIF produced in CI",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437415435",
+  "extra": {
+    "tool_version": "demotape gem 0.0.10",
+    "omp_version": "omp/18.2.6"
+  }
+}
