@@ -54,7 +54,7 @@ jobs:
           unset LD_LIBRARY_PATH
           mkdir -p "$HOME/bin"
           case "$(uname -s)-$(uname -m)" in
-            Linux-x86_64)  ACAST=acast_linux-amd64;  AGG=agg-x86_64-unknown-linux-gnu ;;
+            Linux-x86_64)  ACAST=acast_linux-amd64;  AGG=agg-x86_64-unknown-linux-musl ;;
             Linux-aarch64) ACAST=acast_linux-arm64;  AGG=agg-aarch64-unknown-linux-gnu ;;
             Darwin-arm64)  ACAST=acast_darwin-arm64; AGG=agg-aarch64-apple-darwin ;;
             Darwin-x86_64) ACAST=acast_darwin-amd64; AGG=agg-x86_64-apple-darwin ;;
@@ -149,6 +149,11 @@ jobs:
             if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
               cp -f "$gif" "assets/acast/${base}.gif"
               verdict=working; reason=""; gifpath="assets/acast/${base}.gif"
+              if [ "$scenario" = "tui-splash" ]; then
+                reason="omp TUI splash captured; quit forced via SIGINT->SIGTERM->SIGKILL watchdog (acast cannot quit the TUI by keystroke headlessly)"
+              elif [ "$scenario" = "typing-demo" ]; then
+                reason="scenarios.md S4 shell-prompt fallback: sample prompt typed at the shell prompt (acast cannot inject into the omp TUI input box headlessly)"
+              fi
             else
               verdict=broken
               reason="acast (v0.4.0) + agg (v1.9.0) produced no valid GIF for this cell in CI; see run logs"
