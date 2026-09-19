@@ -1,0 +1,14 @@
+{
+  "tool": "vhs",
+  "os": "linux",
+  "shell": "pwsh",
+  "scenario": "launch-exit",
+  "verdict": "working",
+  "reason": "",
+  "gif": "assets/vhs/linux-pwsh-launch-exit.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35434442088",
+  "extra": {
+    "tool_version": "v0.11.0",
+    "omp_version": "omp/18.2.6"
+  }
+}
