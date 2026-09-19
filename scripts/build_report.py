@@ -146,7 +146,7 @@ def recordings(tools: dict, idx: dict) -> str:
     for t, chosen, gifs in sections:
         out.append(f'<a id="rec-{t["id"]}"></a>')
         out.append("")
-        out.append(f"#### [{t['name']}]({t['url']}) (`{chosen}`)")
+        out.append(f"#### {t['name']} (`{chosen}`)")
         out.append("")
         for s, gif in gifs:
             out.append(f"**{s}**")
