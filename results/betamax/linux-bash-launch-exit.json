@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/betamax/linux-bash-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437557082",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437779843",
   "extra": {
     "tool_version": "betamax-v0.1.21",
     "omp_version": "omp/18.2.6"
