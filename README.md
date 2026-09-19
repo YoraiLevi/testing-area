@@ -120,7 +120,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-vhs"></a>
 
-#### [VHS](https://github.com/charmbracelet/vhs) (`linux-bash`)
+#### VHS (`linux-bash`)
 
 **launch-exit**
 
@@ -140,7 +140,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-console2svg"></a>
 
-#### [console2svg](https://github.com/arika0093/console2svg) (`linux-bash`)
+#### console2svg (`linux-bash`)
 
 **launch-exit**
 
@@ -160,7 +160,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-foley"></a>
 
-#### [Foley](https://github.com/GH-Jaider/foley) (`linux-bash`)
+#### Foley (`linux-bash`)
 
 **launch-exit**
 
@@ -180,7 +180,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-betamax"></a>
 
-#### [Betamax (joshka)](https://github.com/joshka/betamax) (`linux-bash`)
+#### Betamax (joshka) (`linux-bash`)
 
 **launch-exit**
 
@@ -200,7 +200,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-evp"></a>
 
-#### [EVP](https://github.com/HalFrgrd/evp) (`linux-bash`)
+#### EVP (`linux-bash`)
 
 **launch-exit**
 
@@ -220,7 +220,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-demotape"></a>
 
-#### [Demo Tape](https://github.com/fnando/demotape) (`linux-bash`)
+#### Demo Tape (`linux-bash`)
 
 **launch-exit**
 
@@ -240,7 +240,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-asciinema"></a>
 
-#### [asciinema + agg](https://github.com/asciinema/asciinema) (`linux-bash`)
+#### asciinema + agg (`linux-bash`)
 
 **launch-exit**
 
@@ -260,7 +260,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-terminalizer"></a>
 
-#### [Terminalizer](https://github.com/faressoft/terminalizer) (`linux-bash`)
+#### Terminalizer (`linux-bash`)
 
 **launch-exit**
 
@@ -280,7 +280,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-acast"></a>
 
-#### [acast](https://github.com/gvcgo/asciinema) (`linux-bash`)
+#### acast (`linux-bash`)
 
 **launch-exit**
 
@@ -300,7 +300,7 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 
 <a id="rec-termsvg"></a>
 
-#### [termsvg](https://github.com/mrmarble/termsvg) (`linux-bash`)
+#### termsvg (`linux-bash`)
 
 **launch-exit**
 
