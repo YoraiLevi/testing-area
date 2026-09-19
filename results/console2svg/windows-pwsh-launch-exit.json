@@ -1,0 +1,14 @@
+{
+  "tool": "console2svg",
+  "os": "windows",
+  "shell": "pwsh",
+  "scenario": "launch-exit",
+  "verdict": "broken",
+  "reason": "no valid GIF produced in CI",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435816261",
+  "extra": {
+    "tool_version": "v0.9.3",
+    "omp_version": "omp/18.2.6"
+  }
+}

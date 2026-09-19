@@ -1,0 +1,14 @@
+{
+  "tool": "console2svg",
+  "os": "linux",
+  "shell": "pwsh",
+  "scenario": "tui-splash",
+  "verdict": "working",
+  "reason": "omp TUI captured headlessly via console2svg --timeout (splash/onboarding screen)",
+  "gif": "assets/console2svg/linux-pwsh-tui-splash.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435816261",
+  "extra": {
+    "tool_version": "v0.9.3",
+    "omp_version": "omp/18.2.6"
+  }
+}
