@@ -1,11 +1,11 @@
 {
   "tool": "acast",
-  "os": "macos",
-  "shell": "zsh",
+  "os": "linux",
+  "shell": "bash",
   "scenario": "launch-exit",
   "verdict": "working",
   "reason": "",
-  "gif": "assets/acast/macos-zsh-launch-exit.gif",
+  "gif": "assets/acast/linux-bash-launch-exit.gif",
   "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436227880",
   "extra": {
     "tool_version": "v0.4.0 (agg v1.9.0)",
