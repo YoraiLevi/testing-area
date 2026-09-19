@@ -45,11 +45,33 @@ jobs:
         shell: pwsh
         run: ./scenarios/shared/install-omp.ps1
 
-      # Pins both the action code (@v0.9.3) and the installed binary (version input).
-      - name: Install console2svg
+      # The official action pins both action code (@v0.9.3) and the binary (version input),
+      # but its install script is broken on Windows (git bash mangles the backslashed
+      # github.action_path), so Windows installs the pinned release zip directly below.
+      - name: Install console2svg (unix)
+        if: runner.os != 'Windows'
         uses: arika0093/console2svg@v0.9.3
         with:
           version: '0.9.3'
+
+      # The Windows release archive bundles console2svg + ffmpeg; extract and add to PATH.
+      - name: Install console2svg (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $url = "https://github.com/arika0093/console2svg/releases/download/v0.9.3/console2svg-win-x64.zip"
+          $dest = "$env:RUNNER_TEMP\console2svg"
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+          Invoke-WebRequest -Uri $url -OutFile "$env:RUNNER_TEMP\console2svg.zip"
+          Expand-Archive -Path "$env:RUNNER_TEMP\console2svg.zip" -DestinationPath $dest -Force
+          $exe = Get-ChildItem -Path $dest -Recurse -Filter console2svg.exe | Select-Object -First 1
+          if (-not $exe) { throw "console2svg.exe not found after extracting $url" }
+          $dir = $exe.Directory.FullName
+          Add-Content -Path $env:GITHUB_PATH -Value $dir
+          $env:PATH = "$dir;$env:PATH"
+          Write-Host "console2svg installed at $dir"
+          & $exe.FullName --version
 
       # console2svg needs ffmpeg to normalize SVG -> GIF. The Windows release archive
       # already bundles ffmpeg; Linux/macOS install it from the system package manager.
