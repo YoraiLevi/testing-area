@@ -30,6 +30,19 @@ CHILD_GRACE = 25.0         # seconds to wait for termsvg to save after the scrip
 HARD_LIMIT = 150           # absolute backstop (seconds) for the whole run
 
 
+def omp_watchdog(run_secs: int) -> str:
+    """Command that runs the omp TUI in the terminal's foreground group and force-
+    terminates it after `run_secs`. Using `sh -c` (job control off) keeps omp in the
+    foreground process group so it renders and receives typed input, while a
+    background watchdog escalates INT -> TERM -> KILL to guarantee a clean return."""
+    return (
+        "sh -c 'omp --no-session & p=$!; "
+        f"(sleep {run_secs}; kill -INT $p 2>/dev/null; sleep 1; "
+        "kill -TERM $p 2>/dev/null; sleep 1; kill -KILL $p 2>/dev/null) "
+        ">/dev/null 2>&1 & wait $p'"
+    )
+
+
 def build_actions(scenario: str):
     """A scenario is a list of actions:
         ("type", text, per_char_delay) -- type text character by character
@@ -54,27 +67,23 @@ def build_actions(scenario: str):
         run_line("exit")
         acts.append(("sleep", 0.6))
     elif scenario == "tui-splash":
-        # The omp TUI runs in the alternate screen and ignores SIGINT at the splash;
-        # its documented interactive quit is the `/exit` slash command (scenarios.md
-        # S3). Submitting it returns us to the shell so termsvg saves the cast.
-        run_line("omp --no-session")
-        acts.append(("sleep", 4.5))          # let the splash / onboarding render
-        acts.append(("type", "/exit", 0.08))
-        acts.append(("key", b"\r"))
-        acts.append(("sleep", 1.8))          # omp tears down and returns to shell
+        # `omp --no-session` on a keyless CI runner opens the interactive onboarding
+        # wizard (documented as an acceptable, honest capture in scenarios.md S3). It
+        # traps SIGINT and has no reliable headless quit key, so we run it inside a
+        # non-job-control `sh -c` (omp stays in the terminal's foreground group and
+        # renders normally) with a watchdog that escalates INT -> TERM -> KILL. When
+        # omp dies, `sh -c` returns to the interactive shell and termsvg saves the
+        # cast (a hard-killed termsvg would save nothing).
+        run_line(omp_watchdog(5), delay=0.02)
+        acts.append(("sleep", 8.0))          # splash renders ~5s, watchdog then kills
         run_line("exit")
         acts.append(("sleep", 0.6))
     elif scenario == "typing-demo":
-        run_line("omp --no-session")
+        run_line(omp_watchdog(9), delay=0.02)
         acts.append(("sleep", 3.5))          # let the TUI input box appear
         acts.append(("type", "explain what this repository does", 0.11))
-        acts.append(("sleep", 2.0))          # keep the typed (unsent) text visible
-        acts.append(("key", b"\x7f" * 40))   # clear the input before the quit command
-        acts.append(("sleep", 0.4))
-        acts.append(("type", "/exit", 0.08))
-        acts.append(("key", b"\r"))
-        acts.append(("sleep", 1.8))
-        run_line("exit")
+        acts.append(("sleep", 4.0))          # keep the typed (unsent) text visible
+        run_line("exit")                     # watchdog has killed omp by now (~11s)
         acts.append(("sleep", 0.6))
     else:
         raise SystemExit(f"drive.py: unknown scenario {scenario!r}")
