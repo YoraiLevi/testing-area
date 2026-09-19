@@ -1,0 +1,14 @@
+{
+  "tool": "acast",
+  "os": "windows",
+  "shell": "pwsh",
+  "scenario": "launch-exit",
+  "verdict": "broken",
+  "reason": "acast (v0.4.0) + agg (v1.9.0) produced no valid GIF for this cell in CI; see run logs",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435965541",
+  "extra": {
+    "tool_version": "v0.4.0 (agg v1.9.0)",
+    "omp_version": "omp/18.2.6"
+  }
+}
