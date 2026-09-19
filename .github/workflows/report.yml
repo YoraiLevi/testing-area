@@ -1,0 +1,37 @@
+name: report
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - 'results/**'
+      - 'scripts/build_report.py'
+      - 'scripts/tools.json'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Build README report from CI evidence
+        run: python scripts/build_report.py
+
+      - name: Commit README
+        run: |
+          bash scripts/commit-artifacts.sh "docs(report): regenerate README" README.md

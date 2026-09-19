@@ -1,0 +1,138 @@
+{
+  "scenarios": ["launch-exit", "help-tour", "tui-splash", "typing-demo"],
+  "headline_scenario": "launch-exit",
+  "tools": [
+    {
+      "id": "vhs",
+      "name": "VHS",
+      "family": "scripted",
+      "pinned_version": "v0.12.0",
+      "native_formats": ["gif", "mp4", "webm"],
+      "converter": null,
+      "discovered": false,
+      "cells": [
+        "linux-bash", "linux-zsh", "linux-pwsh", "macos-zsh", "windows-pwsh"
+      ]
+    },
+    {
+      "id": "console2svg",
+      "name": "console2svg",
+      "family": "scripted",
+      "pinned_version": "v0.9.3",
+      "native_formats": ["svg", "gif", "mp4"],
+      "converter": "ffmpeg",
+      "discovered": true,
+      "cells": ["linux-bash", "linux-pwsh", "macos-zsh", "windows-pwsh"]
+    },
+    {
+      "id": "foley",
+      "name": "Foley",
+      "family": "scripted",
+      "pinned_version": "latest",
+      "native_formats": ["gif", "mp4", "webm"],
+      "converter": null,
+      "discovered": false,
+      "cells": ["linux-bash", "linux-zsh", "macos-zsh"]
+    },
+    {
+      "id": "betamax",
+      "name": "Betamax (joshka)",
+      "family": "scripted",
+      "pinned_version": "v0.1.21",
+      "native_formats": ["gif", "png", "mp4", "webm"],
+      "converter": null,
+      "discovered": false,
+      "cells": ["linux-bash", "linux-zsh", "macos-zsh"]
+    },
+    {
+      "id": "evp",
+      "name": "EVP",
+      "family": "scripted",
+      "pinned_version": "latest",
+      "native_formats": ["gif", "svg"],
+      "converter": null,
+      "discovered": true,
+      "cells": ["linux-bash"]
+    },
+    {
+      "id": "demotape",
+      "name": "Demo Tape",
+      "family": "scripted",
+      "pinned_version": "0.0.10",
+      "native_formats": ["gif", "mp4", "webm"],
+      "converter": "ffmpeg",
+      "discovered": false,
+      "cells": ["linux-bash", "macos-zsh"]
+    },
+    {
+      "id": "asciinema",
+      "name": "asciinema + agg",
+      "family": "interactive",
+      "pinned_version": "v3.2.1 + agg v1.9.0",
+      "native_formats": ["cast"],
+      "converter": "agg",
+      "discovered": false,
+      "cells": ["linux-bash", "linux-zsh", "macos-zsh"]
+    },
+    {
+      "id": "powersession",
+      "name": "PowerSession-rs + agg",
+      "family": "interactive",
+      "pinned_version": "v0.1.16 + agg v1.9.0",
+      "native_formats": ["cast"],
+      "converter": "agg",
+      "discovered": false,
+      "cells": ["windows-pwsh"]
+    },
+    {
+      "id": "terminalizer",
+      "name": "Terminalizer",
+      "family": "interactive",
+      "pinned_version": "latest",
+      "native_formats": ["gif"],
+      "converter": null,
+      "discovered": false,
+      "cells": ["linux-bash"]
+    },
+    {
+      "id": "acast",
+      "name": "acast",
+      "family": "interactive",
+      "pinned_version": "v0.4.0",
+      "native_formats": ["cast", "gif"],
+      "converter": "agg",
+      "discovered": true,
+      "cells": ["linux-bash", "macos-zsh", "windows-pwsh"]
+    },
+    {
+      "id": "termsvg",
+      "name": "termsvg",
+      "family": "interactive",
+      "pinned_version": "v0.11.0",
+      "native_formats": ["svg", "gif"],
+      "converter": "ffmpeg",
+      "discovered": true,
+      "cells": ["linux-bash", "macos-zsh"]
+    }
+  ],
+  "skipped": [
+    {"name": "s-vhs", "reason": "Not a maintained standalone product (means VHS itself or a DIY tmux+asciinema stack)."},
+    {"name": "ttysvg", "reason": "No matching maintained project; closest are termsvg / svg-term-cli / termtosvg."},
+    {"name": "TermRecord", "reason": "Dead since 2017; outputs self-contained HTML, not GIF."},
+    {"name": "terminal-recorder", "reason": "Stale since 2020; HTML output, no GIF path."},
+    {"name": "tty-record", "reason": "Quiet; HTML (asciinema-player) output, no GIF path."},
+    {"name": "ovh-ttyrec", "reason": "Maintained but no headless GIF path (ttygif needs X11)."},
+    {"name": "script / scriptreplay", "reason": "typescript only; no practical headless GIF converter."},
+    {"name": "t-rec", "reason": "Screenshots a desktop window; fails on headless GHA (repo confirms)."},
+    {"name": "ttygif", "reason": "Converter needing ImageMagick + X11; fails headless."},
+    {"name": "termgif (pypi)", "reason": "1 star, unproven; no CI evidence."},
+    {"name": "asciinema-windows (Ruby)", "reason": "Niche (1 star); PowerSession-rs is the stronger Windows path."},
+    {"name": "freeze", "reason": "Static PNG/SVG, not animated GIF."},
+    {"name": "termshot", "reason": "Static PNG; no Windows asset."},
+    {"name": "termtosvg", "reason": "Read-only/archived since 2020; SVG only."},
+    {"name": "svg-term-cli", "reason": "Unmaintained since 2019; SVG only."},
+    {"name": "asciicast2gif", "reason": "Archived 2022 (PhantomJS); superseded by agg."},
+    {"name": "menyoki", "reason": "Linux X11/Wayland window capture; needs a display."},
+    {"name": "Peek", "reason": "GUI app, archived 2025; not headless."}
+  ]
+}

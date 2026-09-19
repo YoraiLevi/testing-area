@@ -1,0 +1,163 @@
+name: rec-vhs
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-vhs.yml'
+      - 'scenarios/vhs/**'
+      - 'scenarios/shared/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-vhs-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest,  cell_os: linux,   shell: bash }
+          - { os: ubuntu-latest,  cell_os: linux,   shell: zsh }
+          - { os: ubuntu-latest,  cell_os: linux,   shell: pwsh }
+          - { os: macos-latest,   cell_os: macos,   shell: zsh }
+          - { os: windows-latest, cell_os: windows, shell: pwsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install omp (unix)
+        if: runner.os != 'Windows'
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install omp (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scenarios/shared/install-omp.ps1
+
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Compose tapes
+        shell: bash
+        run: |
+          mkdir -p tapes out
+          for f in scenarios/vhs/0*.tape; do
+            s="$(basename "$f" .tape)"        # e.g. 01-launch-exit
+            scenario="${s#*-}"                # e.g. launch-exit
+            {
+              echo "Output out/${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}.gif"
+              echo "Set Shell \"${{ matrix.shell }}\""
+              cat "$f"
+            } > "tapes/${s}.tape"
+          done
+          ls -la tapes out
+
+      - name: Record launch-exit
+        uses: charmbracelet/vhs-action@v2
+        continue-on-error: true
+        with:
+          path: tapes/01-launch-exit.tape
+          version: v0.12.0
+          install-fonts: true
+
+      - name: Record help-tour
+        uses: charmbracelet/vhs-action@v2
+        continue-on-error: true
+        with:
+          path: tapes/02-help-tour.tape
+          version: v0.12.0
+
+      - name: Record tui-splash
+        uses: charmbracelet/vhs-action@v2
+        continue-on-error: true
+        with:
+          path: tapes/03-tui-splash.tape
+          version: v0.12.0
+
+      - name: Record typing-demo
+        uses: charmbracelet/vhs-action@v2
+        continue-on-error: true
+        with:
+          path: tapes/04-typing-demo.tape
+          version: v0.12.0
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          mkdir -p results/vhs assets/vhs
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            gif="out/${base}.gif"
+            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp "$gif" "assets/vhs/${base}.gif"
+              verdict=working; reason=""; gifpath="assets/vhs/${base}.gif"
+            else
+              verdict=broken; reason="no valid GIF produced in CI"; gifpath=""
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              '{tool:"vhs",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"v0.12.0",omp_version:$ompv}}' \
+              > "results/vhs/${base}.json"
+          done
+          echo "=== results ==="; cat results/vhs/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vhs-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/vhs/
+            results/vhs/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/vhs results/vhs
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/vhs/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/vhs/ \; || true
+          echo "=== assets/vhs ==="; ls -la assets/vhs || true
+          echo "=== results/vhs ==="; ls -la results/vhs || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(vhs): recordings + results"
