@@ -4,9 +4,9 @@
   "shell": "zsh",
   "scenario": "tui-splash",
   "verdict": "broken",
-  "reason": "foley launched the omp TUI (omp --no-session) and sent Ctrl+C, but no valid GIF was captured in CI",
+  "reason": "foley launched the omp TUI (omp --no-session) in realtime mode but no valid GIF was captured in CI; foley v0.1.0's vtengine cannot encode Ctrl+<letter> so no interactive quit could be sent",
   "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436632604",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436806818",
   "extra": {
     "tool_version": "foley v0.1.0",
     "omp_version": "omp/18.2.6"
