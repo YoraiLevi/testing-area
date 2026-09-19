@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/foley/linux-bash-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35440276588",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35444370151",
   "extra": {
     "tool_version": "foley v0.1.0",
     "omp_version": "omp/18.2.6"
