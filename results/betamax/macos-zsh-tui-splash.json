@@ -6,7 +6,7 @@
   "verdict": "broken",
   "reason": "Betamax launched the omp TUI but no valid GIF was captured before the watchdog ended the session",
   "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437247640",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437380248",
   "extra": {
     "tool_version": "betamax-v0.1.21",
     "omp_version": "omp/18.2.6"
