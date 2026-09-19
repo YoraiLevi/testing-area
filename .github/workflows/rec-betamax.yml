@@ -77,6 +77,14 @@ jobs:
             *)    shell_cmd="${{ matrix.shell }}" ;;
           esac
 
+          # GNU `timeout` is absent on macOS runners (it lives in coreutils as `gtimeout`),
+          # so pick whichever exists; fall back to no wrapper. Our tapes are time-bounded
+          # (fixed Sleeps + the tui-splash watchdog), and the step has its own timeout-minutes.
+          if command -v timeout >/dev/null 2>&1; then TIMEOUT="timeout 150"
+          elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT="gtimeout 150"
+          else TIMEOUT=""; fi
+          echo "timeout wrapper: ${TIMEOUT:-<none>}"
+
           for f in scenarios/betamax/0*.tape; do
             s="$(basename "$f" .tape)"          # e.g. 01-launch-exit
             scenario="${s#*-}"                  # e.g. launch-exit
@@ -98,11 +106,11 @@ jobs:
                 pkill -KILL -f 'omp --no-session' 2>/dev/null || true
               ) &
               watchdog=$!
-              timeout 150 betamax run "$tape" --output "$gif" \
+              $TIMEOUT betamax run "$tape" --output "$gif" \
                 || echo "  betamax exit=$? for ${scenario}"
               kill "$watchdog" 2>/dev/null || true
             else
-              timeout 150 betamax run "$tape" --output "$gif" \
+              $TIMEOUT betamax run "$tape" --output "$gif" \
                 || echo "  betamax exit=$? for ${scenario}"
             fi
             echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"
