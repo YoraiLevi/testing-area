@@ -26,9 +26,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-latest,  cell_os: linux,   shell: bash }
-          - { os: ubuntu-latest,  cell_os: linux,   shell: zsh }
-          - { os: ubuntu-latest,  cell_os: linux,   shell: pwsh }
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: bash }
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: zsh }
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: pwsh }
           - { os: macos-latest,   cell_os: macos,   shell: zsh }
           - { os: windows-latest, cell_os: windows, shell: pwsh }
     steps:
@@ -77,7 +77,7 @@ jobs:
         timeout-minutes: 8
         with:
           path: tapes/01-launch-exit.tape
-          version: v0.12.0
+          version: v0.11.0
           install-fonts: true
 
       - name: Render scenarios in workspace
@@ -124,7 +124,7 @@ jobs:
               --arg gif "$gifpath" \
               --arg run "$RUN_URL" \
               --arg ompv "$OMPV" \
-              '{tool:"vhs",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"v0.12.0",omp_version:$ompv}}' \
+              '{tool:"vhs",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"v0.11.0",omp_version:$ompv}}' \
               > "results/vhs/${base}.json"
           done
           echo "=== results ==="; cat results/vhs/*.json
