@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/termsvg/linux-bash-help-tour.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436959805",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437089250",
   "extra": {
     "tool_version": "v0.11.0",
     "omp_version": "omp/18.2.6"
