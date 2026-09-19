@@ -95,7 +95,7 @@ jobs:
           fi
           echo "RECORDER_OK=$RECORDER_OK"
 
-          SKIP_REASON="PowerSession v0.1.16 could not capture a recording headlessly on the windows-pwsh runner: its stdout thread mirrors captured output with WriteConsoleW, which fails on the runner's redirected (non-console) stdout, so no usable .cast/GIF is produced. See run logs."
+          SKIP_REASON="PowerSession v0.1.16 cannot record headlessly on the windows-pwsh runner: its stdout mirror thread calls WriteConsoleW on the runner's redirected (non-console) stdout, which fails with HRESULT 0x80070001 ('Incorrect function') and panics at record.rs:270 (cascading to terminal.rs:263 SendError). Only the asciicast header is written (cast has 0 output events), so no usable GIF is produced. See run logs."
 
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="windows-pwsh-${scenario}"
