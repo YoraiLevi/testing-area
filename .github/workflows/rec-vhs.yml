@@ -66,38 +66,30 @@ jobs:
           done
           ls -la tapes out
 
-      - name: Record launch-exit
+      # vhs-action installs vhs + ttyd + ffmpeg and adds them to PATH for later steps.
+      # The tape it runs here is a throwaway warmup (it renders in its own temp dir).
+      - name: Install VHS toolchain
         uses: charmbracelet/vhs-action@v2
         continue-on-error: true
-        timeout-minutes: 6
+        timeout-minutes: 8
         with:
           path: tapes/01-launch-exit.tape
           version: v0.12.0
           install-fonts: true
 
-      - name: Record help-tour
-        uses: charmbracelet/vhs-action@v2
-        continue-on-error: true
-        timeout-minutes: 6
-        with:
-          path: tapes/02-help-tour.tape
-          version: v0.12.0
-
-      - name: Record tui-splash
-        uses: charmbracelet/vhs-action@v2
-        continue-on-error: true
-        timeout-minutes: 6
-        with:
-          path: tapes/03-tui-splash.tape
-          version: v0.12.0
-
-      - name: Record typing-demo
-        uses: charmbracelet/vhs-action@v2
-        continue-on-error: true
-        timeout-minutes: 6
-        with:
-          path: tapes/04-typing-demo.tape
-          version: v0.12.0
+      - name: Render scenarios in workspace
+        if: always()
+        shell: bash
+        timeout-minutes: 20
+        run: |
+          echo "vhs: $(command -v vhs || echo MISSING)"; vhs --version 2>/dev/null || true
+          echo "ttyd: $(command -v ttyd || echo MISSING)"
+          echo "ffmpeg: $(command -v ffmpeg || echo MISSING)"
+          for f in tapes/*.tape; do
+            echo "== rendering $f =="
+            vhs "$f" || echo "vhs render failed for $f"
+          done
+          echo "=== out ==="; ls -la out || true
 
       - name: Evaluate and emit results
         if: always()
@@ -109,9 +101,9 @@ jobs:
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
-            gif="$(find . -type f -name "${base}.gif" 2>/dev/null | head -1)"
-            if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp "$gif" "assets/vhs/${base}.gif"
+            gif="out/${base}.gif"
+            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/vhs/${base}.gif"
               verdict=working; reason=""; gifpath="assets/vhs/${base}.gif"
             else
               verdict=broken; reason="no valid GIF produced in CI"; gifpath=""
