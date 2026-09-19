@@ -1,6 +1,22 @@
 name: report
 
 on:
+  # GITHUB_TOKEN commits (the collect jobs) do NOT fire `push`, so chain off the
+  # recorder workflows completing instead; that fires regardless of the committer.
+  workflow_run:
+    workflows:
+      - rec-vhs
+      - rec-console2svg
+      - rec-foley
+      - rec-betamax
+      - rec-evp
+      - rec-demotape
+      - rec-asciinema
+      - rec-powersession
+      - rec-terminalizer
+      - rec-acast
+      - rec-termsvg
+    types: [completed]
   push:
     branches: [testing-vhs]
     paths:
