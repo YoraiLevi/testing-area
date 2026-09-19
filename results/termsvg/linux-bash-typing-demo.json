@@ -6,7 +6,7 @@
   "verdict": "broken",
   "reason": "omp TUI could not be driven/quit headlessly via termsvg PTY capture; no valid GIF produced",
   "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436212614",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436227847",
   "extra": {
     "tool_version": "v0.11.0",
     "omp_version": "omp/18.2.6"
