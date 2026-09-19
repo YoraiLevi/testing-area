@@ -3,10 +3,10 @@
   "os": "windows",
   "shell": "pwsh",
   "scenario": "typing-demo",
-  "verdict": "skipped",
-  "reason": "vhs requires ttyd, which is unsupported on Windows CI runners",
+  "verdict": "not-applicable",
+  "reason": "VHS records via ttyd, which has no Windows build (Unix-only); the capture pipeline cannot run on Windows.",
   "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35440276580",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35444370193",
   "extra": {
     "tool_version": "v0.11.0",
     "omp_version": "omp/18.2.6"
