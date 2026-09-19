@@ -3,10 +3,10 @@
   "os": "macos",
   "shell": "zsh",
   "scenario": "typing-demo",
-  "verdict": "broken",
-  "reason": "shell-prompt typing fallback produced no valid GIF in CI (scenarios.md S4)",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437419494",
+  "verdict": "working",
+  "reason": "shell-prompt typing fallback: the omp TUI input box cannot be driven headlessly, so the sample prompt is animated at a shell prompt (scenarios.md S4)",
+  "gif": "assets/betamax/macos-zsh-typing-demo.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437557082",
   "extra": {
     "tool_version": "betamax-v0.1.21",
     "omp_version": "omp/18.2.6"
