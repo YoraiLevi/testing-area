@@ -3,12 +3,12 @@
   "os": "macos",
   "shell": "zsh",
   "scenario": "help-tour",
-  "verdict": "broken",
-  "reason": "no valid GIF produced in CI",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35433378272",
+  "verdict": "working",
+  "reason": "",
+  "gif": "assets/vhs/macos-zsh-help-tour.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35433856803",
   "extra": {
-    "tool_version": "v0.12.0",
+    "tool_version": "v0.11.0",
     "omp_version": "omp/18.2.6"
   }
 }
