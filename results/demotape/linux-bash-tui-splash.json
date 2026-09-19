@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "interactive omp TUI splash captured via the ttyd PTY; quit driven by Ctrl+C with a background SIGINT->SIGTERM->SIGKILL watchdog backstop",
   "gif": "assets/demotape/linux-bash-tui-splash.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35438136370",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35438572347",
   "extra": {
     "tool_version": "demotape gem 0.0.10",
     "omp_version": "omp/18.2.6"
