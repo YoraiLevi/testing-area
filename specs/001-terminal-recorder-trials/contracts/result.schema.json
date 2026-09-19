@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://testing-area/recorder-trials/result.schema.json",
+  "title": "Recorder Trial Result",
+  "description": "One tool x cell x scenario evaluation record. One file per record under results/<tool>/.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tool", "os", "shell", "scenario", "verdict"],
+  "properties": {
+    "tool": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "os": { "enum": ["linux", "macos", "windows"] },
+    "shell": { "enum": ["bash", "zsh", "pwsh"] },
+    "scenario": { "enum": ["launch-exit", "help-tour", "tui-splash", "typing-demo"] },
+    "verdict": { "enum": ["working", "broken", "not-applicable"] },
+    "reason": { "type": "string" },
+    "gif": { "type": ["string", "null"], "description": "repo-relative path under assets/ when working" },
+    "run_url": { "type": "string", "format": "uri" },
+    "extra": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "mp4": { "type": ["string", "null"] },
+        "svg": { "type": ["string", "null"] },
+        "tool_version": { "type": "string" },
+        "omp_version": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "verdict": { "const": "working" } } },
+      "then": { "required": ["gif", "run_url"], "properties": { "gif": { "type": "string", "minLength": 1 } } }
+    },
+    {
+      "if": { "properties": { "verdict": { "enum": ["broken", "not-applicable"] } } },
+      "then": { "required": ["reason"], "properties": { "reason": { "type": "string", "minLength": 1 } } }
+    }
+  ]
+}
