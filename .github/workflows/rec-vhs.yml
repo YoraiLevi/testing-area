@@ -103,6 +103,9 @@ jobs:
         shell: bash
         run: |
           set -u
+          # Start from a clean slate so this cell's artifact carries ONLY its own fresh
+          # files; the checkout brings stale committed results that must not ride along.
+          rm -rf results/vhs assets/vhs
           mkdir -p results/vhs assets/vhs
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
