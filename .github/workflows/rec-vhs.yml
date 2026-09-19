@@ -21,6 +21,7 @@ jobs:
   record:
     name: ${{ matrix.cell_os }}-${{ matrix.shell }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -68,6 +69,7 @@ jobs:
       - name: Record launch-exit
         uses: charmbracelet/vhs-action@v2
         continue-on-error: true
+        timeout-minutes: 6
         with:
           path: tapes/01-launch-exit.tape
           version: v0.12.0
@@ -76,6 +78,7 @@ jobs:
       - name: Record help-tour
         uses: charmbracelet/vhs-action@v2
         continue-on-error: true
+        timeout-minutes: 6
         with:
           path: tapes/02-help-tour.tape
           version: v0.12.0
@@ -83,6 +86,7 @@ jobs:
       - name: Record tui-splash
         uses: charmbracelet/vhs-action@v2
         continue-on-error: true
+        timeout-minutes: 6
         with:
           path: tapes/03-tui-splash.tape
           version: v0.12.0
@@ -90,6 +94,7 @@ jobs:
       - name: Record typing-demo
         uses: charmbracelet/vhs-action@v2
         continue-on-error: true
+        timeout-minutes: 6
         with:
           path: tapes/04-typing-demo.tape
           version: v0.12.0
@@ -104,8 +109,8 @@ jobs:
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
-            gif="out/${base}.gif"
-            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+            gif="$(find . -type f -name "${base}.gif" 2>/dev/null | head -1)"
+            if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
               cp "$gif" "assets/vhs/${base}.gif"
               verdict=working; reason=""; gifpath="assets/vhs/${base}.gif"
             else
