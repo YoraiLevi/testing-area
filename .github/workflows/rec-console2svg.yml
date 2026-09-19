@@ -1,0 +1,144 @@
+name: rec-console2svg
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-console2svg.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-console2svg-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: bash }
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: pwsh }
+          - { os: macos-latest,   cell_os: macos,   shell: zsh }
+          - { os: windows-latest, cell_os: windows, shell: pwsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install omp (unix)
+        if: runner.os != 'Windows'
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install omp (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scenarios/shared/install-omp.ps1
+
+      # Pins both the action code (@v0.9.3) and the installed binary (version input).
+      - name: Install console2svg
+        uses: arika0093/console2svg@v0.9.3
+        with:
+          version: '0.9.3'
+
+      # console2svg needs ffmpeg to normalize SVG -> GIF. The Windows release archive
+      # already bundles ffmpeg; Linux/macOS install it from the system package manager.
+      - name: Install ffmpeg (linux)
+        if: matrix.cell_os == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install ffmpeg (macos)
+        if: matrix.cell_os == 'macos'
+        run: brew list ffmpeg >/dev/null 2>&1 || brew install ffmpeg
+
+      - name: Render scenarios
+        if: always()
+        shell: bash
+        timeout-minutes: 20
+        run: bash scenarios/console2svg/render.sh "${{ matrix.cell_os }}" "${{ matrix.shell }}"
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          # Start clean so this cell's artifact carries ONLY its own fresh files; the
+          # checkout brings stale committed results that must not ride along.
+          rm -rf results/console2svg assets/console2svg
+          mkdir -p results/console2svg assets/console2svg
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            case "$scenario" in
+              tui-splash)  note="omp TUI captured headlessly via console2svg --timeout (splash/onboarding screen)";;
+              typing-demo) note="console2svg has no headless TUI input driver; sample prompt animated as a typed command line via -c (shell-prompt fallback per scenarios.md)";;
+              *)           note="";;
+            esac
+            gif="$(find out -type f -name "${base}.gif" 2>/dev/null | head -1)"
+            if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/console2svg/${base}.gif"
+              verdict=working; reason="$note"; gifpath="assets/console2svg/${base}.gif"
+            else
+              verdict=broken; reason="no valid GIF produced in CI${note:+; $note}"; gifpath=""
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              '{tool:"console2svg",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"v0.9.3",omp_version:$ompv}}' \
+              > "results/console2svg/${base}.json"
+          done
+          echo "=== results ==="; cat results/console2svg/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: console2svg-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/console2svg/
+            results/console2svg/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/console2svg results/console2svg
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/console2svg/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/console2svg/ \; || true
+          echo "=== assets/console2svg ==="; ls -la assets/console2svg || true
+          echo "=== results/console2svg ==="; ls -la results/console2svg || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(console2svg): recordings + results"
