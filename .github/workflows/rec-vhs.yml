@@ -85,14 +85,18 @@ jobs:
         shell: bash
         timeout-minutes: 20
         run: |
+          # setup-python exports LD_LIBRARY_PATH to its own lib dir, which breaks the
+          # shared libs vhs's headless capture + ffmpeg load; clear it for the render.
+          unset LD_LIBRARY_PATH
           echo "vhs: $(command -v vhs || echo MISSING)"; vhs --version 2>/dev/null || true
           echo "ttyd: $(command -v ttyd || echo MISSING)"
           echo "ffmpeg: $(command -v ffmpeg || echo MISSING)"
           for f in tapes/*.tape; do
             echo "== rendering $f =="
-            vhs "$f" || echo "vhs render failed for $f"
+            vhs "$f"; echo "  exit=$? for $f"
           done
-          echo "=== out ==="; ls -la out || true
+          echo "=== find gifs (path size) ==="; find . -type f -name '*.gif' -printf '%p %s\n' 2>/dev/null || find . -type f -name '*.gif'
+          echo "=== out ==="; ls -la out || true; echo "=== tapes/out ==="; ls -la tapes/out || true
 
       - name: Evaluate and emit results
         if: always()
