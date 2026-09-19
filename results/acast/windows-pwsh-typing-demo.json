@@ -3,10 +3,10 @@
   "os": "windows",
   "shell": "pwsh",
   "scenario": "typing-demo",
-  "verdict": "broken",
-  "reason": "acast (v0.4.0) + agg (v1.9.0) produced no valid GIF for this cell in CI; see run logs",
+  "verdict": "skipped",
+  "reason": "acast v0.4.0 record panics on the headless windows-pwsh runner (nil pointer dereference at asciicast/recorder.go:28 -- ConPTY has no attached interactive console to size); the binary itself runs (acast version and agg --version succeed). See run logs.",
   "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436464924",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436524435",
   "extra": {
     "tool_version": "v0.4.0 (agg v1.9.0)",
     "omp_version": "omp/18.2.6"
