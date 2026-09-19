@@ -1,0 +1,206 @@
+name: rec-demotape
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-demotape.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-demotape-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04, cell_os: linux, shell: bash }
+          - { os: macos-latest, cell_os: macos, shell: zsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Install omp
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      # Demo Tape records by driving a ttyd-served terminal in a headless Chrome
+      # (Capybara/selenium) and encodes frames with ffmpeg. ttyd + ffmpeg are hard
+      # dependencies; Chrome is preinstalled on GitHub runners and located by
+      # Selenium Manager, which also fetches the matching chromedriver.
+      - name: Install ttyd + ffmpeg (linux)
+        if: runner.os == 'Linux'
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          if ! command -v ttyd >/dev/null 2>&1; then
+            sudo curl -fsSL -o /usr/local/bin/ttyd \
+              https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64
+            sudo chmod +x /usr/local/bin/ttyd
+          fi
+          ttyd --version
+          ffmpeg -version | head -1
+          (google-chrome --version || google-chrome-stable --version) 2>/dev/null \
+            || echo "chrome: using preinstalled runner browser"
+
+      - name: Install ttyd + ffmpeg (macos)
+        if: runner.os == 'macOS'
+        run: |
+          brew install ttyd ffmpeg
+          ttyd --version
+          ffmpeg -version | head -1
+
+      - name: Install Demo Tape (pinned gem 0.0.10)
+        run: |
+          gem install demotape -v 0.0.10
+          gem list demotape
+          demotape help run | head -5 || true
+
+      - name: Render scenarios
+        shell: bash
+        timeout-minutes: 20
+        run: |
+          # setup-python exports LD_LIBRARY_PATH to its own lib dir, which breaks the
+          # shared libs ttyd/ffmpeg/Chrome load; clear it for the render.
+          unset LD_LIBRARY_PATH
+          set -u
+          mkdir -p out
+          echo "ruby=$(ruby -v)"
+          echo "demotape=$(gem list demotape 2>/dev/null | tr -d '\n')"
+          echo "ttyd=$(command -v ttyd)  ffmpeg=$(command -v ffmpeg)"
+
+          # Run one tape with a background SIGINT -> SIGTERM -> SIGKILL watchdog so a
+          # TUI that cannot be quit by keystroke headlessly can never wedge the job.
+          # Demo Tape also self-bounds via its --timeout; the watchdog is the backstop.
+          render() {   # $1=tape  $2=out  $3=demotape-timeout(s)
+            local tape="$1" out="$2" t="$3"
+            echo "== rendering $(basename "$tape") -> $out (timeout ${t}s) =="
+            demotape run "$tape" \
+              --overwrite \
+              --shell "${{ matrix.shell }}" \
+              --output-path "$out" \
+              --width 1200 --height 640 --font-size 20 \
+              --typing-speed 60ms \
+              --timeout "$t" \
+              --debug &
+            local pid=$!
+            ( sleep $((t + 20)); kill -INT  "$pid" 2>/dev/null
+              sleep 8;           kill -TERM "$pid" 2>/dev/null
+              sleep 8;           kill -KILL "$pid" 2>/dev/null ) &
+            local wd=$!
+            wait "$pid"; local rc=$?
+            kill "$wd" 2>/dev/null || true
+            wait "$wd" 2>/dev/null || true
+            echo "  demotape exit=$rc  gif=$(ls -la "$out" 2>/dev/null || echo MISSING)"
+          }
+
+          C="${{ matrix.cell_os }}-${{ matrix.shell }}"
+          render scenarios/demotape/01-launch-exit.tape "out/${C}-launch-exit.gif" 60
+          render scenarios/demotape/02-help-tour.tape   "out/${C}-help-tour.gif"   60
+          render scenarios/demotape/03-tui-splash.tape  "out/${C}-tui-splash.gif"  60
+          render scenarios/demotape/04-typing-demo.tape "out/${C}-typing-demo.gif" 45
+          echo "=== out ==="; ls -la out || true
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          # Start from a clean slate so this cell's artifact carries ONLY its own
+          # fresh files; the checkout brings stale committed results/assets that must
+          # not ride along and poison verdicts.
+          rm -rf results/demotape assets/demotape
+          mkdir -p results/demotape assets/demotape
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            gif="out/${base}.gif"
+            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/demotape/${base}.gif"
+              verdict=working; gifpath="assets/demotape/${base}.gif"
+              case "$scenario" in
+                typing-demo) reason="shell-prompt typing fallback: the sample prompt is typed at the shell prompt (not sent) because omp's TUI input box is not reliably drivable headlessly (scenarios.md S4)";;
+                tui-splash)  reason="interactive omp TUI splash captured via the ttyd PTY; quit driven by Ctrl+C with a background SIGINT->SIGTERM->SIGKILL watchdog backstop";;
+                *) reason="";;
+              esac
+            else
+              verdict=broken; gifpath=""
+              case "$scenario" in
+                tui-splash)  reason="omp TUI did not render/quit cleanly under headless ttyd capture; no valid GIF produced in CI";;
+                typing-demo) reason="shell-prompt typing fallback produced no valid GIF in CI";;
+                *) reason="no valid GIF produced in CI";;
+              esac
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              '{tool:"demotape",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"demotape gem 0.0.10",omp_version:$ompv}}' \
+              > "results/demotape/${base}.json"
+          done
+          echo "=== results ==="; cat results/demotape/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demotape-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/demotape/
+            results/demotape/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/demotape results/demotape
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/demotape/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/demotape/ \; || true
+          echo "=== assets/demotape ==="; ls -la assets/demotape || true
+          echo "=== results/demotape ==="; ls -la results/demotape || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(demotape): recordings + results"
