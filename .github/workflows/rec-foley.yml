@@ -78,7 +78,14 @@ jobs:
               tui-splash|typing-demo) mode=realtime ;;
             esac
             echo "== rendering ${scenario} (mode=${mode}) =="
-            foley -mode "$mode" "tapes/${s}.tape"; echo "  exit=$? for ${scenario}"
+            # GHA runs this step under `bash -e`; keep one scenario's non-zero foley exit
+            # from aborting the loop so every scenario is attempted and Evaluate can gate
+            # each GIF independently.
+            if foley -mode "$mode" "tapes/${s}.tape"; then
+              echo "  foley ok for ${scenario}"
+            else
+              echo "  foley failed (exit $?) for ${scenario}"
+            fi
             echo "  gif: $(ls -la "$out" 2>/dev/null || echo MISSING)"
           done
           echo "=== out ==="; ls -la out || true
@@ -104,15 +111,15 @@ jobs:
               cp -f "$gif" "assets/foley/${base}.gif"
               verdict=working; gifpath="assets/foley/${base}.gif"
               case "$scenario" in
-                tui-splash)  reason="foley drives the omp TUI on a real pty: launch omp --no-session, hold the splash, then Ctrl+C to quit (realtime mode)" ;;
-                typing-demo) reason="foley types the sample prompt straight into the omp TUI input box without sending it, then Ctrl+C to quit (realtime mode; no shell-prompt fallback needed)" ;;
+                tui-splash)  reason="foley launches and holds the omp TUI (omp --no-session) on a real pty in realtime mode, capturing the splash/onboarding screen; foley finalizes the take at tape end (foley v0.1.0's vtengine cannot encode Ctrl+<letter>, so no interactive Ctrl+C quit is sent)" ;;
+                typing-demo) reason="foley types the sample prompt straight into the omp TUI input box without sending it (no shell-prompt fallback needed), in realtime mode; foley finalizes the take at tape end (foley v0.1.0's vtengine cannot encode Ctrl+<letter>, so no Ctrl+C quit is sent)" ;;
                 *) reason="" ;;
               esac
             else
               verdict=broken; gifpath=""
               case "$scenario" in
-                tui-splash)  reason="foley launched the omp TUI (omp --no-session) and sent Ctrl+C, but no valid GIF was captured in CI" ;;
-                typing-demo) reason="foley typed the sample prompt into the omp TUI and sent Ctrl+C, but no valid GIF was captured in CI" ;;
+                tui-splash)  reason="foley launched the omp TUI (omp --no-session) in realtime mode but no valid GIF was captured in CI; foley v0.1.0's vtengine cannot encode Ctrl+<letter> so no interactive quit could be sent" ;;
+                typing-demo) reason="foley typed the sample prompt into the omp TUI in realtime mode but no valid GIF was captured in CI; foley v0.1.0's vtengine cannot encode Ctrl+<letter> so no interactive quit could be sent" ;;
                 *) reason="no valid GIF produced in CI" ;;
               esac
             fi

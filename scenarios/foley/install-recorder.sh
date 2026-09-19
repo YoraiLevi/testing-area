@@ -40,14 +40,33 @@ sudo chmod +x "${BIN_DIR}/foley"
 foley --version
 echo "::endgroup::"
 
-# ffmpeg is foley's only runtime dependency; GHA runner images do not always ship it.
-if ! command -v ffmpeg >/dev/null 2>&1; then
-  echo "::group::install ffmpeg"
+# ffmpeg is foley's only runtime dependency, and foley requires ffmpeg >= 6. macOS brew
+# ships a current ffmpeg, but ubuntu's apt tops out at 4.x (foley rejects it: "ffmpeg 4 < 6"),
+# so on Linux install a static ffmpeg 7.x from BtbN's GitHub builds into /usr/local/bin
+# (ahead of /usr/bin on PATH). Only (re)install when the present ffmpeg is older than 6.
+ffmpeg_major() {
+  command -v ffmpeg >/dev/null 2>&1 || { echo 0; return; }
+  ffmpeg -version 2>/dev/null | head -1 | grep -oE 'version n?[0-9]+' | head -1 | grep -oE '[0-9]+' || echo 0
+}
+
+if [ "$(ffmpeg_major)" -lt 6 ]; then
+  echo "::group::install ffmpeg (>= 6, foley requirement)"
   if [ "$os" = "darwin" ]; then
     brew install ffmpeg
   else
-    sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+    case "$arch" in
+      amd64) ff_arch="linux64" ;;
+      arm64) ff_arch="linuxarm64" ;;
+    esac
+    ff_url="https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-${ff_arch}-gpl.tar.xz"
+    ff_tmp="$(mktemp -d)"
+    curl -fsSL "$ff_url" -o "${ff_tmp}/ffmpeg.tar.xz"
+    tar xJf "${ff_tmp}/ffmpeg.tar.xz" -C "${ff_tmp}"
+    ff_bin="$(find "${ff_tmp}" -maxdepth 2 -type f -name ffmpeg | head -1)"
+    sudo cp -f "$(dirname "$ff_bin")/ffmpeg" "$(dirname "$ff_bin")/ffprobe" "${BIN_DIR}/"
+    sudo chmod +x "${BIN_DIR}/ffmpeg" "${BIN_DIR}/ffprobe"
   fi
+  echo "ffmpeg -> $(command -v ffmpeg): $(ffmpeg -version 2>/dev/null | head -1)"
   echo "::endgroup::"
 fi
 
