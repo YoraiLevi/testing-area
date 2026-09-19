@@ -1,0 +1,169 @@
+name: rec-foley
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-foley.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-foley-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04, cell_os: linux, shell: bash }
+          - { os: ubuntu-22.04, cell_os: linux, shell: zsh }
+          - { os: macos-latest, cell_os: macos, shell: zsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install omp
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Install foley + ffmpeg (pinned)
+        run: bash scenarios/foley/install-recorder.sh
+
+      - name: Render scenarios
+        shell: bash
+        timeout-minutes: 20
+        run: |
+          # setup-python exports LD_LIBRARY_PATH to its own lib dir, which can break the
+          # shared libs native binaries load; clear it for the render. (foley's linux
+          # binary is static, but ffmpeg is not — keep it clean.)
+          unset LD_LIBRARY_PATH
+          set -u
+          mkdir -p tapes out
+          CELL="${{ matrix.cell_os }}-${{ matrix.shell }}"
+          echo "foley=$(command -v foley) -> $(foley --version 2>/dev/null | head -1)"
+          echo "ffmpeg=$(command -v ffmpeg || echo MISSING)"
+          echo "shell=$(command -v ${{ matrix.shell }})"
+          for f in scenarios/foley/0*.tape; do
+            s="$(basename "$f" .tape)"        # e.g. 01-launch-exit
+            scenario="${s#*-}"                # e.g. launch-exit
+            out="out/${CELL}-${scenario}.gif"
+            # foley resolves Output against its own working directory, so the GIF lands
+            # in ./out directly. Inject the per-cell Output + Shell header, then the body.
+            {
+              echo "Output ${out}"
+              echo "Set Shell \"${{ matrix.shell }}\""
+              cat "$f"
+            } > "tapes/${s}.tape"
+            # Deterministic (virtual clock, byte-identical) for the CLI scenarios; realtime
+            # for the two TUI scenarios, whose continuously drawing interface can record
+            # blank under the virtual clock (foley.md "Two clocks").
+            mode=deterministic
+            case "$scenario" in
+              tui-splash|typing-demo) mode=realtime ;;
+            esac
+            echo "== rendering ${scenario} (mode=${mode}) =="
+            foley -mode "$mode" "tapes/${s}.tape"; echo "  exit=$? for ${scenario}"
+            echo "  gif: $(ls -la "$out" 2>/dev/null || echo MISSING)"
+          done
+          echo "=== out ==="; ls -la out || true
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          unset LD_LIBRARY_PATH
+          set -u
+          # Start from a clean slate so this cell's artifact carries ONLY its own fresh
+          # files; the checkout brings stale committed results that must not ride along.
+          rm -rf results/foley assets/foley
+          mkdir -p results/foley assets/foley
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          FOLEYV="$(foley --version 2>/dev/null | head -1 || echo v0.1.0)"
+          CELL="${{ matrix.cell_os }}-${{ matrix.shell }}"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${CELL}-${scenario}"
+            gif="out/${base}.gif"
+            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/foley/${base}.gif"
+              verdict=working; gifpath="assets/foley/${base}.gif"
+              case "$scenario" in
+                tui-splash)  reason="foley drives the omp TUI on a real pty: launch omp --no-session, hold the splash, then Ctrl+C to quit (realtime mode)" ;;
+                typing-demo) reason="foley types the sample prompt straight into the omp TUI input box without sending it, then Ctrl+C to quit (realtime mode; no shell-prompt fallback needed)" ;;
+                *) reason="" ;;
+              esac
+            else
+              verdict=broken; gifpath=""
+              case "$scenario" in
+                tui-splash)  reason="foley launched the omp TUI (omp --no-session) and sent Ctrl+C, but no valid GIF was captured in CI" ;;
+                typing-demo) reason="foley typed the sample prompt into the omp TUI and sent Ctrl+C, but no valid GIF was captured in CI" ;;
+                *) reason="no valid GIF produced in CI" ;;
+              esac
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg toolv "$FOLEYV" \
+              --arg ompv "$OMPV" \
+              '{tool:"foley",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:$toolv,omp_version:$ompv}}' \
+              > "results/foley/${base}.json"
+          done
+          echo "=== results ==="; cat results/foley/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: foley-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/foley/
+            results/foley/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/foley results/foley
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/foley/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/foley/ \; || true
+          echo "=== assets/foley ==="; ls -la assets/foley || true
+          echo "=== results/foley ==="; ls -la results/foley || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(foley): recordings + results"
