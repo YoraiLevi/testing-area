@@ -6,7 +6,7 @@
   "verdict": "skipped",
   "reason": "PowerSession v0.1.16 cannot record headlessly on the windows-pwsh runner: its stdout mirror thread calls WriteConsoleW on the runner's redirected (non-console) stdout, which fails with HRESULT 0x80070001 ('Incorrect function') and panics at record.rs:270 (cascading to terminal.rs:263 SendError). Only the asciicast header is written (cast has 0 output events), so no usable GIF is produced. See run logs.",
   "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35438572361",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35439744382",
   "extra": {
     "tool_version": "v0.1.16 (agg v1.9.0)",
     "omp_version": "omp/18.2.6"
