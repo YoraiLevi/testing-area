@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "omp TUI splash captured; quit forced via SIGINT->SIGTERM->SIGKILL watchdog (acast cannot quit the TUI by keystroke headlessly)",
   "gif": "assets/acast/linux-bash-tui-splash.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35438136385",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35438572333",
   "extra": {
     "tool_version": "v0.4.0 (agg v1.9.0)",
     "omp_version": "omp/18.2.6"
