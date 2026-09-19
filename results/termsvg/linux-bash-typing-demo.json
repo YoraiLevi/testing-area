@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "omp TUI input not reachable headlessly; per scenarios.md S4, sample prompt typed at the shell prompt (keystroke-animation fallback)",
   "gif": "assets/termsvg/linux-bash-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35439744402",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35440276712",
   "extra": {
     "tool_version": "v0.11.0",
     "omp_version": "omp/18.2.6"
