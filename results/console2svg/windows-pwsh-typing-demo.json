@@ -3,10 +3,10 @@
   "os": "windows",
   "shell": "pwsh",
   "scenario": "typing-demo",
-  "verdict": "broken",
-  "reason": "no valid GIF produced in CI; console2svg has no headless TUI input driver; sample prompt animated as a typed command line via -c (shell-prompt fallback per scenarios.md)",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435838229",
+  "verdict": "working",
+  "reason": "console2svg has no headless TUI input driver; sample prompt animated as a typed command line via -c (shell-prompt fallback per scenarios.md)",
+  "gif": "assets/console2svg/windows-pwsh-typing-demo.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436016253",
   "extra": {
     "tool_version": "v0.9.3",
     "omp_version": "omp/18.2.6"

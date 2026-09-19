@@ -3,10 +3,10 @@
   "os": "windows",
   "shell": "pwsh",
   "scenario": "tui-splash",
-  "verdict": "broken",
-  "reason": "no valid GIF produced in CI; omp TUI captured headlessly via console2svg --timeout (splash/onboarding screen)",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435838229",
+  "verdict": "working",
+  "reason": "omp TUI captured headlessly via console2svg --timeout (splash/onboarding screen)",
+  "gif": "assets/console2svg/windows-pwsh-tui-splash.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436016253",
   "extra": {
     "tool_version": "v0.9.3",
     "omp_version": "omp/18.2.6"
