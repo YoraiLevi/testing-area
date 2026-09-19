@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/acast/macos-zsh-help-tour.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436959812",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35437089258",
   "extra": {
     "tool_version": "v0.4.0 (agg v1.9.0)",
     "omp_version": "omp/18.2.6"
