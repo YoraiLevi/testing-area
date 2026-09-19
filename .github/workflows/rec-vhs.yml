@@ -55,16 +55,19 @@ jobs:
         shell: bash
         run: |
           mkdir -p tapes out
+          # VHS resolves Output relative to the tape's own directory, so bake an ABSOLUTE
+          # workspace path (native form on Windows via `pwd -W`) to land GIFs in ./out.
+          WS="$(pwd -W 2>/dev/null || pwd)"
           for f in scenarios/vhs/0*.tape; do
             s="$(basename "$f" .tape)"        # e.g. 01-launch-exit
             scenario="${s#*-}"                # e.g. launch-exit
             {
-              echo "Output out/${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}.gif"
+              echo "Output ${WS}/out/${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}.gif"
               echo "Set Shell \"${{ matrix.shell }}\""
               cat "$f"
             } > "tapes/${s}.tape"
           done
-          ls -la tapes out
+          echo "=== composed launch-exit tape ==="; cat tapes/01-launch-exit.tape
 
       # vhs-action installs vhs + ttyd + ffmpeg and adds them to PATH for later steps.
       # The tape it runs here is a throwaway warmup (it renders in its own temp dir).
@@ -101,8 +104,8 @@ jobs:
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
-            gif="out/${base}.gif"
-            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+            gif="$(find . -type f -name "${base}.gif" 2>/dev/null | head -1)"
+            if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
               cp -f "$gif" "assets/vhs/${base}.gif"
               verdict=working; reason=""; gifpath="assets/vhs/${base}.gif"
             else
