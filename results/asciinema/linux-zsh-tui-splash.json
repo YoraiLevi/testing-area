@@ -3,10 +3,10 @@
   "os": "linux",
   "shell": "zsh",
   "scenario": "tui-splash",
-  "verdict": "broken",
-  "reason": "asciinema rec -c runs a single command to completion and cannot send an interactive quit to the omp TUI headlessly; no valid GIF captured",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435838254",
+  "verdict": "working",
+  "reason": "",
+  "gif": "assets/asciinema/linux-zsh-tui-splash.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435949331",
   "extra": {
     "tool_version": "v3.2.1 + agg v1.9.0",
     "omp_version": "omp/18.2.6"

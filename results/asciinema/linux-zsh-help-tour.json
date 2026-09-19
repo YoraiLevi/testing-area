@@ -3,10 +3,10 @@
   "os": "linux",
   "shell": "zsh",
   "scenario": "help-tour",
-  "verdict": "broken",
-  "reason": "no valid GIF produced in CI",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435838254",
+  "verdict": "working",
+  "reason": "",
+  "gif": "assets/asciinema/linux-zsh-help-tour.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35435949331",
   "extra": {
     "tool_version": "v3.2.1 + agg v1.9.0",
     "omp_version": "omp/18.2.6"
