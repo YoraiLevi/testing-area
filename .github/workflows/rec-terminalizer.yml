@@ -1,0 +1,192 @@
+name: rec-terminalizer
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-terminalizer.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-terminalizer-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # tools.json declares terminalizer for the linux-bash cell ONLY.
+          - { os: ubuntu-22.04, cell_os: linux, shell: bash }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install omp
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install Xvfb + Electron/Chromium system libs + fonts
+        run: |
+          sudo apt-get update
+          # terminalizer's `render` runs headless Electron (Chromium); it needs a virtual
+          # display (xvfb) plus Chromium's shared libraries, and real monospace fonts so
+          # the offscreen render has a font to draw with.
+          sudo apt-get install -y \
+            xvfb \
+            fonts-dejavu-core fonts-liberation \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+            libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+            libgbm1 libgtk-3-0 libasound2 libxshmfence1 libx11-xcb1 libxss1 \
+            libgl1 libgl1-mesa-dri
+
+      - name: Install terminalizer (latest npm)
+        run: |
+          npm install -g terminalizer
+          echo "terminalizer: $(command -v terminalizer)"
+          terminalizer --version || true
+          # Electron's Chromium sandbox helper must be root-owned + SUID or the headless
+          # render aborts on GitHub runners (non-root `runner` user). Fix it in place.
+          CHROME_SANDBOX="$(npm root -g)/terminalizer/node_modules/electron/dist/chrome-sandbox"
+          if [ -f "$CHROME_SANDBOX" ]; then
+            sudo chown root:root "$CHROME_SANDBOX"
+            sudo chmod 4755 "$CHROME_SANDBOX"
+            echo "chrome-sandbox fixed: $CHROME_SANDBOX"
+          else
+            echo "WARNING: chrome-sandbox not found at $CHROME_SANDBOX"
+          fi
+
+      - name: Record and render scenarios
+        shell: bash
+        timeout-minutes: 20
+        env:
+          TERM: xterm-256color
+        run: |
+          # setup-python exports LD_LIBRARY_PATH to its own lib dir, which breaks the
+          # shared libs Electron/Chromium load; clear it for record + render.
+          unset LD_LIBRARY_PATH
+          set -u
+          mkdir -p out rec
+          CFG="scenarios/terminalizer/config.yml"
+          echo "terminalizer: $(command -v terminalizer || echo MISSING) -> $(terminalizer --version 2>/dev/null || echo unknown)"
+          echo "omp: $(command -v omp || echo MISSING)"; omp --version || true
+          for f in scenarios/terminalizer/0*.sh; do
+            s="$(basename "$f" .sh)"          # e.g. 01-launch-exit
+            scenario="${s#*-}"                # e.g. launch-exit
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            rec="rec/${base}.yml"
+            gif="out/${base}.gif"
+            echo "::group::record ${scenario}"
+            # `terminalizer record` requires a real TTY on stdin (it calls
+            # stdin.setRawMode); `script` allocates a pty so it works headlessly. The
+            # -d command runs the scenario script to completion inside terminalizer's
+            # node-pty, and that exit ends the recording. -k skips the sharing prompt.
+            timeout 200 script -qec "terminalizer record 'rec/${base}' -c '${CFG}' -d 'bash ${f}' -k" /dev/null \
+              || echo "  record exit=$? for ${scenario}"
+            echo "  rec: $(ls -la "$rec" 2>/dev/null || echo MISSING)"
+            if [ -s "$rec" ]; then
+              echo "-- rendering ${scenario} (xvfb + headless Electron) --"
+              timeout 300 xvfb-run -a --server-args='-screen 0 1920x1200x24' \
+                terminalizer render "$rec" -o "$gif" -q 50 \
+                || echo "  render exit=$? for ${scenario}"
+            else
+              echo "  no recording produced for ${scenario}; skipping render"
+            fi
+            echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"
+            echo "::endgroup::"
+          done
+          echo "=== out ==="; ls -la out || true
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          # Stale-result poisoning bit VHS: start from a clean slate so this cell's
+          # artifact carries ONLY its own fresh files (the checkout brings committed
+          # results/assets that must not ride along).
+          rm -rf results/terminalizer assets/terminalizer
+          mkdir -p results/terminalizer assets/terminalizer
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          TOOLV="latest (npm $(terminalizer --version 2>/dev/null | head -1 || echo unknown))"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            gif="out/${base}.gif"
+            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/terminalizer/${base}.gif"
+              verdict=working; gifpath="assets/terminalizer/${base}.gif"
+              case "$scenario" in
+                typing-demo) reason="shell-prompt typing fallback: terminalizer records a command to completion and cannot inject keystrokes into the omp TUI input box headlessly (scenarios.md S4)";;
+                *) reason="";;
+              esac
+            else
+              verdict=broken; gifpath=""
+              case "$scenario" in
+                tui-splash) reason="terminalizer record runs a command to completion and cannot send an interactive quit to the omp TUI headlessly; a SIGINT->SIGTERM->SIGKILL watchdog ends the session but no valid GIF was captured";;
+                typing-demo) reason="shell-prompt typing fallback produced no valid GIF in CI";;
+                *) reason="no valid GIF produced in CI";;
+              esac
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              --arg toolv "$TOOLV" \
+              '{tool:"terminalizer",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:$toolv,omp_version:$ompv}}' \
+              > "results/terminalizer/${base}.json"
+          done
+          echo "=== results ==="; cat results/terminalizer/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terminalizer-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/terminalizer/
+            results/terminalizer/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/terminalizer results/terminalizer
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/terminalizer/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/terminalizer/ \; || true
+          echo "=== assets/terminalizer ==="; ls -la assets/terminalizer || true
+          echo "=== results/terminalizer ==="; ls -la results/terminalizer || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(terminalizer): recordings + results"
