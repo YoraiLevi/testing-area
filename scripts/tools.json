@@ -26,7 +26,8 @@
         "macos-zsh",
         "windows-pwsh"
       ],
-      "url": "https://github.com/charmbracelet/vhs"
+      "url": "https://github.com/charmbracelet/vhs",
+      "unsupported": {}
     },
     {
       "id": "console2svg",
@@ -46,7 +47,8 @@
         "macos-zsh",
         "windows-pwsh"
       ],
-      "url": "https://github.com/arika0093/console2svg"
+      "url": "https://github.com/arika0093/console2svg",
+      "unsupported": {}
     },
     {
       "id": "foley",
@@ -65,7 +67,10 @@
         "linux-zsh",
         "macos-zsh"
       ],
-      "url": "https://github.com/GH-Jaider/foley"
+      "url": "https://github.com/GH-Jaider/foley",
+      "unsupported": {
+        "windows-pwsh": "Foley builds on libghostty-vt, which has no Windows native build (Unix-only)."
+      }
     },
     {
       "id": "betamax",
@@ -85,7 +90,10 @@
         "linux-zsh",
         "macos-zsh"
       ],
-      "url": "https://github.com/joshka/betamax"
+      "url": "https://github.com/joshka/betamax",
+      "unsupported": {
+        "windows-pwsh": "Betamax builds on libghostty-vt-sys, which has no Windows native build (unsupported upstream)."
+      }
     },
     {
       "id": "evp",
@@ -101,7 +109,10 @@
       "cells": [
         "linux-bash"
       ],
-      "url": "https://github.com/HalFrgrd/evp"
+      "url": "https://github.com/HalFrgrd/evp",
+      "unsupported": {
+        "windows-pwsh": "EVP ships Linux and macOS binaries only; there is no Windows build."
+      }
     },
     {
       "id": "demotape",
@@ -119,7 +130,10 @@
         "linux-bash",
         "macos-zsh"
       ],
-      "url": "https://github.com/fnando/demotape"
+      "url": "https://github.com/fnando/demotape",
+      "unsupported": {
+        "windows-pwsh": "Demo Tape captures through ttyd, which is Unix-only; there is no Windows recording path."
+      }
     },
     {
       "id": "asciinema",
@@ -136,7 +150,10 @@
         "linux-zsh",
         "macos-zsh"
       ],
-      "url": "https://github.com/asciinema/asciinema"
+      "url": "https://github.com/asciinema/asciinema",
+      "unsupported": {
+        "windows-pwsh": "The asciinema CLI is Unix-only; Windows capture is out of scope (PowerSession-rs is the Windows-native alternative)."
+      }
     },
     {
       "id": "powersession",
@@ -151,7 +168,13 @@
       "cells": [
         "windows-pwsh"
       ],
-      "url": "https://github.com/Watfaq/PowerSession-rs"
+      "url": "https://github.com/Watfaq/PowerSession-rs",
+      "unsupported": {
+        "linux-bash": "PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.",
+        "linux-pwsh": "PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.",
+        "linux-zsh": "PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.",
+        "macos-zsh": "PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix."
+      }
     },
     {
       "id": "terminalizer",
@@ -166,7 +189,8 @@
       "cells": [
         "linux-bash"
       ],
-      "url": "https://github.com/faressoft/terminalizer"
+      "url": "https://github.com/faressoft/terminalizer",
+      "unsupported": {}
     },
     {
       "id": "acast",
@@ -184,7 +208,8 @@
         "macos-zsh",
         "windows-pwsh"
       ],
-      "url": "https://github.com/gvcgo/asciinema"
+      "url": "https://github.com/gvcgo/asciinema",
+      "unsupported": {}
     },
     {
       "id": "termsvg",
@@ -201,7 +226,8 @@
         "linux-bash",
         "macos-zsh"
       ],
-      "url": "https://github.com/mrmarble/termsvg"
+      "url": "https://github.com/mrmarble/termsvg",
+      "unsupported": {}
     }
   ],
   "skipped": [

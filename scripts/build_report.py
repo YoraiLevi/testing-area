@@ -82,33 +82,44 @@ def grid(tools: dict, idx: dict, footnotes: dict) -> str:
     sep = "|------|--------|" + "|".join([":--:"] * len(cells)) + "|"
     rows = [header, sep]
     for t in tools["tools"]:
+        unsupported = t.get("unsupported", {})
         row = [f"[{t['name']}][{t['id']}]", t["family"]]
         for c in cells:
             rec = idx.get((t["id"], c, headline))
             if rec is None:
-                # A cell the tool never declared is not-applicable, not merely un-run.
-                row.append("➖" if c not in t["cells"] else VERDICT_GLYPH[None])
+                # No CI run for this cell: genuinely unsupported upstream vs. simply
+                # outside the sampled matrix are distinct, honest states.
+                if c in unsupported:
+                    fid = f"na-{t['id']}-{c}"
+                    footnotes[fid] = f"**{t['name']} — `{c}`:** {unsupported[c]}"
+                    row.append(f"➖[^{fid}]")
+                else:
+                    row.append("⬜")
                 continue
             verdict = rec.get("verdict")
             glyph = VERDICT_GLYPH.get(verdict, "⬜")
             run = rec.get("run_url")
             cell_md = f"[{glyph}]({run})" if run else glyph
-            # A cell the tool was actually exercised on but could not produce a GIF
-            # carries its own footnote with the exact CI reason.
-            if verdict in ("skipped", "not-applicable") and rec.get("reason"):
-                fid = f"na-{t['id']}-{c}"
+            # Any cell that ran in CI and did not succeed (a hard failure, or a
+            # genuine platform limitation) carries its own footnote with the reason.
+            if verdict in ("broken", "skipped", "not-applicable") and rec.get("reason"):
+                fid = f"cell-{t['id']}-{c}"
                 footnotes[fid] = f"**{t['name']} — `{c}`:** {rec['reason']}"
                 cell_md += f"[^{fid}]"
             row.append(cell_md)
         rows.append("| " + " | ".join(row) + " |")
     footnotes["na"] = (
-        "**Not applicable (➖).** Either the recorder does not target that OS/shell combination, so"
-        " no cell was declared for it (for example EVP and Terminalizer are Linux-only, and Demo"
-        " Tape, termsvg, Foley, and Betamax publish no Windows build), or the recorder was exercised"
-        " on that platform in CI but cannot produce a GIF headlessly — those cells carry their own"
-        " footnote with the exact CI reason."
+        "**Not applicable (➖).** The recorder cannot target this OS/shell: the upstream project"
+        " publishes no build for it, or a hard dependency is platform-specific (ttyd and"
+        " libghostty-vt are Unix-only; PowerSession-rs is Windows-only). Cells with a specific"
+        " cause carry their own footnote."
     )
-    legend = "\nLegend: ✅ working · ❌ broken · ➖ not applicable[^na] · ⬜ not yet run\n"
+    footnotes["ne"] = (
+        "**Not evaluated (⬜).** This OS/shell was outside the sampled matrix for this recorder."
+        " The shell axis (bash/zsh/pwsh) was sampled rather than run exhaustively, so the tool may"
+        " still work here; no CI run exists, so no verdict is claimed."
+    )
+    legend = "\nLegend: ✅ working · ❌ broken · ➖ not applicable[^na] · ⬜ not evaluated[^ne]\n"
     return "### Capability Grid — headline scenario `launch-exit`\n\n" + "\n".join(rows) + "\n" + legend
 
 
@@ -246,7 +257,7 @@ def refs(tools: dict) -> str:
 
 def footnote_defs(footnotes: dict) -> str:
     # `na` (the general legend note) first, then per-cell reasons in stable order.
-    order = ["na"] + sorted(k for k in footnotes if k != "na")
+    order = ["na", "ne"] + sorted(k for k in footnotes if k not in ("na", "ne"))
     return "\n".join(f"[^{k}]: {footnotes[k]}" for k in order if k in footnotes)
 
 

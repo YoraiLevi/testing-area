@@ -158,7 +158,7 @@ jobs:
                 reason="scenarios.md S4 shell-prompt fallback: sample prompt typed at the shell prompt (acast cannot inject into the omp TUI input box headlessly)"
               fi
             elif [ "${{ matrix.cell_os }}" = "windows" ]; then
-              verdict=skipped
+              verdict=broken
               reason="acast v0.4.0 record panics on the headless windows-pwsh runner (nil pointer dereference at asciicast/recorder.go:28 -- ConPTY has no attached interactive console to size); the binary itself runs (acast version and agg --version succeed). See run logs."
               gifpath=""
             else

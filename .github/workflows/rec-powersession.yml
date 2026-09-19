@@ -117,7 +117,7 @@ jobs:
                 *) reason="PowerSession (v0.1.16) + agg (v1.9.0) produced no valid GIF for this cell in CI; see run logs";;
               esac
             else
-              verdict=skipped; gifpath=""; reason="$SKIP_REASON"
+              verdict=broken; gifpath=""; reason="$SKIP_REASON"
             fi
             jq -n \
               --arg os "windows" \

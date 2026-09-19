@@ -114,7 +114,7 @@ jobs:
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="$(find . -type f -name "${base}.gif" 2>/dev/null | head -1)"
             if [ "${{ runner.os }}" = "Windows" ]; then
-              verdict=skipped; reason="vhs requires ttyd, which is unsupported on Windows CI runners"; gifpath=""
+              verdict=not-applicable; reason="VHS records via ttyd, which has no Windows build (Unix-only); the capture pipeline cannot run on Windows."; gifpath=""
             elif [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
               cp -f "$gif" "assets/vhs/${base}.gif"
               verdict=working; reason=""; gifpath="assets/vhs/${base}.gif"
