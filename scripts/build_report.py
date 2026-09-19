@@ -70,7 +70,7 @@ def badges(tools: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def grid(tools: dict, idx: dict) -> str:
+def grid(tools: dict, idx: dict, footnotes: dict) -> str:
     headline = tools["headline_scenario"]
     cells = []
     for t in tools["tools"]:
@@ -82,28 +82,42 @@ def grid(tools: dict, idx: dict) -> str:
     sep = "|------|--------|" + "|".join([":--:"] * len(cells)) + "|"
     rows = [header, sep]
     for t in tools["tools"]:
-        row = [t["name"], t["family"]]
+        row = [f"[{t['name']}][{t['id']}]", t["family"]]
         for c in cells:
             rec = idx.get((t["id"], c, headline))
             if rec is None:
                 # A cell the tool never declared is not-applicable, not merely un-run.
-                row.append(VERDICT_GLYPH["not-applicable"] if c not in t["cells"] else VERDICT_GLYPH[None])
+                row.append("➖" if c not in t["cells"] else VERDICT_GLYPH[None])
                 continue
-            glyph = VERDICT_GLYPH.get(rec.get("verdict"), "⬜")
+            verdict = rec.get("verdict")
+            glyph = VERDICT_GLYPH.get(verdict, "⬜")
             run = rec.get("run_url")
-            row.append(f"[{glyph}]({run})" if run else glyph)
+            cell_md = f"[{glyph}]({run})" if run else glyph
+            # A cell the tool was actually exercised on but could not produce a GIF
+            # carries its own footnote with the exact CI reason.
+            if verdict in ("skipped", "not-applicable") and rec.get("reason"):
+                fid = f"na-{t['id']}-{c}"
+                footnotes[fid] = f"**{t['name']} — `{c}`:** {rec['reason']}"
+                cell_md += f"[^{fid}]"
+            row.append(cell_md)
         rows.append("| " + " | ".join(row) + " |")
-    legend = "\nLegend: ✅ working · ❌ broken · ➖ not applicable · ⬜ not yet run\n"
+    footnotes["na"] = (
+        "**Not applicable (➖).** Either the recorder does not target that OS/shell combination, so"
+        " no cell was declared for it (for example EVP and Terminalizer are Linux-only, and Demo"
+        " Tape, termsvg, Foley, and Betamax publish no Windows build), or the recorder was exercised"
+        " on that platform in CI but cannot produce a GIF headlessly — those cells carry their own"
+        " footnote with the exact CI reason."
+    )
+    legend = "\nLegend: ✅ working · ❌ broken · ➖ not applicable[^na] · ⬜ not yet run\n"
     return "### Capability Grid — headline scenario `launch-exit`\n\n" + "\n".join(rows) + "\n" + legend
 
 
 def recordings(tools: dict, idx: dict) -> str:
     scen = tools["scenarios"]
-    out = ["### Recordings (per tool: minimal + creative)", ""]
-    any_gif = False
+    pref = ["linux-bash", "linux-zsh", "macos-zsh", "linux-pwsh", "windows-pwsh"]
+    # First resolve which tools have an embeddable recording set and where.
+    sections = []  # (tool, chosen_cell, [(scenario, gif), ...])
     for t in tools["tools"]:
-        # pick a representative cell that has a working launch-exit, prefer linux-bash
-        pref = ["linux-bash", "linux-zsh", "macos-zsh", "linux-pwsh", "windows-pwsh"]
         chosen = None
         for c in pref + t["cells"]:
             if idx.get((t["id"], c, "launch-exit"), {}).get("verdict") == "working":
@@ -111,24 +125,34 @@ def recordings(tools: dict, idx: dict) -> str:
                 break
         if chosen is None:
             continue
-        gifs = []
-        for s in scen:
-            rec = idx.get((t["id"], chosen, s))
-            if rec and rec.get("verdict") == "working" and rec.get("gif"):
-                gifs.append((s, rec["gif"]))
-        if not gifs:
-            continue
-        any_gif = True
-        out.append(f"#### {t['name']} (`{chosen}`)")
+        gifs = [
+            (s, idx[(t["id"], chosen, s)]["gif"])
+            for s in scen
+            if idx.get((t["id"], chosen, s), {}).get("verdict") == "working"
+            and idx.get((t["id"], chosen, s), {}).get("gif")
+        ]
+        if gifs:
+            sections.append((t, chosen, gifs))
+
+    out = ["### Recordings (per tool: minimal + creative)", ""]
+    if not sections:
+        out.append("_No working recordings committed yet. Trigger the `rec-*` workflows._")
+        out.append("")
+        return "\n".join(out)
+    # Table of contents so readers can jump straight to a tool's GIFs.
+    toc = " · ".join(f"[{t['name']}](#rec-{t['id']})" for t, _c, _g in sections)
+    out.append(f"**Jump to a recording:** {toc}")
+    out.append("")
+    for t, chosen, gifs in sections:
+        out.append(f'<a id="rec-{t["id"]}"></a>')
+        out.append("")
+        out.append(f"#### [{t['name']}]({t['url']}) (`{chosen}`)")
         out.append("")
         for s, gif in gifs:
             out.append(f"**{s}**")
             out.append("")
             out.append(f"![{t['name']} {s}]({gif})")
             out.append("")
-    if not any_gif:
-        out.append("_No working recordings committed yet. Trigger the `rec-*` workflows._")
-        out.append("")
     return "\n".join(out)
 
 
@@ -187,47 +211,65 @@ def analysis(tools: dict, idx: dict) -> str:
             if idx.get((t["id"], c, headline), {}).get("verdict") != "working":
                 continue
             n = sum(1 for s in scen if idx.get((t["id"], c, s), {}).get("verdict") == "working")
-            ranked.append((n, t["name"]))
+            ranked.append((n, t["name"], t["id"]))
         ranked.sort(key=lambda x: (-x[0], x[1].lower()))
-        listing = ", ".join(f"{name} ({n}/4)" for n, name in ranked) or "_none_"
+        listing = ", ".join(f"[{name}][{tid}] ({n}/4)" for n, name, tid in ranked) or "_none_"
         out.append(f"| `{c}` | {listing} |")
     out.append("")
 
     # Full-house tools (every declared cell x scenario working).
-    full = [t["name"] for t in tools["tools"] if tool_working[t["id"]][0] == tool_working[t["id"]][1] and tool_working[t["id"]][1] > 0]
-    partial = [
-        (t["name"], *tool_working[t["id"]])
-        for t in tools["tools"]
-        if 0 < tool_working[t["id"]][0] < tool_working[t["id"]][1]
-    ]
-    none = [t["name"] for t in tools["tools"] if tool_working[t["id"]][0] == 0]
+    def link(t):
+        return f"[{t['name']}][{t['id']}]"
+    full = [t for t in tools["tools"] if tool_working[t["id"]][0] == tool_working[t["id"]][1] and tool_working[t["id"]][1] > 0]
+    partial = [t for t in tools["tools"] if 0 < tool_working[t["id"]][0] < tool_working[t["id"]][1]]
+    none = [t for t in tools["tools"] if tool_working[t["id"]][0] == 0]
     if full:
-        out.append("**Green on every declared cell and scenario:** " + ", ".join(sorted(full)) + ".")
+        out.append("**Green on every declared cell and scenario:** "
+                   + ", ".join(link(t) for t in sorted(full, key=lambda t: t["name"].lower())) + ".")
         out.append("")
     if partial:
-        frag = ", ".join(f"{name} ({n}/{tot})" for name, n, tot in sorted(partial))
+        frag = ", ".join(f"{link(t)} ({tool_working[t['id']][0]}/{tool_working[t['id']][1]})"
+                         for t in sorted(partial, key=lambda t: t["name"].lower()))
         out.append("**Partial coverage (working / declared cell-scenarios):** " + frag + ".")
         out.append("")
     if none:
-        out.append("**No working GIF in CI (honest skip/broken):** " + ", ".join(sorted(none)) + ".")
+        out.append("**No working GIF in CI (honest skip/broken):** "
+                   + ", ".join(link(t) for t in sorted(none, key=lambda t: t["name"].lower())) + ".")
         out.append("")
     return "\n".join(out)
 
 
+def refs(tools: dict) -> str:
+    """Named reference-link definitions for tool homepages, used across the report."""
+    return "\n".join(f"[{t['id']}]: {t['url']}" for t in tools["tools"])
+
+
+def footnote_defs(footnotes: dict) -> str:
+    # `na` (the general legend note) first, then per-cell reasons in stable order.
+    order = ["na"] + sorted(k for k in footnotes if k != "na")
+    return "\n".join(f"[^{k}]: {footnotes[k]}" for k in order if k in footnotes)
+
+
 def build_section(tools: dict, idx: dict) -> str:
+    footnotes: dict = {}
+    grid_md = grid(tools, idx, footnotes)
     parts = [
         "_Generated by `scripts/build_report.py` from CI evidence. Verdicts come only from"
         " green runs on `testing-vhs` (constitution Principles I & II)._",
         "",
         badges(tools),
         "",
-        grid(tools, idx),
+        grid_md,
         "",
         analysis(tools, idx),
         "",
         recordings(tools, idx),
         "",
         ledger(tools),
+        "",
+        footnote_defs(footnotes),
+        "",
+        refs(tools),
     ]
     return "\n".join(parts)
 
