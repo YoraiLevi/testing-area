@@ -55,14 +55,14 @@ jobs:
         shell: bash
         run: |
           mkdir -p tapes out
-          # VHS resolves Output relative to the tape's own directory, so bake an ABSOLUTE
-          # workspace path (native form on Windows via `pwd -W`) to land GIFs in ./out.
-          WS="$(pwd -W 2>/dev/null || pwd)"
+          # VHS parses Output as a relative path (absolute paths break its parser) and
+          # resolves it against the tape's own directory, so GIFs land in tapes/out/;
+          # the Evaluate step locates them with `find`.
           for f in scenarios/vhs/0*.tape; do
             s="$(basename "$f" .tape)"        # e.g. 01-launch-exit
             scenario="${s#*-}"                # e.g. launch-exit
             {
-              echo "Output ${WS}/out/${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}.gif"
+              echo "Output out/${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}.gif"
               echo "Set Shell \"${{ matrix.shell }}\""
               cat "$f"
             } > "tapes/${s}.tape"
