@@ -1,0 +1,194 @@
+name: rec-betamax
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-betamax.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-betamax-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Betamax uses libghostty-vt and publishes only Linux/macOS binaries; per
+        # scripts/tools.json its cells are linux-bash, linux-zsh, macos-zsh. The Linux
+        # archives are `-gnu` builds (no musl variant), so the Linux cells run on
+        # ubuntu-24.04 (glibc 2.39) to avoid a GLIBC_2.3x-not-found failure.
+        include:
+          - { os: ubuntu-24.04, cell_os: linux, shell: bash }
+          - { os: ubuntu-24.04, cell_os: linux, shell: zsh }
+          - { os: macos-latest, cell_os: macos, shell: zsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install omp
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Install JetBrains Mono font (linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y fonts-jetbrains-mono || true
+
+      - name: Install Betamax (pinned v0.1.21)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash scenarios/betamax/install-betamax.sh
+
+      - name: Render scenarios
+        shell: bash
+        timeout-minutes: 20
+        run: |
+          # setup-python exports LD_LIBRARY_PATH to its own lib dir; clear it so nothing
+          # perturbs the native binary this step invokes (betamax links libghostty-vt in).
+          unset LD_LIBRARY_PATH
+          set -u
+          mkdir -p tapes out
+          echo "betamax=$(command -v betamax) -> $(betamax --version)"
+          echo "omp=$(command -v omp) -> $(omp --version 2>/dev/null | head -1)"
+
+          # Betamax has no --shell flag; the shell is a tape `Set Shell` startup command,
+          # so compose it at the head of each cell's tape. Startup commands (Set/Env/Output)
+          # must precede runtime commands, and the scenario tapes only add more Set/Env
+          # startup lines, so prepending Set Shell keeps ordering valid.
+          case "${{ matrix.shell }}" in
+            bash) shell_cmd="bash --norc" ;;
+            zsh)  shell_cmd="zsh -f" ;;
+            *)    shell_cmd="${{ matrix.shell }}" ;;
+          esac
+
+          for f in scenarios/betamax/0*.tape; do
+            s="$(basename "$f" .tape)"          # e.g. 01-launch-exit
+            scenario="${s#*-}"                  # e.g. launch-exit
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            gif="out/${base}.gif"
+            tape="tapes/${s}.tape"
+            { echo "Set Shell \"${shell_cmd}\""; cat "$f"; } > "$tape"
+            echo "== rendering ${scenario} =="
+            if [ "$scenario" = "tui-splash" ]; then
+              # The omp TUI ignores headless quit keystrokes, so escalate signals to the
+              # omp process after the splash has been captured; once it dies the shell
+              # returns and the tape's `exit` lets Betamax finalize the recording.
+              (
+                sleep 6
+                pkill -INT  -f 'omp --no-session' 2>/dev/null || true
+                sleep 2
+                pkill -TERM -f 'omp --no-session' 2>/dev/null || true
+                sleep 2
+                pkill -KILL -f 'omp --no-session' 2>/dev/null || true
+              ) &
+              watchdog=$!
+              timeout 150 betamax run "$tape" --output "$gif" \
+                || echo "  betamax exit=$? for ${scenario}"
+              kill "$watchdog" 2>/dev/null || true
+            else
+              timeout 150 betamax run "$tape" --output "$gif" \
+                || echo "  betamax exit=$? for ${scenario}"
+            fi
+            echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"
+          done
+          echo "=== out ==="; ls -la out || true
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          # Start from a clean slate so this cell's artifact carries ONLY its own fresh
+          # files; the checkout brings stale committed results that must not ride along
+          # (a stale result poisoning a fresh grid cell is a known VHS-family footgun).
+          rm -rf results/betamax assets/betamax
+          mkdir -p results/betamax assets/betamax
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          BMV="${BETAMAX_TAG:-betamax-v0.1.21}"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            gif="out/${base}.gif"
+            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/betamax/${base}.gif"
+              verdict=working; gifpath="assets/betamax/${base}.gif"
+              case "$scenario" in
+                tui-splash)  reason="omp TUI ignores headless quit keystrokes; a background SIGINT->SIGTERM->SIGKILL watchdog ends the omp process so Betamax can finalize the splash recording (scenarios.md S3)";;
+                typing-demo) reason="shell-prompt typing fallback: the omp TUI input box cannot be driven headlessly, so the sample prompt is animated at a shell prompt (scenarios.md S4)";;
+                *) reason="";;
+              esac
+            else
+              verdict=broken; gifpath=""
+              case "$scenario" in
+                tui-splash)  reason="Betamax launched the omp TUI but no valid GIF was captured before the watchdog ended the session";;
+                typing-demo) reason="shell-prompt typing fallback produced no valid GIF in CI (scenarios.md S4)";;
+                *) reason="no valid GIF produced in CI";;
+              esac
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              --arg bmv "$BMV" \
+              '{tool:"betamax",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:$bmv,omp_version:$ompv}}' \
+              > "results/betamax/${base}.json"
+          done
+          echo "=== results ==="; cat results/betamax/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: betamax-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/betamax/
+            results/betamax/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/betamax results/betamax
+          find _artifacts -type f -name '*.gif' -path '*assets*' -exec cp -f {} assets/betamax/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/betamax/ \; || true
+          echo "=== assets/betamax ==="; ls -la assets/betamax || true
+          echo "=== results/betamax ==="; ls -la results/betamax || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(betamax): recordings + results"
