@@ -72,6 +72,7 @@ jobs:
       # vhs-action installs vhs + ttyd + ffmpeg and adds them to PATH for later steps.
       # The tape it runs here is a throwaway warmup (it renders in its own temp dir).
       - name: Install VHS toolchain
+        if: runner.os != 'Windows'
         uses: charmbracelet/vhs-action@v2
         continue-on-error: true
         timeout-minutes: 8
@@ -81,7 +82,7 @@ jobs:
           install-fonts: true
 
       - name: Render scenarios in workspace
-        if: always()
+        if: runner.os != 'Windows'
         shell: bash
         timeout-minutes: 20
         run: |
@@ -112,7 +113,9 @@ jobs:
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="$(find . -type f -name "${base}.gif" 2>/dev/null | head -1)"
-            if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+            if [ "${{ runner.os }}" = "Windows" ]; then
+              verdict=skipped; reason="vhs requires ttyd, which is unsupported on Windows CI runners"; gifpath=""
+            elif [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
               cp -f "$gif" "assets/vhs/${base}.gif"
               verdict=working; reason=""; gifpath="assets/vhs/${base}.gif"
             else

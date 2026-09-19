@@ -30,6 +30,7 @@ VERDICT_GLYPH = {
     "working": "✅",
     "broken": "❌",
     "not-applicable": "➖",
+    "skipped": "➖",
     None: "⬜",
 }
 
