@@ -1,0 +1,165 @@
+name: rec-termsvg
+
+on:
+  push:
+    branches: [testing-vhs]
+    paths:
+      - '.github/workflows/rec-termsvg.yml'
+      - 'scenarios/**'
+      - 'scripts/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rec-termsvg-collect
+  cancel-in-progress: false
+
+jobs:
+  record:
+    name: ${{ matrix.cell_os }}-${{ matrix.shell }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-22.04, cell_os: linux, shell: bash }
+          - { os: macos-latest, cell_os: macos, shell: zsh }
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+
+      - name: Install omp
+        run: bash scenarios/shared/install-omp.sh
+
+      - name: Install termsvg (pinned)
+        shell: bash
+        run: |
+          # v0.11.0 ships NO prebuilt release binaries, so build the pinned tag
+          # from source. GOTOOLCHAIN=auto fetches the toolchain go.mod requires.
+          export GOTOOLCHAIN=auto
+          go install github.com/mrmarble/termsvg/cmd/termsvg@v0.11.0
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          "$(go env GOPATH)/bin/termsvg" --version || true
+
+      - name: Record scenarios and export GIFs
+        shell: bash
+        timeout-minutes: 20
+        env:
+          TERM: xterm-256color
+        run: |
+          # setup-python exports LD_LIBRARY_PATH to its own lib dir, which breaks
+          # native shared libs; clear it before the render (matches rec-vhs).
+          unset LD_LIBRARY_PATH
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          echo "termsvg: $(command -v termsvg || echo MISSING)"; termsvg --version || true
+          echo "omp: $(command -v omp || echo MISSING)"; omp --version || true
+
+          # termsvg's record subcommand: source names it `record` (kong); probe so
+          # a rename to `rec` (per README) still works.
+          REC=record
+          if ! termsvg record --help >/dev/null 2>&1; then
+            if termsvg rec --help >/dev/null 2>&1; then REC=rec; fi
+          fi
+          echo "record subcommand: $REC"
+
+          mkdir -p out
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            echo "::group::record $scenario"
+            python3 scenarios/termsvg/drive.py "out/${base}.cast" "${{ matrix.shell }}" "$scenario" "$REC" \
+              || echo "drive.py failed for $scenario"
+            if [ -s "out/${base}.cast" ]; then
+              echo "-- exporting ${base} to gif (native termsvg renderer) --"
+              termsvg export -f gif -o "out/${base}.gif" "out/${base}.cast" \
+                || echo "gif export failed for $scenario"
+              termsvg export -f svg -o "out/${base}.svg" "out/${base}.cast" || true
+            else
+              echo "no cast recorded for $scenario"
+            fi
+            echo "::endgroup::"
+          done
+          echo "=== out ==="; ls -la out || true
+
+      - name: Evaluate and emit results
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          # Start clean so this cell's artifact carries ONLY its own fresh files;
+          # the checkout brings stale committed results that must not ride along.
+          rm -rf results/termsvg assets/termsvg
+          mkdir -p results/termsvg assets/termsvg
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
+          for scenario in launch-exit help-tour tui-splash typing-demo; do
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            gif="out/${base}.gif"
+            if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
+              cp -f "$gif" "assets/termsvg/${base}.gif"
+              verdict=working; reason=""; gifpath="assets/termsvg/${base}.gif"
+            elif [ "$scenario" = "tui-splash" ] || [ "$scenario" = "typing-demo" ]; then
+              verdict=broken; gifpath=""
+              reason="omp TUI could not be driven/quit headlessly via termsvg PTY capture; no valid GIF produced"
+            else
+              verdict=broken; reason="no valid GIF produced in CI"; gifpath=""
+            fi
+            jq -n \
+              --arg os "${{ matrix.cell_os }}" \
+              --arg shell "${{ matrix.shell }}" \
+              --arg scenario "$scenario" \
+              --arg verdict "$verdict" \
+              --arg reason "$reason" \
+              --arg gif "$gifpath" \
+              --arg run "$RUN_URL" \
+              --arg ompv "$OMPV" \
+              '{tool:"termsvg",os:$os,shell:$shell,scenario:$scenario,verdict:$verdict,reason:$reason,gif:(if $gif=="" then null else $gif end),run_url:$run,extra:{tool_version:"v0.11.0",omp_version:$ompv}}' \
+              > "results/termsvg/${base}.json"
+          done
+          echo "=== results ==="; cat results/termsvg/*.json
+
+      - name: Upload cell artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: termsvg-${{ matrix.cell_os }}-${{ matrix.shell }}
+          path: |
+            assets/termsvg/
+            results/termsvg/
+          if-no-files-found: warn
+
+  collect:
+    name: collect
+    needs: [record]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-vhs
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: _artifacts
+
+      - name: Assemble assets and results
+        run: |
+          mkdir -p assets/termsvg results/termsvg
+          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/termsvg/ \; || true
+          find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/termsvg/ \; || true
+          echo "=== assets/termsvg ==="; ls -la assets/termsvg || true
+          echo "=== results/termsvg ==="; ls -la results/termsvg || true
+
+      - name: Commit recordings and results
+        run: |
+          bash scripts/commit-artifacts.sh "chore(termsvg): recordings + results"
