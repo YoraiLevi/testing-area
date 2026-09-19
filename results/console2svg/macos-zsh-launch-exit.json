@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/console2svg/macos-zsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436607592",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436632620",
   "extra": {
     "tool_version": "v0.9.3",
     "omp_version": "omp/18.2.6"
