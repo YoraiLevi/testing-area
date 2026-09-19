@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "shell-prompt typing fallback: asciinema cannot inject keystrokes into the omp TUI headlessly (scenarios.md S4)",
   "gif": "assets/asciinema/linux-bash-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436464928",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35436607569",
   "extra": {
     "tool_version": "v3.2.1 + agg v1.9.0",
     "omp_version": "omp/18.2.6"
