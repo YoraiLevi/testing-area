@@ -3,7 +3,6 @@
 # shell prompt (still exercises keystroke animation). The substitution is recorded in the
 # result reason. The text is typed but never sent; Ctrl+C aborts the line, then the shell
 # exits. Output paths are supplied by the workflow via `evp --output`.
-Set Shell bash --norc
 Env PS1 "$ "
 Set Cols 100
 Set Rows 24

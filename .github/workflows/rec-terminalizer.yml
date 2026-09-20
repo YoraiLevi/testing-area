@@ -25,8 +25,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # tools.json declares terminalizer for the linux-bash cell ONLY.
           - { os: ubuntu-22.04, cell_os: linux, shell: bash }
+          - { os: ubuntu-22.04, cell_os: linux, shell: zsh }
+          - { os: ubuntu-22.04, cell_os: linux, shell: pwsh }
+          - { os: macos-latest, cell_os: macos, shell: zsh }
+          - { os: windows-latest, cell_os: windows, shell: pwsh }
     steps:
       - uses: actions/checkout@v4
 
@@ -34,10 +37,21 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install omp
+      - name: Install omp (Unix)
+        if: runner.os != 'Windows'
         run: bash scenarios/shared/install-omp.sh
 
+      - name: Install omp (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: ./scenarios/shared/install-omp.ps1
+
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
       - name: Install Xvfb + Electron/Chromium system libs + fonts
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           # terminalizer's `render` runs headless Electron (Chromium); it needs a virtual
@@ -51,13 +65,20 @@ jobs:
             libgbm1 libgtk-3-0 libasound2 libxshmfence1 libx11-xcb1 libxss1 \
             libgl1 libgl1-mesa-dri
 
-      - name: Install terminalizer (latest npm)
+      - name: Install terminalizer (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           npm install -g terminalizer
           echo "terminalizer: $(command -v terminalizer)"
           terminalizer --version || true
-          # Electron's Chromium sandbox helper must be root-owned + SUID or the headless
-          # render aborts on GitHub runners (non-root `runner` user). Fix it in place.
+
+      - name: Fix Electron chrome-sandbox permissions (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          # Electron's Chromium sandbox helper must be root-owned + SUID or the
+          # headless render aborts on GitHub runners (non-root `runner` user).
           CHROME_SANDBOX="$(npm root -g)/terminalizer/node_modules/electron/dist/chrome-sandbox"
           if [ -f "$CHROME_SANDBOX" ]; then
             sudo chown root:root "$CHROME_SANDBOX"
@@ -67,7 +88,16 @@ jobs:
             echo "WARNING: chrome-sandbox not found at $CHROME_SANDBOX"
           fi
 
+      - name: Install terminalizer (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          npm install -g terminalizer
+          Write-Host "terminalizer: $((Get-Command terminalizer).Source)"
+          terminalizer --version
+
       - name: Record and render scenarios
+        if: runner.os == 'Linux'
         shell: bash
         timeout-minutes: 20
         env:
@@ -92,7 +122,7 @@ jobs:
             # stdin.setRawMode); `script` allocates a pty so it works headlessly. The
             # -d command runs the scenario script to completion inside terminalizer's
             # node-pty, and that exit ends the recording. -k skips the sharing prompt.
-            timeout 200 script -qec "terminalizer record 'rec/${base}' -c '${CFG}' -d 'bash ${f}' -k" /dev/null \
+            timeout 200 script -qec "terminalizer record 'rec/${base}' -c '${CFG}' -d '${{ matrix.shell }} ${f}' -k" /dev/null \
               || echo "  record exit=$? for ${scenario}"
             echo "  rec: $(ls -la "$rec" 2>/dev/null || echo MISSING)"
             if [ -s "$rec" ]; then
@@ -108,6 +138,91 @@ jobs:
           done
           echo "=== out ==="; ls -la out || true
 
+
+      - name: Record and render scenarios (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        timeout-minutes: 20
+        env:
+          TERM: xterm-256color
+        run: |
+          set -u
+          mkdir -p out rec
+          CFG="scenarios/terminalizer/config.yml"
+          echo "terminalizer: $(command -v terminalizer || echo MISSING) -> $(terminalizer --version 2>/dev/null || echo unknown)"
+          echo "omp: $(command -v omp || echo MISSING)"; omp --version || true
+          for f in scenarios/terminalizer/0*.sh; do
+            s="$(basename "$f" .sh)"
+            scenario="${s#*-}"
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
+            rec="rec/${base}.yml"
+            gif="out/${base}.gif"
+            echo "::group::record ${scenario}"
+            # BSD `script` allocates the TTY required by terminalizer's raw-mode input.
+            if command -v gtimeout >/dev/null 2>&1; then
+              gtimeout 200 script -q /dev/null terminalizer record "rec/${base}" \
+                -c "$CFG" -d "${{ matrix.shell }} ${f}" -k \
+                || echo "  record exit=$? for ${scenario}"
+            else
+              script -q /dev/null terminalizer record "rec/${base}" \
+                -c "$CFG" -d "${{ matrix.shell }} ${f}" -k \
+                || echo "  record exit=$? for ${scenario}"
+            fi
+            echo "  rec: $(ls -la "$rec" 2>/dev/null || echo MISSING)"
+            if [ -s "$rec" ]; then
+              echo "-- rendering ${scenario} (macOS window server) --"
+              if command -v gtimeout >/dev/null 2>&1; then
+                gtimeout 300 terminalizer render "$rec" -o "$gif" -q 50 \
+                  || echo "  render exit=$? for ${scenario}"
+              else
+                terminalizer render "$rec" -o "$gif" -q 50 \
+                  || echo "  render exit=$? for ${scenario}"
+              fi
+            else
+              echo "  no recording produced for ${scenario}; skipping render"
+            fi
+            echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"
+            echo "::endgroup::"
+          done
+          echo "=== out ==="; ls -la out || true
+
+      - name: Record and render scenarios (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        timeout-minutes: 20
+        env:
+          TERM: xterm-256color
+        run: |
+          New-Item -ItemType Directory -Force -Path out, rec | Out-Null
+          $cfg = "scenarios/terminalizer/config.yml"
+          Write-Host "terminalizer: $((Get-Command terminalizer).Source)"
+          terminalizer --version
+          Write-Host "omp: $((Get-Command omp).Source)"
+          omp --version
+          Get-ChildItem "scenarios/terminalizer/0*.sh" | ForEach-Object {
+            $scenario = $_.BaseName -replace '^[^-]+-', ''
+            $base = "${{ matrix.cell_os }}-${{ matrix.shell }}-$scenario"
+            $rec = "rec/$base.yml"
+            $gif = "out/$base.gif"
+            Write-Host "::group::record $scenario"
+            terminalizer record "rec/$base" -c $cfg -d "${{ matrix.shell }} $($_.FullName)" -k
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "  record exit=$LASTEXITCODE for $scenario"
+            }
+            if (Test-Path $rec -PathType Leaf) {
+              Write-Host "-- rendering $scenario (Windows Electron) --"
+              terminalizer render $rec -o $gif -q 50
+              if ($LASTEXITCODE -ne 0) {
+                Write-Host "  render exit=$LASTEXITCODE for $scenario"
+              }
+            } else {
+              Write-Host "  no recording produced for $scenario; skipping render"
+            }
+            Write-Host "  gif: $(if (Test-Path $gif) { Get-Item $gif } else { 'MISSING' })"
+            Write-Host "::endgroup::"
+          }
+          Write-Host "=== out ==="
+          Get-ChildItem out
       - name: Evaluate and emit results
         if: always()
         shell: bash

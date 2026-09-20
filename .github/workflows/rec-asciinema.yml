@@ -26,6 +26,7 @@ jobs:
       matrix:
         include:
           - { os: ubuntu-22.04, cell_os: linux, shell: bash }
+          - { os: ubuntu-22.04, cell_os: linux, shell: pwsh }
           - { os: ubuntu-22.04, cell_os: linux, shell: zsh }
           - { os: macos-latest, cell_os: macos, shell: zsh }
     steps:

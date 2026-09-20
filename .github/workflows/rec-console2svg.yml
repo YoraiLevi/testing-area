@@ -27,6 +27,7 @@ jobs:
         include:
           - { os: ubuntu-22.04,   cell_os: linux,   shell: bash }
           - { os: ubuntu-22.04,   cell_os: linux,   shell: pwsh }
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: zsh }
           - { os: macos-latest,   cell_os: macos,   shell: zsh }
           - { os: windows-latest, cell_os: windows, shell: pwsh }
     steps:
@@ -44,6 +45,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scenarios/shared/install-omp.ps1
+
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
 
       # The official action pins both action code (@v0.9.3) and the binary (version input),
       # but its install script is broken on Windows (git bash mangles the backslashed

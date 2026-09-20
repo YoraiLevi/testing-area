@@ -55,7 +55,14 @@ echo "::group::install evp ${TAG} (${triple})"
 tmpdir="$(mktemp -d)"
 curl -fsSL "${auth[@]}" -o "${tmpdir}/${stage}.tar.gz" "$url"
 if curl -fsSL "${auth[@]}" -o "${tmpdir}/${stage}.tar.gz.sha256" "${url}.sha256" 2>/dev/null; then
-  (cd "$tmpdir" && sha256sum -c "${stage}.tar.gz.sha256")
+  # macOS lacks GNU `sha256sum`; use `shasum -a 256 -c` there. Linux keeps sha256sum -c.
+  if command -v sha256sum >/dev/null 2>&1; then
+    (cd "$tmpdir" && sha256sum -c "${stage}.tar.gz.sha256")
+  elif command -v shasum >/dev/null 2>&1; then
+    (cd "$tmpdir" && shasum -a 256 -c "${stage}.tar.gz.sha256")
+  else
+    echo "install-evp: no sha256sum/shasum available; skipping verification" >&2
+  fi
 else
   echo "install-evp: no .sha256 published for ${TAG}; skipping verification" >&2
 fi

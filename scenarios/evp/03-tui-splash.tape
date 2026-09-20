@@ -4,7 +4,6 @@
 # after the splash is captured. Once omp exits, control returns to the shell and the
 # `exit` below closes the EVP session so the streamed GIF/SVG is finalized. Output paths
 # are supplied by the workflow via `evp --output`.
-Set Shell bash --norc
 Env PS1 "$ "
 Set Cols 100
 Set Rows 24

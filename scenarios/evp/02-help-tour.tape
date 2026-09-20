@@ -1,7 +1,6 @@
 # Scenario S2 help-tour (creative): run `omp --help`, pause to let the long, colored help
 # render (exercises color and scrollback fidelity), then exit. Output paths are supplied
 # by the workflow via `evp --output`.
-Set Shell bash --norc
 Env PS1 "$ "
 Set Cols 100
 Set Rows 24

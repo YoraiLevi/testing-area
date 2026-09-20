@@ -24,10 +24,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # EVP publishes only Linux/macOS static musl binaries and drives an embedded
-        # libghostty PTY; per scripts/tools.json this tool is evaluated on linux-bash only.
+        # EVP publishes only Linux/macOS static binaries and drives an embedded libghostty
+        # PTY; per scripts/tools.json its cells are linux-bash, linux-pwsh, linux-zsh,
+        # macos-zsh (no Windows build exists). The Linux musl build runs on ubuntu-22.04.
         include:
           - { os: ubuntu-22.04, cell_os: linux, shell: bash }
+          - { os: ubuntu-22.04, cell_os: linux, shell: pwsh }
+          - { os: ubuntu-22.04, cell_os: linux, shell: zsh }
+          - { os: macos-latest, cell_os: macos, shell: zsh }
     steps:
       - uses: actions/checkout@v4
 
@@ -43,23 +47,49 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: bash scenarios/evp/install-evp.sh
 
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
       - name: Render scenarios
         shell: bash
         timeout-minutes: 20
         run: |
           # setup-python exports LD_LIBRARY_PATH to its own lib dir; clear it so nothing
-          # perturbs the native binaries this step invokes (EVP is a static musl build).
+          # perturbs the native binaries this step invokes (EVP is a static prebuilt binary).
           unset LD_LIBRARY_PATH
           set -u
-          mkdir -p out
+          mkdir -p tapes out
           echo "evp=$(command -v evp) -> $(evp --version)"
           echo "omp=$(command -v omp) -> $(omp --version 2>/dev/null | head -1)"
+
+          # The scenario tapes are shell-agnostic; EVP uses the VHS .tape language whose
+          # shell is a `Set Shell` startup command, so compose it at the head of each
+          # cell's tape. Startup commands (Set/Env) must precede runtime commands, and the
+          # scenario tapes only add more Set/Env startup lines, so prepending is valid.
+          case "${{ matrix.shell }}" in
+            bash) shell_cmd="bash --norc" ;;
+            zsh)  shell_cmd="zsh -f" ;;
+            pwsh) shell_cmd="pwsh -NoLogo" ;;
+            *)    shell_cmd="${{ matrix.shell }}" ;;
+          esac
+
+          # GNU `timeout` is absent on macOS runners (it lives in coreutils as `gtimeout`),
+          # so pick whichever exists; fall back to no wrapper. Our tapes are time-bounded
+          # (fixed Sleeps + the tui-splash watchdog), and the step has its own timeout-minutes.
+          if command -v timeout >/dev/null 2>&1; then TIMEOUT="timeout 150"
+          elif command -v gtimeout >/dev/null 2>&1; then TIMEOUT="gtimeout 150"
+          else TIMEOUT=""; fi
+          echo "timeout wrapper: ${TIMEOUT:-<none>}"
+
           for f in scenarios/evp/0*.tape; do
             s="$(basename "$f" .tape)"          # e.g. 01-launch-exit
             scenario="${s#*-}"                  # e.g. launch-exit
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="out/${base}.gif"
             svg="out/${base}.svg"
+            tape="tapes/${s}.tape"
+            { echo "Set Shell \"${shell_cmd}\""; cat "$f"; } > "$tape"
             echo "== rendering ${scenario} =="
             if [ "$scenario" = "tui-splash" ]; then
               # The omp TUI ignores headless quit keystrokes, so escalate signals to the
@@ -74,11 +104,11 @@ jobs:
                 pkill -KILL -f 'omp --no-session' 2>/dev/null || true
               ) &
               watchdog=$!
-              timeout 150 evp "$f" --output "$gif" --output "$svg" --log-level info \
+              $TIMEOUT evp "$tape" --output "$gif" --output "$svg" --log-level info \
                 || echo "  evp exit=$? for ${scenario}"
               kill "$watchdog" 2>/dev/null || true
             else
-              timeout 150 evp "$f" --output "$gif" --output "$svg" --log-level info \
+              $TIMEOUT evp "$tape" --output "$gif" --output "$svg" --log-level info \
                 || echo "  evp exit=$? for ${scenario}"
             fi
             echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"

@@ -26,6 +26,8 @@ jobs:
       matrix:
         include:
           - { os: ubuntu-22.04,   cell_os: linux,   shell: bash, shell_path: /bin/bash }
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: zsh,  shell_path: /bin/zsh }
+          - { os: ubuntu-22.04,   cell_os: linux,   shell: pwsh, shell_path: /usr/bin/pwsh }
           - { os: macos-latest,   cell_os: macos,   shell: zsh,  shell_path: /bin/zsh }
           - { os: windows-latest, cell_os: windows, shell: pwsh, shell_path: pwsh }
     steps:
@@ -43,6 +45,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: ./scenarios/shared/install-omp.ps1
+
+      - name: Install zsh (linux zsh cell)
+        if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
+        run: sudo apt-get update && sudo apt-get install -y zsh
 
       - name: Install acast + agg (unix)
         if: runner.os != 'Windows'

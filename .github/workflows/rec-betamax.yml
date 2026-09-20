@@ -31,6 +31,7 @@ jobs:
         include:
           - { os: ubuntu-24.04, cell_os: linux, shell: bash }
           - { os: ubuntu-24.04, cell_os: linux, shell: zsh }
+          - { os: ubuntu-24.04, cell_os: linux, shell: pwsh }
           - { os: macos-latest, cell_os: macos, shell: zsh }
     steps:
       - uses: actions/checkout@v4
@@ -74,6 +75,7 @@ jobs:
           case "${{ matrix.shell }}" in
             bash) shell_cmd="bash --norc" ;;
             zsh)  shell_cmd="zsh -f" ;;
+            pwsh) shell_cmd="pwsh -NoLogo" ;;
             *)    shell_cmd="${{ matrix.shell }}" ;;
           esac
 

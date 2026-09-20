@@ -1,7 +1,6 @@
 # Scenario S1 launch-exit (minimal): show a prompt, run `omp --version`, pause so the
 # version line is legible, then exit the shell cleanly. Output paths are supplied by the
 # workflow via `evp --output`. EVP uses a superset of the VHS .tape language.
-Set Shell bash --norc
 Env PS1 "$ "
 Set Cols 100
 Set Rows 24
