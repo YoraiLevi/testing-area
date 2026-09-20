@@ -201,7 +201,10 @@ jobs:
           # Rebuild this tool's asset tree ONLY when the run actually produced files;
           # never wipe last-good committed assets on a zero-artifact (all-cells-failed) run.
           if find _artifacts -path '*/assets/evp/*' -type f | grep -q .; then
-            rm -rf assets/evp; mkdir -p assets/evp
+            # Remove only the format subdirs so the report-owned README.md survives
+            # (deleting it here races the report commit into a rebase delete/modify conflict).
+            find assets/evp -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} + 2>/dev/null || true
+            mkdir -p assets/evp
           else
             echo "collect: no assets in _artifacts for evp; keeping last-good committed files"
           fi

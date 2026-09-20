@@ -22,6 +22,9 @@ fi
 git commit -m "$MSG"
 
 for attempt in 1 2 3 4 5 6; do
+  # A prior failed rebase leaves the tree mid-rebase; abort it so the next pull is not
+  # blocked by "Pulling is not possible because you have unmerged files".
+  git rebase --abort >/dev/null 2>&1 || true
   if git pull --rebase --autostash origin testing-vhs && \
      git push origin HEAD:testing-vhs; then
     echo "commit-artifacts: pushed on attempt $attempt"
