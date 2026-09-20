@@ -1,11 +1,11 @@
 {
   "tool": "demotape",
-  "os": "macos",
+  "os": "linux",
   "shell": "zsh",
-  "scenario": "help-tour",
+  "scenario": "launch-exit",
   "verdict": "working",
   "reason": "",
-  "gif": "assets/demotape/macos-zsh-help-tour.gif",
+  "gif": "assets/demotape/linux-zsh-launch-exit.gif",
   "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356791",
   "extra": {
     "tool_version": "demotape gem 0.0.10",
