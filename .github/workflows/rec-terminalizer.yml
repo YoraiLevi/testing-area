@@ -285,11 +285,19 @@ jobs:
               esac
             else
               verdict=broken; gifpath=""
-              case "$scenario" in
-                tui-splash) reason="terminalizer record runs a command to completion and cannot send an interactive quit to the omp TUI headlessly; a SIGINT->SIGTERM->SIGKILL watchdog ends the session but no valid GIF was captured";;
-                typing-demo) reason="shell-prompt typing fallback produced no valid GIF in CI";;
-                *) reason="no valid GIF produced in CI";;
-              esac
+              if [ "${{ matrix.cell_os }}" = "windows" ]; then
+                # Genuine tool limit, not an arg/shim/path bug: the .cmd shim with
+                # long --config/--command flags passes values verbatim and the
+                # config resolves, yet terminalizer's record still ENOENTs when it
+                # spawns the pty recording session on the headless Windows runner.
+                reason="terminalizer is installed and its CLI runs and the config is found and passed, but 'record' fails on Windows with a blank-path ENOENT ('File not found') when spawning the pty recording session headlessly; no valid GIF produced"
+              else
+                case "$scenario" in
+                  tui-splash) reason="terminalizer record runs a command to completion and cannot send an interactive quit to the omp TUI headlessly; a SIGINT->SIGTERM->SIGKILL watchdog ends the session but no valid GIF was captured";;
+                  typing-demo) reason="shell-prompt typing fallback produced no valid GIF in CI";;
+                  *) reason="no valid GIF produced in CI";;
+                esac
+              fi
             fi
             jq -n \
               --arg os "${{ matrix.cell_os }}" \
