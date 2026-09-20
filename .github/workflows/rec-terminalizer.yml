@@ -208,6 +208,12 @@ jobs:
           # step's CWD, and so the value survives shim/quoting round-trips intact.
           $cfg = (Resolve-Path "scenarios/terminalizer/config.yml").Path
           Write-Host "terminalizer: $((Get-Command terminalizer).Source)"
+          # npm installs terminalizer.ps1/.cmd/.sh shims; the .ps1 shim (first on
+          # PATH) drops short-flag VALUES and `cmd /c` re-tokenizes and blanks
+          # --config. Resolve the .cmd shim and call it directly with the call
+          # operator + long flags, so PowerShell hands each value over verbatim.
+          $tz = (Get-Command terminalizer.cmd).Source
+          Write-Host "terminalizer.cmd: $tz"
           terminalizer --version
           Write-Host "omp: $((Get-Command omp).Source)"
           omp --version
@@ -218,9 +224,9 @@ jobs:
           Write-Host "cwd: $((Get-Location).Path)"
           Write-Host "config Test-Path: $(Test-Path 'scenarios/terminalizer/config.yml')"
           Write-Host "config abs: $cfg"
-          # Route through cmd.exe (the .cmd npm shim forwards %* verbatim) instead of the
-          # arg-mangling .ps1 shim, so `record --help` actually prints.
-          cmd /c terminalizer record --help
+          # Call the resolved .cmd shim directly so `record --help` prints and the
+          # diagnostic proves the config path is found before the record loop.
+          & $tz record --help
           Write-Host "::endgroup::"
           Get-ChildItem "scenarios/terminalizer/0*.sh" | ForEach-Object {
             $scenario = $_.BaseName -replace '^[^-]+-', ''
@@ -231,18 +237,18 @@ jobs:
             $rec = "$recBase.yml"
             $gif = Join-Path (Get-Location).Path "out/$base.gif"
             Write-Host "::group::record $scenario"
-            # Invoke terminalizer through cmd.exe rather than the pwsh .ps1 shim, which
-            # silently dropped `-c`/`-d` values and made every record die with an empty
-            # "File not found:". cmd's .cmd shim forwards its arguments verbatim, so the
-            # absolute, space-safe paths reach terminalizer unmangled. Any failure past
-            # this point is a genuine tool/TTY limit, not an arg/shim/path bug.
-            cmd /c terminalizer record "$recBase" -c "$cfg" -d "${{ matrix.shell }} $($_.FullName)" -k
+            # Call the .cmd shim directly (not the arg-mangling .ps1, not `cmd /c`
+            # which blanked --config). PowerShell passes each argument to the .cmd
+            # verbatim, so the absolute config path and the shell command reach
+            # terminalizer intact. A failure past this point is a genuine tool/TTY
+            # limit, not an arg/shim/path bug.
+            & $tz record $recBase --config $cfg --command "${{ matrix.shell }} $($_.FullName)" --skip-sharing
             if ($LASTEXITCODE -ne 0) {
               Write-Host "  record exit=$LASTEXITCODE for $scenario"
             }
             if (Test-Path $rec -PathType Leaf) {
               Write-Host "-- rendering $scenario (Windows Electron) --"
-              cmd /c terminalizer render "$rec" -o "$gif" -q 50
+              & $tz render $rec -o $gif -q 50
               if ($LASTEXITCODE -ne 0) {
                 Write-Host "  render exit=$LASTEXITCODE for $scenario"
               }
