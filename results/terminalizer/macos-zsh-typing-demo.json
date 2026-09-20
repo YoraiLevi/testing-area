@@ -1,0 +1,14 @@
+{
+  "tool": "terminalizer",
+  "os": "macos",
+  "shell": "zsh",
+  "scenario": "typing-demo",
+  "verdict": "broken",
+  "reason": "shell-prompt typing fallback produced no valid GIF in CI",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356745",
+  "extra": {
+    "tool_version": "latest (npm unknown)",
+    "omp_version": "omp/18.2.6"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "tool": "terminalizer",
+  "os": "macos",
+  "shell": "zsh",
+  "scenario": "tui-splash",
+  "verdict": "broken",
+  "reason": "terminalizer record runs a command to completion and cannot send an interactive quit to the omp TUI headlessly; a SIGINT->SIGTERM->SIGKILL watchdog ends the session but no valid GIF was captured",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356745",
+  "extra": {
+    "tool_version": "latest (npm unknown)",
+    "omp_version": "omp/18.2.6"
+  }
+}

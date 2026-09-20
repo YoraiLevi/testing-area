@@ -1,11 +1,11 @@
 {
   "tool": "terminalizer",
   "os": "linux",
-  "shell": "bash",
+  "shell": "pwsh",
   "scenario": "typing-demo",
   "verdict": "working",
   "reason": "shell-prompt typing fallback: terminalizer records a command to completion and cannot inject keystrokes into the omp TUI input box headlessly (scenarios.md S4)",
-  "gif": "assets/terminalizer/linux-bash-typing-demo.gif",
+  "gif": "assets/terminalizer/linux-pwsh-typing-demo.gif",
   "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356745",
   "extra": {
     "tool_version": "latest (npm 0.12.0)",
