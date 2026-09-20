@@ -62,7 +62,7 @@ def index(results: list[dict]) -> dict:
 
 
 def badges(tools: dict) -> str:
-    lines = ["### CI Status (per tool)", ""]
+    lines = ["### CI Status", ""]
     for t in tools["tools"]:
         wf = f"rec-{t['id']}.yml"
         url = f"{SERVER}/{REPO}/actions/workflows/{wf}"
@@ -115,12 +115,7 @@ def grid(tools: dict, idx: dict) -> str:
         rows.append("| " + " | ".join(row) + " |")
     legend = ("\nLegend: ✅ working · ❌ broken · ➖ not applicable"
               + (" · ⬜ not evaluated" if ne_used else "") + "\n")
-    na_body = (
-        "The recorder cannot target this OS/shell: the upstream project ships no build for it,"
-        " or a hard dependency is platform-specific (ttyd and libghostty-vt are Unix-only;"
-        " PowerSession-rs is Windows-only). A cell with a specific cause carries its own"
-        " numbered note below."
-    )
+    na_body = "No upstream build, or a platform-only dependency. Numbered notes give the cell's cause."
     block = ["**Grid notes**", "", f"- **➖ not applicable.** {na_body}"]
     if ne_used:
         block.append(
@@ -159,7 +154,7 @@ def recordings(tools: dict, idx: dict) -> str:
         if gifs:
             sections.append((t, chosen, gifs))
 
-    out = ["### Recordings (one representative cell per tool)", ""]
+    out = ["### Recordings", ""]
     if not sections:
         out.append("_No working recordings committed yet. Trigger the `rec-*` workflows._")
         out.append("")
@@ -228,16 +223,13 @@ def analysis(tools: dict, idx: dict) -> str:
     out = [
         "### What To Use",
         "",
-        "Counted from committed CI results, not reputation. A not-applicable cell (no upstream"
-        " build for that OS/shell) is excluded from a tool's score, so a Unix-only tool is not"
-        " marked down for skipping Windows.",
-        "",
-        "**Per cell**, recorders whose headline `launch-exit` GIF is green, ordered by how many"
-        " of the four scenarios they land:",
+        "Headline `launch-exit` green, ranked by how many of the four tapes landed.",
         "",
         "| Cell | Working recorders (scenarios / 4) |",
         "|------|-----------------------------------|",
     ]
+    # Build each cell's listing, then collapse cells that share an identical listing.
+    listings = []
     for c in cells:
         ranked = []
         for t in tools["tools"]:
@@ -247,7 +239,18 @@ def analysis(tools: dict, idx: dict) -> str:
             ranked.append((n, t["name"], t["id"]))
         ranked.sort(key=lambda x: (-x[0], x[1].lower()))
         listing = ", ".join(f"[{name}][{tid}] ({n}/4)" for n, name, tid in ranked) or "_none_"
-        out.append(f"| `{c}` | {listing} |")
+        listings.append((c, listing))
+    grouped = []
+    for c, listing in listings:
+        for g in grouped:
+            if g[0] == listing:
+                g[1].append(c)
+                break
+        else:
+            grouped.append((listing, [c]))
+    for listing, cs in grouped:
+        label = " · ".join(f"`{c}`" for c in cs)
+        out.append(f"| {label} | {listing} |")
     out.append("")
 
     def link(t):
@@ -296,8 +299,9 @@ def _modes_str(t: dict) -> str:
     return " + ".join(parts) if parts else "—"
 
 
-# Formats GitHub renders inline in Markdown via ![](path); others are linked only.
-EMBEDDABLE = {"gif", "png", "webp", "svg", "jpg", "jpeg", "apng"}
+# Formats GitHub reliably inline-renders in Markdown via ![](path). svg is flaky and
+# mp4/webm/avi/cast/svgz/yml never inline, so those are linked with a gif preview instead.
+INLINE = {"gif", "webp", "png", "apng", "jpg", "jpeg"}
 # Prefer a visually rich scenario for the single representative sample.
 _SCENARIO_PREF = ("help-tour", "typing-demo", "tui-splash", "launch-exit")
 
@@ -362,14 +366,20 @@ def asset_readmes(tools: dict) -> None:
             lines.append(f"## `{fmt}` — {len(files)} file(s)")
             lines.append("")
             rep = _representative(files)
-            if rep and fmt in EMBEDDABLE:
-                lines.append(f"![{t['name']} {fmt} sample — {rep}]({fmt}/{rep})")
+            if rep and fmt in INLINE:
+                lines.append(f"![{t['name']} {fmt} sample: {rep}]({fmt}/{rep})")
                 lines.append("")
             elif rep:
                 lines.append(
-                    f"Sample: [`{rep}`]({fmt}/{rep}) "
-                    f"(`{fmt}` does not render inline on GitHub; download to view)"
+                    f"Sample: [`{rep}`]({fmt}/{rep}) (`{fmt}` does not render inline on GitHub)."
                 )
+                cell = rep.rsplit(".", 1)[0]
+                gif_name = f"{cell}.gif"
+                if fmt != "gif" and gif_name in fmt_files.get("gif", []):
+                    lines.append("")
+                    lines.append(
+                        f"![{t['name']} {cell} (gif preview of the same cell)](gif/{gif_name})"
+                    )
                 lines.append("")
             if files:
                 lines.extend(f"- [`{name}`]({fmt}/{name})" for name in files)
@@ -385,19 +395,17 @@ def asset_readmes(tools: dict) -> None:
 def build_section(tools: dict, idx: dict) -> str:
     grid_md = grid(tools, idx)
     parts = [
-        "_Generated by `scripts/build_report.py` from committed CI results on `testing-vhs`."
-        " Working = a green job that committed a GIF; ❌ = a run that failed to; ➖ = an upstream"
-        " limit (often no job). Stars never decide a verdict (constitution I & II)._",
+        "_Generated from committed CI results on `testing-vhs`._",
         "",
         grid_md,
-        "",
-        badges(tools),
         "",
         analysis(tools, idx),
         "",
         recordings(tools, idx),
         "",
         ledger(tools),
+        "",
+        badges(tools),
         "",
         refs(tools),
     ]
