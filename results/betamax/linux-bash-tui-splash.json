@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "omp TUI ignores headless quit keystrokes; a background SIGINT->SIGTERM->SIGKILL watchdog ends the omp process so Betamax can finalize the splash recording (scenarios.md S3)",
   "gif": "assets/betamax/gif/linux-bash-tui-splash.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35540912340",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35544253472",
   "extra": {
     "tool_version": "betamax-v0.1.21",
     "omp_version": "omp/18.2.6"
