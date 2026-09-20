@@ -5,8 +5,8 @@
   "scenario": "tui-splash",
   "verdict": "working",
   "reason": "foley launches and holds the omp TUI (omp --no-session) on a real pty in realtime mode, capturing the splash/onboarding screen; foley finalizes the take at tape end (foley v0.1.0's vtengine cannot encode Ctrl+<letter>, so no interactive Ctrl+C quit is sent)",
-  "gif": "assets/foley/linux-bash-tui-splash.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35528565014",
+  "gif": "assets/foley/gif/linux-bash-tui-splash.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35533474587",
   "extra": {
     "tool_version": "foley v0.1.0",
     "omp_version": "omp/18.2.6"
