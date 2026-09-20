@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "scenarios.md S4 shell-prompt fallback: sample prompt typed at the shell prompt (acast cannot inject into the omp TUI input box headlessly)",
   "gif": "assets/acast/gif/linux-zsh-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35540912305",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35544253440",
   "extra": {
     "tool_version": "v0.4.0 (agg v1.9.0)",
     "omp_version": "omp/18.2.6"
