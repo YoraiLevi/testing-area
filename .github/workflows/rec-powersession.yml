@@ -85,8 +85,10 @@ jobs:
           cast_lines() { if [ -f "$1" ]; then wc -l < "$1" | tr -d ' '; else echo 0; fi; }
 
           # Recorder-level health: did the headline scenario capture a real recording
-          # (valid GIF backed by a cast with actual output events)? If not, PowerSession
-          # could not record headlessly at all -> every scenario is an honest `skipped`.
+          # (valid GIF backed by a cast with actual output events)? PowerSession is now
+          # launched in its own new console (CREATE_NEW_CONSOLE) so it can record
+          # headlessly; the SKIP_REASON/broken branch below is only a fallback for when
+          # no valid recording is produced.
           le_gif="$(find out -type f -name 'windows-pwsh-launch-exit.gif' 2>/dev/null | head -1)"
           if valid_gif "$le_gif" && [ "$(cast_lines casts/windows-pwsh-launch-exit.cast)" -ge 3 ]; then
             RECORDER_OK=1

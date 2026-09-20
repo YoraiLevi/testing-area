@@ -75,7 +75,11 @@ def record(scenario: str, cast: str) -> int:
            "--command", command_arg]
     print(f"drive: {' '.join(cmd)}", flush=True)
 
-    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+    # CREATE_NEW_CONSOLE gives PowerSession its own real console screen buffer,
+    # so its stdout-mirror thread's WriteConsoleW (record.rs:270) no longer fails
+    # with HRESULT 0x80070001 the way it does on the runner's redirected stdout.
+    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                            creationflags=subprocess.CREATE_NEW_CONSOLE)
 
     if kill_after is not None:
         def watchdog():

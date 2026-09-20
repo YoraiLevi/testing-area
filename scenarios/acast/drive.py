@@ -175,29 +175,44 @@ def run_posix(cmd, env, steps) -> int:
 
 
 def run_windows(cmd, env, steps) -> int:
-    # Inherit acast's stdout/stderr so any ConPTY/record error is visible in CI logs.
-    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, env=env)
+    # acast runs under a pywinpty ConPTY so terminal.(*Pty).Size succeeds; without a
+    # real pseudo-console (redirected stdio) it nil-derefs at asciicast/recorder.go:28.
+    import threading
+
+    from winpty import PtyProcess
+
+    proc = PtyProcess.spawn(cmd, dimensions=(ROWS, COLS))
+
+    def drain():
+        while True:
+            try:
+                proc.read(65536)
+            except EOFError:
+                return
+            except Exception:
+                return
+            if not proc.isalive():
+                return
+
+    reader = threading.Thread(target=drain, daemon=True)
+    reader.start()
 
     def write(data):
-        if proc.poll() is not None:
-            return
         try:
-            proc.stdin.write(data)
-            proc.stdin.flush()
-        except (BrokenPipeError, OSError):
+            proc.write(data.decode("utf-8", "ignore"))
+        except OSError:
             pass
 
     perform(write, steps, kill_tui_windows)
 
-    try:
-        proc.stdin.close()
-    except (BrokenPipeError, OSError):
-        pass
-    try:
-        rc = proc.wait(timeout=45)
-    except subprocess.TimeoutExpired:
-        proc.kill()
+    deadline = time.time() + 45
+    while proc.isalive() and time.time() < deadline:
+        time.sleep(0.2)
+    if proc.isalive():
+        proc.terminate(force=True)
         rc = 124
+    else:
+        rc = proc.exitstatus or 0
     return rc
 
 

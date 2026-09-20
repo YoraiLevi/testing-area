@@ -70,7 +70,7 @@ def badges(tools: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
-def grid(tools: dict, idx: dict, footnotes: dict) -> str:
+def grid(tools: dict, idx: dict) -> str:
     headline = tools["headline_scenario"]
     cells = []
     for t in tools["tools"]:
@@ -81,6 +81,9 @@ def grid(tools: dict, idx: dict, footnotes: dict) -> str:
     header = "| Tool | Family | " + " | ".join(cells) + " |"
     sep = "|------|--------|" + "|".join([":--:"] * len(cells)) + "|"
     rows = [header, sep]
+    # Per-cell reasons collected in grid iteration order (tools in file order,
+    # cells sorted); the index becomes the cell's `<sup>N</sup>` marker.
+    notes: list[str] = []
     for t in tools["tools"]:
         unsupported = t.get("unsupported", {})
         row = [f"[{t['name']}][{t['id']}]", t["family"]]
@@ -90,9 +93,8 @@ def grid(tools: dict, idx: dict, footnotes: dict) -> str:
                 # No CI run for this cell: genuinely unsupported upstream vs. simply
                 # outside the sampled matrix are distinct, honest states.
                 if c in unsupported:
-                    fid = f"na-{t['id']}-{c}"
-                    footnotes[fid] = f"**{t['name']} — `{c}`:** {unsupported[c]}"
-                    row.append(f"➖[^{fid}]")
+                    notes.append(f"**{t['name']} · `{c}`** — {unsupported[c]}")
+                    row.append(f"➖<sup>{len(notes)}</sup>")
                 else:
                     row.append("⬜")
                 continue
@@ -101,26 +103,36 @@ def grid(tools: dict, idx: dict, footnotes: dict) -> str:
             run = rec.get("run_url")
             cell_md = f"[{glyph}]({run})" if run else glyph
             # Any cell that ran in CI and did not succeed (a hard failure, or a
-            # genuine platform limitation) carries its own footnote with the reason.
+            # genuine platform limitation) is flagged with its reason in the notes.
             if verdict in ("broken", "skipped", "not-applicable") and rec.get("reason"):
-                fid = f"cell-{t['id']}-{c}"
-                footnotes[fid] = f"**{t['name']} — `{c}`:** {rec['reason']}"
-                cell_md += f"[^{fid}]"
+                notes.append(f"**{t['name']} · `{c}`** — {rec['reason']}")
+                cell_md += f"<sup>{len(notes)}</sup>"
             row.append(cell_md)
         rows.append("| " + " | ".join(row) + " |")
-    footnotes["na"] = (
-        "**Not applicable (➖).** The recorder cannot target this OS/shell: the upstream project"
-        " publishes no build for it, or a hard dependency is platform-specific (ttyd and"
-        " libghostty-vt are Unix-only; PowerSession-rs is Windows-only). Cells with a specific"
-        " cause carry their own footnote."
+    legend = "\nLegend: ✅ working · ❌ broken · ➖ not applicable · ⬜ not evaluated\n"
+    na_body = (
+        "The recorder cannot target this OS/shell: the upstream project publishes no build"
+        " for it, or a hard dependency is platform-specific (ttyd and libghostty-vt are"
+        " Unix-only; PowerSession-rs is Windows-only). Cells with a specific cause carry"
+        " their own numbered note below."
     )
-    footnotes["ne"] = (
-        "**Not evaluated (⬜).** This OS/shell was outside the sampled matrix for this recorder."
-        " The shell axis (bash/zsh/pwsh) was sampled rather than run exhaustively, so the tool may"
-        " still work here; no CI run exists, so no verdict is claimed."
+    ne_body = (
+        "This OS/shell was outside the sampled matrix for this recorder. The shell axis"
+        " (bash/zsh/pwsh) was sampled rather than run exhaustively, so the tool may still"
+        " work here; no CI run exists, so no verdict is claimed."
     )
-    legend = "\nLegend: ✅ working · ❌ broken · ➖ not applicable[^na] · ⬜ not evaluated[^ne]\n"
-    return "### Capability Grid — headline scenario `launch-exit`\n\n" + "\n".join(rows) + "\n" + legend
+    block = ["**Grid notes**", "",
+             f"- **➖ not applicable** — {na_body}",
+             f"- **⬜ not evaluated** — {ne_body}"]
+    if notes:
+        block.append("")
+        block.extend(f"{i}. {n}" for i, n in enumerate(notes, 1))
+    block.append("")
+    notes_md = "\n".join(block)
+    return (
+        "### Capability Grid — headline scenario `launch-exit`\n\n"
+        + "\n".join(rows) + "\n" + legend + "\n" + notes_md
+    )
 
 
 def recordings(tools: dict, idx: dict) -> str:
@@ -255,15 +267,8 @@ def refs(tools: dict) -> str:
     return "\n".join(f"[{t['id']}]: {t['url']}" for t in tools["tools"])
 
 
-def footnote_defs(footnotes: dict) -> str:
-    # `na` (the general legend note) first, then per-cell reasons in stable order.
-    order = ["na", "ne"] + sorted(k for k in footnotes if k not in ("na", "ne"))
-    return "\n".join(f"[^{k}]: {footnotes[k]}" for k in order if k in footnotes)
-
-
 def build_section(tools: dict, idx: dict) -> str:
-    footnotes: dict = {}
-    grid_md = grid(tools, idx, footnotes)
+    grid_md = grid(tools, idx)
     parts = [
         "_Generated by `scripts/build_report.py` from CI evidence. Verdicts come only from"
         " green runs on `testing-vhs` (constitution Principles I & II)._",
@@ -277,8 +282,6 @@ def build_section(tools: dict, idx: dict) -> str:
         recordings(tools, idx),
         "",
         ledger(tools),
-        "",
-        footnote_defs(footnotes),
         "",
         refs(tools),
     ]

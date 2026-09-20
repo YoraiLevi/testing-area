@@ -86,6 +86,7 @@ jobs:
           $env:PATH = "$bin;$env:PATH"
           & "$bin\acast.exe" version
           & "$bin\agg.exe" --version
+          python -m pip install --disable-pip-version-check --quiet pywinpty
 
       - name: Record scenarios (unix)
         if: runner.os != 'Windows'
@@ -114,8 +115,8 @@ jobs:
       - name: Record scenarios (windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        # acast v0.4.0 `record` panics on the headless Windows runner (see Evaluate);
-        # this is an honest `skipped` outcome, so the step must not red the workflow.
+        # acast v0.4.0 `record` now runs under a pywinpty ConPTY (see drive.py run_windows),
+        # so it can record headlessly; continue-on-error stays as harmless safety.
         continue-on-error: true
         timeout-minutes: 20
         run: |
