@@ -14,11 +14,13 @@ Usage: drive.py <cast-out> <shell> <scenario> <rec-subcommand>
 """
 from __future__ import annotations
 
+import fcntl
 import os
 import select
 import signal
 import struct
 import sys
+import termios
 import time
 
 COLS, ROWS = 100, 24
@@ -172,9 +174,11 @@ class Session:
         return 124
 
 
-def run_posix(cast_out, shell, scenario, rec, actions) -> int:
-    import fcntl
-    import termios
+def main() -> int:
+    if len(sys.argv) != 5:
+        raise SystemExit("usage: drive.py <cast-out> <shell> <scenario> <rec-subcommand>")
+    cast_out, shell, scenario, rec = sys.argv[1:5]
+    actions = build_actions(scenario)
 
     master, slave = os.openpty()
     fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", ROWS, COLS, 0, 0))
@@ -217,73 +221,6 @@ def run_posix(cast_out, shell, scenario, rec, actions) -> int:
     sys.stdout.flush()
     print(f"\ndrive.py: termsvg exited with {code} (scenario={scenario})", file=sys.stderr)
     return 0 if code in (0, 124) else code
-
-
-def run_windows(cast_out, shell, scenario, rec, actions) -> int:
-    # termsvg's record refuses non-TTY stdio, so on Windows we spawn it under a
-    # pywinpty ConPTY (mirrors scenarios/acast run_windows). A daemon reader keeps
-    # the pseudo-console drained while we replay the scenario keystrokes, then we
-    # wait for termsvg to save the cast and terminate it if it overruns.
-    import threading
-
-    from winpty import PtyProcess
-
-    cmd = ["termsvg", rec, "-c", shell, cast_out]
-    proc = PtyProcess.spawn(cmd, dimensions=(ROWS, COLS))
-
-    def drain():
-        while True:
-            try:
-                proc.read(65536)
-            except EOFError:
-                return
-            except Exception:
-                return
-            if not proc.isalive():
-                return
-
-    reader = threading.Thread(target=drain, daemon=True)
-    reader.start()
-
-    def write(data: bytes):
-        try:
-            proc.write(data.decode("utf-8", "ignore"))
-        except OSError:
-            pass
-
-    for act in actions:
-        if act[0] == "sleep":
-            time.sleep(act[1])
-        elif act[0] == "type":
-            for ch in act[1]:
-                write(ch.encode())
-                time.sleep(act[2])
-        elif act[0] == "key":
-            write(act[1])
-        if not proc.isalive():
-            break
-
-    deadline = time.time() + CHILD_GRACE
-    while proc.isalive() and time.time() < deadline:
-        time.sleep(0.2)
-    if proc.isalive():
-        proc.terminate(force=True)
-        code = 124
-    else:
-        code = proc.exitstatus or 0
-    sys.stdout.flush()
-    print(f"\ndrive.py: termsvg exited with {code} (scenario={scenario})", file=sys.stderr)
-    return 0 if code in (0, 124) else code
-
-
-def main() -> int:
-    if len(sys.argv) != 5:
-        raise SystemExit("usage: drive.py <cast-out> <shell> <scenario> <rec-subcommand>")
-    cast_out, shell, scenario, rec = sys.argv[1:5]
-    actions = build_actions(scenario)
-    if os.name == "nt":
-        return run_windows(cast_out, shell, scenario, rec, actions)
-    return run_posix(cast_out, shell, scenario, rec, actions)
 
 
 if __name__ == "__main__":

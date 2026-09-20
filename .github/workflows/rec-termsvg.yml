@@ -29,7 +29,6 @@ jobs:
           - { os: ubuntu-22.04, cell_os: linux, shell: pwsh }
           - { os: ubuntu-22.04, cell_os: linux, shell: zsh }
           - { os: macos-latest, cell_os: macos, shell: zsh }
-          - { os: windows-latest, cell_os: windows, shell: pwsh }
     steps:
       - uses: actions/checkout@v4
 
@@ -41,14 +40,8 @@ jobs:
         with:
           go-version: 'stable'
 
-      - name: Install omp (unix)
-        if: runner.os != 'Windows'
+      - name: Install omp
         run: bash scenarios/shared/install-omp.sh
-
-      - name: Install omp (windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: ./scenarios/shared/install-omp.ps1
 
       - name: Install zsh (linux zsh cell)
         if: matrix.cell_os == 'linux' && matrix.shell == 'zsh'
@@ -64,21 +57,6 @@ jobs:
           go install github.com/mrmarble/termsvg/cmd/termsvg@v0.11.0
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
           "$(go env GOPATH)/bin/termsvg" --version || true
-
-      - name: Install termsvg (pinned, windows) + pywinpty
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          # v0.11.0 ships NO prebuilt release binaries; build the pinned tag from
-          # source. On Windows `go install` drops the exe under $(go env GOPATH)\bin.
-          $env:GOTOOLCHAIN = "auto"
-          go install github.com/mrmarble/termsvg/cmd/termsvg@v0.11.0
-          $gobin = Join-Path (go env GOPATH) "bin"
-          Add-Content -Path $env:GITHUB_PATH -Value $gobin
-          & (Join-Path $gobin "termsvg.exe") --version
-          # ConPTY bridge used by scenarios/termsvg/drive.py run_windows.
-          python -m pip install --disable-pip-version-check --quiet pywinpty
 
       - name: Record scenarios and export GIFs (unix)
         if: runner.os != 'Windows'
@@ -119,44 +97,6 @@ jobs:
             echo "::endgroup::"
           done
           echo "=== out ==="; ls -la out || true
-
-      - name: Record scenarios and export GIFs (windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        timeout-minutes: 20
-        env:
-          TERM: xterm-256color
-        run: |
-          $ErrorActionPreference = "Continue"
-          $env:PATH = "$(Join-Path (go env GOPATH) 'bin');$env:PATH"
-          Write-Host "termsvg: $(Get-Command termsvg -ErrorAction SilentlyContinue)"; termsvg --version
-          Write-Host "omp: $(Get-Command omp -ErrorAction SilentlyContinue)"; omp --version
-
-          # termsvg's record subcommand: source names it `record` (kong); probe so a
-          # rename to `rec` (per README) still works.
-          $REC = "record"
-          termsvg record --help *> $null
-          if ($LASTEXITCODE -ne 0) {
-            termsvg rec --help *> $null
-            if ($LASTEXITCODE -eq 0) { $REC = "rec" }
-          }
-          Write-Host "record subcommand: $REC"
-
-          New-Item -ItemType Directory -Force -Path out | Out-Null
-          foreach ($scenario in @('launch-exit','help-tour','tui-splash','typing-demo')) {
-            $base = "${{ matrix.cell_os }}-${{ matrix.shell }}-$scenario"
-            Write-Host "::group::record $scenario"
-            python scenarios/termsvg/drive.py "out/$base.cast" "${{ matrix.shell }}" $scenario $REC
-            if ((Test-Path "out/$base.cast") -and ((Get-Item "out/$base.cast").Length -gt 0)) {
-              Write-Host "-- exporting $base to gif (native termsvg renderer) --"
-              termsvg export -f gif -o "out/$base.gif" "out/$base.cast"
-              termsvg export -f svg -o "out/$base.svg" "out/$base.cast"
-            } else {
-              Write-Host "no cast recorded for $scenario"
-            }
-            Write-Host "::endgroup::"
-          }
-          Get-ChildItem out -ErrorAction SilentlyContinue | Format-Table Name,Length
 
       - name: Evaluate and emit results
         if: always()

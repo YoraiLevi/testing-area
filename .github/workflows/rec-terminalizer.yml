@@ -65,6 +65,16 @@ jobs:
             libgbm1 libgtk-3-0 libasound2 libxshmfence1 libx11-xcb1 libxss1 \
             libgl1 libgl1-mesa-dri
 
+      - name: Pin Node 20 (macOS)
+        if: runner.os == 'macOS'
+        # GHA macOS runners now default to Node 24, whose V8 headers require C++20 and
+        # break node-pty's native build during `npm install -g terminalizer` ("C++20 or
+        # later required."). Node 20 ships a compatible/prebuilt node-pty, so terminalizer
+        # installs cleanly. Linux/Windows already install fine, so they keep their Node.
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Install terminalizer (Unix)
         if: runner.os != 'Windows'
         shell: bash
@@ -194,24 +204,45 @@ jobs:
           TERM: xterm-256color
         run: |
           New-Item -ItemType Directory -Force -Path out, rec | Out-Null
-          $cfg = "scenarios/terminalizer/config.yml"
+          # Resolve the config to an ABSOLUTE path so terminalizer never depends on the
+          # step's CWD, and so the value survives shim/quoting round-trips intact.
+          $cfg = (Resolve-Path "scenarios/terminalizer/config.yml").Path
           Write-Host "terminalizer: $((Get-Command terminalizer).Source)"
           terminalizer --version
           Write-Host "omp: $((Get-Command omp).Source)"
           omp --version
+          # One-time diagnostic: prove the config is found and dump resolved paths before
+          # the loop. The previous failure was an empty "File not found:" — the pwsh .ps1
+          # npm shim dropped the `-c`/`-d` argument VALUES, so terminalizer saw no config.
+          Write-Host "::group::terminalizer diagnostics"
+          Write-Host "cwd: $((Get-Location).Path)"
+          Write-Host "config Test-Path: $(Test-Path 'scenarios/terminalizer/config.yml')"
+          Write-Host "config abs: $cfg"
+          # Route through cmd.exe (the .cmd npm shim forwards %* verbatim) instead of the
+          # arg-mangling .ps1 shim, so `record --help` actually prints.
+          cmd /c terminalizer record --help
+          Write-Host "::endgroup::"
           Get-ChildItem "scenarios/terminalizer/0*.sh" | ForEach-Object {
             $scenario = $_.BaseName -replace '^[^-]+-', ''
             $base = "${{ matrix.cell_os }}-${{ matrix.shell }}-$scenario"
-            $rec = "rec/$base.yml"
-            $gif = "out/$base.gif"
+            # Absolute record base (terminalizer appends .yml) and gif output, so neither
+            # depends on CWD once cmd.exe re-parses the command line.
+            $recBase = Join-Path (Get-Location).Path "rec/$base"
+            $rec = "$recBase.yml"
+            $gif = Join-Path (Get-Location).Path "out/$base.gif"
             Write-Host "::group::record $scenario"
-            terminalizer record "rec/$base" -c $cfg -d "${{ matrix.shell }} $($_.FullName)" -k
+            # Invoke terminalizer through cmd.exe rather than the pwsh .ps1 shim, which
+            # silently dropped `-c`/`-d` values and made every record die with an empty
+            # "File not found:". cmd's .cmd shim forwards its arguments verbatim, so the
+            # absolute, space-safe paths reach terminalizer unmangled. Any failure past
+            # this point is a genuine tool/TTY limit, not an arg/shim/path bug.
+            cmd /c terminalizer record "$recBase" -c "$cfg" -d "${{ matrix.shell }} $($_.FullName)" -k
             if ($LASTEXITCODE -ne 0) {
               Write-Host "  record exit=$LASTEXITCODE for $scenario"
             }
             if (Test-Path $rec -PathType Leaf) {
               Write-Host "-- rendering $scenario (Windows Electron) --"
-              terminalizer render $rec -o $gif -q 50
+              cmd /c terminalizer render "$rec" -o "$gif" -q 50
               if ($LASTEXITCODE -ne 0) {
                 Write-Host "  render exit=$LASTEXITCODE for $scenario"
               }

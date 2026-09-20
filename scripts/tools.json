@@ -135,12 +135,12 @@
       "cells": [
         "linux-bash",
         "linux-zsh",
-        "linux-pwsh",
         "macos-zsh"
       ],
       "url": "https://github.com/fnando/demotape",
       "unsupported": {
-        "windows-pwsh": "Demo Tape captures through ttyd, which is Unix-only; there is no Windows recording path."
+        "windows-pwsh": "Demo Tape captures through ttyd, which is Unix-only; there is no Windows recording path.",
+        "linux-pwsh": "Demo Tape's --shell flag accepts only bash, zsh, or fish; PowerShell is not a supported shell."
       }
     },
     {
@@ -241,11 +241,12 @@
         "linux-bash",
         "linux-zsh",
         "linux-pwsh",
-        "macos-zsh",
-        "windows-pwsh"
+        "macos-zsh"
       ],
       "url": "https://github.com/mrmarble/termsvg",
-      "unsupported": {}
+      "unsupported": {
+        "windows-pwsh": "termsvg's record command imports syscall.SIGWINCH (POSIX-only); the record subcommand does not compile on Windows."
+      }
     }
   ],
   "skipped": [
