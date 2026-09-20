@@ -1,5 +1,5 @@
-{"version":3,"term":{"cols":100,"rows":24},"timestamp":1789933706,"command":"/usr/bin/zsh scenarios/asciinema/01-launch-exit.sh","env":{"SHELL":"/bin/bash"}}
+{"version":3,"term":{"cols":100,"rows":24},"timestamp":1789942338,"command":"/usr/bin/zsh scenarios/asciinema/01-launch-exit.sh","env":{"SHELL":"/bin/bash"}}
 [0.003, "o", "$ omp --version\r\n"]
-[0.078, "o", "omp/18.2.6\r\n"]
+[0.077, "o", "omp/18.2.6\r\n"]
 [2.009, "o", "$ exit\r\n"]
 [1.002, "x", "0"]
