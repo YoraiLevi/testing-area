@@ -3,10 +3,10 @@
   "os": "linux",
   "shell": "zsh",
   "scenario": "help-tour",
-  "verdict": "broken",
-  "reason": "no valid GIF produced in CI",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35533474667",
+  "verdict": "working",
+  "reason": "",
+  "gif": "assets/betamax/gif/linux-zsh-help-tour.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35534422225",
   "extra": {
     "tool_version": "betamax-v0.1.21",
     "omp_version": "omp/18.2.6"
