@@ -4,9 +4,9 @@
   "shell": "pwsh",
   "scenario": "help-tour",
   "verdict": "broken",
-  "reason": "PowerSession v0.1.16 cannot record headlessly on the windows-pwsh runner: its stdout mirror thread calls WriteConsoleW on the runner's redirected (non-console) stdout, which fails with HRESULT 0x80070001 ('Incorrect function') and panics at record.rs:270 (cascading to terminal.rs:263 SendError). Only the asciicast header is written (cast has 0 output events), so no usable GIF is produced. See run logs.",
+  "reason": "PowerSession v0.1.16 cannot record headlessly on the windows-pwsh runner: its stdout mirror thread calls WriteConsoleW, which fails with HRESULT 0x80070001 ('Incorrect function') and panics at record.rs:270 (cascading to terminal.rs:263 SendError), so only the asciicast header is written (0 output events, no usable GIF). This is a headless-runner limitation: PowerSession records correctly on a real interactive Windows console, but neither a ConPTY (pywinpty/zellij) nor CREATE_NEW_CONSOLE yields a WriteConsoleW-capable screen buffer on the GitHub runner's non-interactive session. See run logs.",
   "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35523872077",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35524261480",
   "extra": {
     "tool_version": "v0.1.16 (agg v1.9.0)",
     "omp_version": "omp/18.2.6"
