@@ -75,9 +75,10 @@ def record(scenario: str, cast: str) -> int:
            "--command", command_arg]
     print(f"drive: {' '.join(cmd)}", flush=True)
 
-    # CREATE_NEW_CONSOLE gives PowerSession its own real console screen buffer,
-    # so its stdout-mirror thread's WriteConsoleW (record.rs:270) no longer fails
-    # with HRESULT 0x80070001 the way it does on the runner's redirected stdout.
+    # CREATE_NEW_CONSOLE gives PowerSession its own console screen buffer so its
+    # stdout-mirror WriteConsoleW (record.rs:270) works on a real interactive Windows
+    # console (verified locally). On a headless CI runner there is no interactive
+    # console session, so WriteConsoleW still fails with HRESULT 0x80070001 there.
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                             creationflags=subprocess.CREATE_NEW_CONSOLE)
 
