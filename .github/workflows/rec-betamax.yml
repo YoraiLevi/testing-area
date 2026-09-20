@@ -87,6 +87,14 @@ jobs:
           else TIMEOUT=""; fi
           echo "timeout wrapper: ${TIMEOUT:-<none>}"
 
+          # Video containers (mp4/webm/webp) are encoded via ffmpeg; the gif path is
+          # native. Ensure ffmpeg exists so every claimed format can render.
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            if [ "$RUNNER_OS" = "Linux" ]; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg;
+            elif [ "$RUNNER_OS" = "macOS" ]; then brew install ffmpeg || true; fi
+          fi
+          echo "ffmpeg: $(command -v ffmpeg || echo MISSING)"
+
           for f in scenarios/betamax/0*.tape; do
             s="$(basename "$f" .tape)"          # e.g. 01-launch-exit
             scenario="${s#*-}"                  # e.g. launch-exit
@@ -95,33 +103,29 @@ jobs:
             tape="tapes/${s}.tape"
             { echo "Set Shell \"${shell_cmd}\""; cat "$f"; } > "$tape"
             echo "== rendering ${scenario} =="
+            # betamax run accepts a single --output, so render once per format
+            # (the extension selects the encoder). tui-splash needs a fresh signal
+            # watchdog around each headless TUI run.
             if [ "$scenario" = "tui-splash" ]; then
-              # The omp TUI ignores headless quit keystrokes, so escalate signals to the
-              # omp process after the splash has been captured; once it dies the shell
-              # returns and the tape's `exit` lets Betamax finalize the recording.
-              (
-                sleep 6
-                pkill -INT  -f 'omp --no-session' 2>/dev/null || true
-                sleep 2
-                pkill -TERM -f 'omp --no-session' 2>/dev/null || true
-                sleep 2
-                pkill -KILL -f 'omp --no-session' 2>/dev/null || true
-              ) &
-              watchdog=$!
-              $TIMEOUT betamax run "$tape" \
-                --output "$gif" \
-                --output "out/${base}.webp" \
-                --output "out/${base}.mp4" \
-                --output "out/${base}.webm" \
-                || echo "  betamax exit=$? for ${scenario}"
-              kill "$watchdog" 2>/dev/null || true
+              for ext in gif webp mp4 webm; do
+                (
+                  sleep 6
+                  pkill -INT  -f 'omp --no-session' 2>/dev/null || true
+                  sleep 2
+                  pkill -TERM -f 'omp --no-session' 2>/dev/null || true
+                  sleep 2
+                  pkill -KILL -f 'omp --no-session' 2>/dev/null || true
+                ) &
+                watchdog=$!
+                $TIMEOUT betamax run "$tape" --output "out/${base}.${ext}" \
+                  || echo "  betamax exit=$? for ${scenario} ${ext}"
+                kill "$watchdog" 2>/dev/null || true
+              done
             else
-              $TIMEOUT betamax run "$tape" \
-                --output "$gif" \
-                --output "out/${base}.webp" \
-                --output "out/${base}.mp4" \
-                --output "out/${base}.webm" \
-                || echo "  betamax exit=$? for ${scenario}"
+              for ext in gif webp mp4 webm; do
+                $TIMEOUT betamax run "$tape" --output "out/${base}.${ext}" \
+                  || echo "  betamax exit=$? for ${scenario} ${ext}"
+              done
             fi
             echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"
           done

@@ -92,32 +92,41 @@ jobs:
           echo "demotape=$(gem list demotape 2>/dev/null | tr -d '\n')"
           echo "ttyd=$(command -v ttyd)  ffmpeg=$(command -v ffmpeg)"
 
+          # mp4/webm/avi are encoded via ffmpeg; gif is native. Ensure ffmpeg exists.
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            if [ "$RUNNER_OS" = "Linux" ]; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg;
+            elif [ "$RUNNER_OS" = "macOS" ]; then brew install ffmpeg || true; fi
+          fi
+          echo "ffmpeg: $(command -v ffmpeg || echo MISSING)"
+
           # Run one tape with a background SIGINT -> SIGTERM -> SIGKILL watchdog so a
           # TUI that cannot be quit by keystroke headlessly can never wedge the job.
           # Demo Tape also self-bounds via its --timeout; the watchdog is the backstop.
           render() {   # $1=tape  $2=out  $3=demotape-timeout(s)
             local tape="$1" out="$2" t="$3" outbase="${2%.gif}"
             echo "== rendering $(basename "$tape") -> $out (timeout ${t}s) =="
-            demotape run "$tape" \
-              --overwrite \
-              --shell "${{ matrix.shell }}" \
-              --output-path "${outbase}.gif" \
-              --output-path "${outbase}.mp4" \
-              --output-path "${outbase}.webm" \
-              --output-path "${outbase}.avi" \
-              --width 1200 --height 640 --font-size 20 \
-              --typing-speed 60ms \
-              --timeout "$t" \
-              --debug &
-            local pid=$!
-            ( sleep $((t + 20)); kill -INT  "$pid" 2>/dev/null
-              sleep 8;           kill -TERM "$pid" 2>/dev/null
-              sleep 8;           kill -KILL "$pid" 2>/dev/null ) &
-            local wd=$!
-            wait "$pid"; local rc=$?
-            kill "$wd" 2>/dev/null || true
-            wait "$wd" 2>/dev/null || true
-            echo "  demotape exit=$rc  gif=$(ls -la "$out" 2>/dev/null || echo MISSING)"
+            # --output-path takes a single value (later ones silently override), so
+            # render once per format; the extension selects the encoder.
+            local ext
+            for ext in gif mp4 webm avi; do
+              demotape run "$tape" \
+                --overwrite \
+                --shell "${{ matrix.shell }}" \
+                --output-path "${outbase}.${ext}" \
+                --width 1200 --height 640 --font-size 20 \
+                --typing-speed 60ms \
+                --timeout "$t" \
+                --debug &
+              local pid=$!
+              ( sleep $((t + 20)); kill -INT  "$pid" 2>/dev/null
+                sleep 8;           kill -TERM "$pid" 2>/dev/null
+                sleep 8;           kill -KILL "$pid" 2>/dev/null ) &
+              local wd=$!
+              wait "$pid"; local rc=$?
+              kill "$wd" 2>/dev/null || true
+              wait "$wd" 2>/dev/null || true
+              echo "  demotape ${ext} exit=$rc  file=$(ls -la "${outbase}.${ext}" 2>/dev/null || echo MISSING)"
+            done
           }
 
           C="${{ matrix.cell_os }}-${{ matrix.shell }}"

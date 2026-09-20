@@ -81,6 +81,13 @@ jobs:
           echo "record subcommand: $REC"
 
           mkdir -p out
+          # termsvg's webm export shells out to ffmpeg (gif/svg are native). Ensure it.
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            if [ "$RUNNER_OS" = "Linux" ]; then sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg;
+            elif [ "$RUNNER_OS" = "macOS" ]; then brew install ffmpeg || true; fi
+          fi
+          echo "ffmpeg: $(command -v ffmpeg || echo MISSING)"
+
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             echo "::group::record $scenario"
