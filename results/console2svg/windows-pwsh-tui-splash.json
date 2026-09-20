@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "omp TUI captured headlessly via console2svg --timeout (splash/onboarding screen)",
   "gif": "assets/console2svg/windows-pwsh-tui-splash.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35524971908",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35525379941",
   "extra": {
     "tool_version": "v0.9.3",
     "omp_version": "omp/18.2.6"
