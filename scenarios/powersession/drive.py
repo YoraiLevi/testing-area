@@ -3,9 +3,9 @@
 
 PowerSession (v0.1.16) is a Windows-only, asciinema-compatible recorder built on
 the Windows Pseudo Console (ConPTY). `PowerSession.exe rec <file> --command
-"<cmd>"` spawns <cmd> under a pseudo console, forwards this process's stdin to
-it, and writes every stdout chunk to an asciicast v2 `.cast` until the child
-exits.
+"<cmd>"` spawns <cmd> under a pseudo console and writes every stdout chunk to an
+asciicast v2 `.cast` until the child exits. Its stdout-mirror thread uses
+WriteConsoleW, so PowerSession is launched in its own new console (see record()).
 
 Scenario handling:
   * launch-exit / help-tour  hand PowerSession a self-contained `pwsh -File`
@@ -16,9 +16,9 @@ Scenario handling:
     recording with the splash captured (PowerSession cannot send an interactive
     quit to the TUI headlessly).
   * typing-demo  scenarios.md S4 shell-prompt fallback: PowerSession cannot inject
-    keystrokes into the omp TUI input box headlessly, so an interactive pwsh is
-    driven over stdin to TYPE a sample prompt (without Enter) at the shell prompt,
-    exercising keystroke animation, then the shell is closed.
+    keystrokes into the omp TUI input box headlessly, so a self-contained
+    `pwsh -File` script types a sample prompt char-by-char at the shell prompt
+    (keystroke animation) and exits.
 
 Usage: drive.py <scenario> <cast_path>
 """
@@ -27,10 +27,6 @@ import subprocess
 import sys
 import threading
 import time
-
-TYPING = 0.05  # per-character delay, fixed typing speed
-CR = b"\r"
-CTRL_C = b"\x03"
 
 SCRIPT_DIR = "scenarios/powersession"
 
@@ -47,45 +43,32 @@ def tree_kill(pid: int) -> None:
 
 
 def plan(scenario: str):
-    """Return (command_arg, kill_after_seconds, steps)."""
+    """Return (command_arg, kill_after_seconds). Every scenario is a self-exiting
+    `--command` script so PowerSession can run in a new console without stdin."""
     if scenario == "launch-exit":
-        return pwsh_file("launch-exit.ps1"), None, []
+        return pwsh_file("launch-exit.ps1"), None
     if scenario == "help-tour":
-        return pwsh_file("help-tour.ps1"), None, []
+        return pwsh_file("help-tour.ps1"), None
     if scenario == "tui-splash":
-        # No stdin steps; a watchdog tree-kills PowerSession once the splash rendered.
-        return pwsh_file("tui-splash.ps1"), 6.0, []
+        # A watchdog tree-kills PowerSession once the splash has rendered.
+        return pwsh_file("tui-splash.ps1"), 6.0
     if scenario == "typing-demo":
-        steps = [
-            ("sleep", 1.5),
-            ("type", "explain what this repository does"),
-            ("sleep", 2.0),
-            ("send", CTRL_C),
-            ("sleep", 0.6),
-            ("type", "exit"), ("send", CR),
-            ("sleep", 0.8),
-        ]
-        return "pwsh.exe -NoLogo -NoProfile", None, steps
+        return pwsh_file("typing-demo.ps1"), None
     raise SystemExit(f"drive: unknown scenario {scenario!r}")
 
 
 def record(scenario: str, cast: str) -> int:
-    command_arg, kill_after, steps = plan(scenario)
+    command_arg, kill_after = plan(scenario)
     cmd = ["PowerSession.exe", "rec", cast, "-f", "--log-level", "trace",
            "--command", command_arg]
     print(f"drive: {' '.join(cmd)}", flush=True)
 
-    # PowerSession's stdout-mirror thread calls WriteConsoleW, so its stdout MUST be a
-    # real console screen buffer, not the runner's redirected pipe. For the self-exiting
-    # `--command` scenarios we launch it in a brand-new console with NO stdio redirection,
-    # so the new console owns stdout/stderr. (Passing stdin=PIPE would set
-    # STARTF_USESTDHANDLES and force the child to inherit the runner's redirected stdout,
-    # defeating CREATE_NEW_CONSOLE.) typing-demo injects keystrokes, which needs an
-    # inherited stdin pipe and therefore cannot use a detached new console.
-    if steps:
-        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-    else:
-        proc = subprocess.Popen(cmd, creationflags=subprocess.CREATE_NEW_CONSOLE)
+    # PowerSession's stdout-mirror thread calls WriteConsoleW, which needs a real
+    # console screen buffer. Launch it in a brand-new console with NO stdio
+    # redirection so that console owns stdout/stderr; a redirected/inherited stdout
+    # pipe makes WriteConsoleW fail with HRESULT 0x80070001. Every scenario is a
+    # self-exiting `--command` script, so no stdin injection is needed.
+    proc = subprocess.Popen(cmd, creationflags=subprocess.CREATE_NEW_CONSOLE)
 
     if kill_after is not None:
         def watchdog():
@@ -93,25 +76,6 @@ def record(scenario: str, cast: str) -> int:
             print(f"drive: watchdog tree-killing PowerSession pid={proc.pid}", flush=True)
             tree_kill(proc.pid)
         threading.Thread(target=watchdog, daemon=True).start()
-
-    if steps and proc.stdin is not None:
-        def write(data: bytes) -> None:
-            if proc.poll() is not None:
-                return
-            try:
-                proc.stdin.write(data)
-                proc.stdin.flush()
-            except (BrokenPipeError, OSError):
-                pass
-        for kind, payload in steps:
-            if kind == "sleep":
-                time.sleep(payload)
-            elif kind == "type":
-                for ch in payload:
-                    write(ch.encode("utf-8"))
-                    time.sleep(TYPING)
-            elif kind == "send":
-                write(payload)
 
     try:
         rc = proc.wait(timeout=45)
@@ -123,12 +87,6 @@ def record(scenario: str, cast: str) -> int:
         except subprocess.TimeoutExpired:
             proc.kill()
             rc = 124
-    finally:
-        try:
-            if proc.stdin:
-                proc.stdin.close()
-        except (BrokenPipeError, OSError):
-            pass
 
     print(f"drive: PowerSession exit={rc}", flush=True)
     return rc
