@@ -1,0 +1,14 @@
+{
+  "tool": "termsvg",
+  "os": "windows",
+  "shell": "pwsh",
+  "scenario": "tui-splash",
+  "verdict": "broken",
+  "reason": "omp TUI could not be driven/quit headlessly via termsvg PTY capture; no valid GIF produced",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356774",
+  "extra": {
+    "tool_version": "v0.11.0",
+    "omp_version": "omp/18.2.6"
+  }
+}

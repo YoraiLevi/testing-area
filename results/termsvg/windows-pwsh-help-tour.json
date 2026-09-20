@@ -1,0 +1,14 @@
+{
+  "tool": "termsvg",
+  "os": "windows",
+  "shell": "pwsh",
+  "scenario": "help-tour",
+  "verdict": "broken",
+  "reason": "no valid GIF produced in CI",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356774",
+  "extra": {
+    "tool_version": "v0.11.0",
+    "omp_version": "omp/18.2.6"
+  }
+}
