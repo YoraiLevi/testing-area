@@ -1,11 +1,11 @@
 {
   "tool": "asciinema",
   "os": "linux",
-  "shell": "bash",
-  "scenario": "launch-exit",
+  "shell": "pwsh",
+  "scenario": "typing-demo",
   "verdict": "working",
-  "reason": "",
-  "gif": "assets/asciinema/linux-bash-launch-exit.gif",
+  "reason": "shell-prompt typing fallback: asciinema cannot inject keystrokes into the omp TUI headlessly (scenarios.md S4)",
+  "gif": "assets/asciinema/linux-pwsh-typing-demo.gif",
   "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356800",
   "extra": {
     "tool_version": "v3.2.1 + agg v1.9.0",

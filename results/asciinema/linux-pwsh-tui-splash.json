@@ -1,11 +1,11 @@
 {
   "tool": "asciinema",
-  "os": "macos",
-  "shell": "zsh",
-  "scenario": "launch-exit",
+  "os": "linux",
+  "shell": "pwsh",
+  "scenario": "tui-splash",
   "verdict": "working",
   "reason": "",
-  "gif": "assets/asciinema/macos-zsh-launch-exit.gif",
+  "gif": "assets/asciinema/linux-pwsh-tui-splash.gif",
   "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356800",
   "extra": {
     "tool_version": "v3.2.1 + agg v1.9.0",
