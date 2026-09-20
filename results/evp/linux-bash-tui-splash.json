@@ -5,10 +5,10 @@
   "scenario": "tui-splash",
   "verdict": "working",
   "reason": "omp TUI ignores headless quit keystrokes; a background SIGINT->SIGTERM->SIGKILL watchdog ends the omp process so EVP can finalize the splash recording (scenarios.md S3)",
-  "gif": "assets/evp/linux-bash-tui-splash.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35528564974",
+  "gif": "assets/evp/gif/linux-bash-tui-splash.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35533474545",
   "extra": {
-    "svg": "assets/evp/linux-bash-tui-splash.svg",
+    "svg": "assets/evp/svg/linux-bash-tui-splash.svg",
     "tool_version": "v0.19.0",
     "omp_version": "omp/18.2.6"
   }
