@@ -14,6 +14,6 @@ format it supports; files are laid out hierarchically as
 | [Demo Tape](demotape/) | scripted | scripted | gif · mp4 · webm · avi | 0 |
 | [asciinema + agg](asciinema/) | hybrid | interactive + scripted | cast · gif | 32 |
 | [PowerSession-rs + agg](powersession/) | hybrid | interactive + scripted | cast · gif | 8 |
-| [Terminalizer](terminalizer/) | hybrid | interactive + scripted | yml · gif | 0 |
+| [Terminalizer](terminalizer/) | hybrid | interactive + scripted | yml · gif | 32 |
 | [acast](acast/) | interactive | interactive | cast · gif | 32 |
-| [termsvg](termsvg/) | interactive | interactive | cast · svg · gif · webm | 0 |
+| [termsvg](termsvg/) | interactive | interactive | cast · svg · gif · webm | 36 |
