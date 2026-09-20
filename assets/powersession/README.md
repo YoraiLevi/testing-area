@@ -10,12 +10,16 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `cast` — 4 file(s)
 
+Sample: [`windows-pwsh-help-tour.cast`](cast/windows-pwsh-help-tour.cast) (`cast` does not render inline on GitHub; download to view)
+
 - [`windows-pwsh-help-tour.cast`](cast/windows-pwsh-help-tour.cast)
 - [`windows-pwsh-launch-exit.cast`](cast/windows-pwsh-launch-exit.cast)
 - [`windows-pwsh-tui-splash.cast`](cast/windows-pwsh-tui-splash.cast)
 - [`windows-pwsh-typing-demo.cast`](cast/windows-pwsh-typing-demo.cast)
 
 ## `gif` — 4 file(s)
+
+![PowerSession-rs + agg gif sample — windows-pwsh-help-tour.gif](gif/windows-pwsh-help-tour.gif)
 
 - [`windows-pwsh-help-tour.gif`](gif/windows-pwsh-help-tour.gif)
 - [`windows-pwsh-launch-exit.gif`](gif/windows-pwsh-launch-exit.gif)

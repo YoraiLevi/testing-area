@@ -10,6 +10,8 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `svg` — 20 file(s)
 
+![console2svg svg sample — linux-bash-help-tour.svg](svg/linux-bash-help-tour.svg)
+
 - [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg)
 - [`linux-bash-launch-exit.svg`](svg/linux-bash-launch-exit.svg)
 - [`linux-bash-tui-splash.svg`](svg/linux-bash-tui-splash.svg)
@@ -32,6 +34,8 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`windows-pwsh-typing-demo.svg`](svg/windows-pwsh-typing-demo.svg)
 
 ## `gif` — 20 file(s)
+
+![console2svg gif sample — linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
 
 - [`linux-bash-help-tour.gif`](gif/linux-bash-help-tour.gif)
 - [`linux-bash-launch-exit.gif`](gif/linux-bash-launch-exit.gif)
@@ -56,6 +60,8 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `mp4` — 20 file(s)
 
+Sample: [`linux-bash-help-tour.mp4`](mp4/linux-bash-help-tour.mp4) (`mp4` does not render inline on GitHub; download to view)
+
 - [`linux-bash-help-tour.mp4`](mp4/linux-bash-help-tour.mp4)
 - [`linux-bash-launch-exit.mp4`](mp4/linux-bash-launch-exit.mp4)
 - [`linux-bash-tui-splash.mp4`](mp4/linux-bash-tui-splash.mp4)
@@ -78,6 +84,8 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`windows-pwsh-typing-demo.mp4`](mp4/windows-pwsh-typing-demo.mp4)
 
 ## `webm` — 20 file(s)
+
+Sample: [`linux-bash-help-tour.webm`](webm/linux-bash-help-tour.webm) (`webm` does not render inline on GitHub; download to view)
 
 - [`linux-bash-help-tour.webm`](webm/linux-bash-help-tour.webm)
 - [`linux-bash-launch-exit.webm`](webm/linux-bash-launch-exit.webm)

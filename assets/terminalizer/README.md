@@ -10,6 +10,8 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `yml` — 16 file(s)
 
+Sample: [`linux-bash-help-tour.yml`](yml/linux-bash-help-tour.yml) (`yml` does not render inline on GitHub; download to view)
+
 - [`linux-bash-help-tour.yml`](yml/linux-bash-help-tour.yml)
 - [`linux-bash-launch-exit.yml`](yml/linux-bash-launch-exit.yml)
 - [`linux-bash-tui-splash.yml`](yml/linux-bash-tui-splash.yml)
@@ -28,6 +30,8 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`macos-zsh-typing-demo.yml`](yml/macos-zsh-typing-demo.yml)
 
 ## `gif` — 16 file(s)
+
+![Terminalizer gif sample — linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
 
 - [`linux-bash-help-tour.gif`](gif/linux-bash-help-tour.gif)
 - [`linux-bash-launch-exit.gif`](gif/linux-bash-launch-exit.gif)
