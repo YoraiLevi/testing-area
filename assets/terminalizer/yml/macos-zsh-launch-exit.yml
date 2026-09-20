@@ -82,9 +82,9 @@ config:
 records:
   - delay: 170
     content: "^D\b\b"
-  - delay: 51
+  - delay: 30
     content: "$ omp --version\r\n"
-  - delay: 345
+  - delay: 41
     content: "omp/18.2.6\r\n"
-  - delay: 2072
+  - delay: 2014
     content: "$ exit\r\n"
