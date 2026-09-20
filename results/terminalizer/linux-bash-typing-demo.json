@@ -5,8 +5,8 @@
   "scenario": "typing-demo",
   "verdict": "working",
   "reason": "shell-prompt typing fallback: terminalizer records a command to completion and cannot inject keystrokes into the omp TUI input box headlessly (scenarios.md S4)",
-  "gif": "assets/terminalizer/linux-bash-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35529650511",
+  "gif": "assets/terminalizer/gif/linux-bash-typing-demo.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35533474643",
   "extra": {
     "tool_version": "latest (npm 0.12.0)",
     "omp_version": "omp/18.2.6"

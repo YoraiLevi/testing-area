@@ -1,0 +1,90 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Terminalizer recording config for the omp trials (linux-bash cell).
+  # Passed to `terminalizer record` via `-c`. The `command` is left null because the
+  # workflow overrides it per scenario with `-d 'bash <scenario>.sh'`; when that script
+  # exits the recording ends. Geometry is pinned to the contract's 100x24 (scenarios.md).
+  
+  # Overridden per scenario by the record step's -d flag.
+  command: bash scenarios/terminalizer/03-tui-splash.sh
+  
+  # Use the workspace as the working directory.
+  cwd: /home/runner/work/testing-area/testing-area
+  
+  # Extra env exported into the recorded command.
+  env:
+    recording: true
+  
+  # Pinned deterministic geometry (contract: 100 cols x 24 rows).
+  cols: 100
+  rows: 24
+  
+  # Loop the GIF indefinitely.
+  repeat: 0
+  
+  # GIF quality (1 - 100). Kept moderate to keep committed assets small.
+  quality: 50
+  
+  # Use the real captured delays, capped so long idle gaps do not bloat the GIF.
+  frameDelay: auto
+  maxIdleTime: 2000
+  
+  # Plain frame (no window chrome) on a solid dark background so the terminal fills
+  # the GIF and rendering stays deterministic.
+  frameBox:
+    type: null
+    title: null
+    style:
+      backgroundColor: "#171717"
+      padding: 16px
+  
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+  
+  cursorStyle: block
+  
+  # Fonts installed by the workflow (fonts-dejavu-core, fonts-liberation) so the
+  # headless Electron renderer always has a real monospace face available.
+  fontFamily: "DejaVu Sans Mono, Liberation Mono, Monospace"
+  fontSize: 14
+  lineHeight: 1
+  letterSpacing: 0
+  
+  theme:
+    background: "transparent"
+    foreground: "#d5d5d0"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#fc4384"
+    green: "#b3e33b"
+    yellow: "#ffa727"
+    blue: "#75dff2"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#ff7fac"
+    brightGreen: "#c8ed71"
+    brightYellow: "#ebdf86"
+    brightBlue: "#75dff2"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+  
+# Records, feel free to edit them
+records:
+  - delay: 272
+    content: "$ omp --no-session\r\n"
+  - delay: 5
+    content: ^@
+  - delay: 3112
+    content: "\e[?2004h\e[?1l\e>\e[?u\e[c\e]11;?\a\e[c\e[?2031h\e[?2026$p\e[c\e[?2048$p\e[c\e[?2031$p\e[c\e[?1010$p\e[c\e[?1011$p\e[c\e[?5522h\e[?25l\e[22;2t\e]0;π >\a\e]0;π > testing-area\a\e[0 q"
+  - delay: 12
+    content: "\e[?25l\e[?7l\e[H\e[2J\e[3J\e[1;1H\e[0m\e[K\e[38;5;243m│\e[39m      \e[1mWelcome back!\e[22m       \e[38;5;243m│\e[39m \e[38;5;243m#\e[39;38;5;248m for prompt actions\e[39m                                                \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m \e[38;5;243m/\e[39;38;5;248m for commands\e[39m                                                      \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m       \e[38;5;99m█\e[0;38;5;99m█\e[0;38;5;99m█\e[0;38;5;69m█\e[0;38;5;69m█\e[0;38;5;69m█\e[0;38;5;69m█\e[0;38;5;74m█\e[0;38;5;74m█\e[0;38;5;74m█\e[0;38;5;44m█\e[0;38;5;44m█\e[0m       \e[38;5;243m│\e[39m \e[38;5;243m!\e[39;38;5;248m to run bash\e[39m                                                       \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m          \e[38;5;69m█\e[0;38;5;74m█\e[0m  \e[38;5;44m█\e[0;38;5;44m█\e[0m          \e[38;5;243m│\e[39m \e[38;5;243m$\e[39;38;5;248m to run python\e[39m                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m          \e[38;5;74m█\e[0;38;5;74m█\e[0m  \e[38;5;44m█\e[0;38;5;44m█\e[0m          \e[38;5;243m│\e[39m \e[38;5;243m───────────────────────────────────────────────────────────────────\e[39m \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m          \e[38;5;44m▒\e[0;38;5;44m▒\e[0m  \e[38;5;170m█\e[0;38;5;170m█\e[0m          \e[38;5;243m│\e[39m \e[1;38;5;39mLSP Servers\e[39;22m                                                         \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m              \e[38;5;134m█\e[0;38;5;134m█\e[0m          \e[38;5;243m│\e[39m \e[38;5;243mNo LSP servers\e[39m                                                      \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m                                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m         \e[38;5;248mUnknown\e[39m          \e[38;5;243m│\e[39m                                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m         \e[38;5;235mUnknown\e[39m          \e[38;5;243m│\e[39m                                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m \e[38;5;243m───────────────────────────────────────────────────────────────────\e[39m \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m \e[1;38;5;39mRecent sessions\e[39;22m                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m \e[38;5;243mNo recent sessions\e[39m                                                  \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m                                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m                                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m                                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m│\e[39m                          \e[38;5;243m│\e[39m                                                                     \e[38;5;243m│\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;243m╰\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m┴\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m─\e[39;38;5;243m╯\e[39m\e[0m\r\r\n\e[0m\e[K \e[3;38;5;180mTip: \e[39;38;5;248mPress ← ← to drill into a running or finished agent and inspect its tool calls and\e[39;23m\e[0m\r\r\n \e[3m     \e[38;5;248mtranscript\e[39;23m\e[0m\e[K\r\r\n\e[0m\e[K\r\r\n\e[0m\e[K\r\r\n\e[0m\e[K\e[48;5;233;39m \e[38;5;243mπ\e[39m \e[38;5;236m>\e[39m \e[38;5;39m⬢ no-model\e[39m \e[38;5;236m>\e[39m \e[38;5;255m\U0001F4C1 ~/work/testing-area/testing-area\e[39m \e[38;5;236m>\e[39m \e[38;5;48m⑂ testing-vhs\e[39m \e[38;5;236m>\e[39m ◫ \e[38;5;248m17K/?\e[39m \e[38;5;248m⟲\e[39m \e[0;38;5;233m▶\e[0;49;38;5;39m─────────────────\e[39m\e[0m\r\r\n\e[0m\e[K\e[38;5;39m╰─ \e[39;38;5;254;39m                                                                                                 \e[0m\r\e[24;4H\e[?25h\e[?7h\e[?2026l\e[?7h\e[?1l\e>\e[?2004l\e[?2031l\e[?2048l\e[?5522l\e[<u\e[>4;0m\e[?1006l\e[?1003l\e[?1000l\e[0 q\e[?25h"

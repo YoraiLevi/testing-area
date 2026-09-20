@@ -1,0 +1,88 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Terminalizer recording config for the omp trials (linux-bash cell).
+  # Passed to `terminalizer record` via `-c`. The `command` is left null because the
+  # workflow overrides it per scenario with `-d 'bash <scenario>.sh'`; when that script
+  # exits the recording ends. Geometry is pinned to the contract's 100x24 (scenarios.md).
+  
+  # Overridden per scenario by the record step's -d flag.
+  command: pwsh scenarios/terminalizer/04-typing-demo.sh
+  
+  # Use the workspace as the working directory.
+  cwd: /home/runner/work/testing-area/testing-area
+  
+  # Extra env exported into the recorded command.
+  env:
+    recording: true
+  
+  # Pinned deterministic geometry (contract: 100 cols x 24 rows).
+  cols: 100
+  rows: 24
+  
+  # Loop the GIF indefinitely.
+  repeat: 0
+  
+  # GIF quality (1 - 100). Kept moderate to keep committed assets small.
+  quality: 50
+  
+  # Use the real captured delays, capped so long idle gaps do not bloat the GIF.
+  frameDelay: auto
+  maxIdleTime: 2000
+  
+  # Plain frame (no window chrome) on a solid dark background so the terminal fills
+  # the GIF and rendering stays deterministic.
+  frameBox:
+    type: null
+    title: null
+    style:
+      backgroundColor: "#171717"
+      padding: 16px
+  
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+  
+  cursorStyle: block
+  
+  # Fonts installed by the workflow (fonts-dejavu-core, fonts-liberation) so the
+  # headless Electron renderer always has a real monospace face available.
+  fontFamily: "DejaVu Sans Mono, Liberation Mono, Monospace"
+  fontSize: 14
+  lineHeight: 1
+  letterSpacing: 0
+  
+  theme:
+    background: "transparent"
+    foreground: "#d5d5d0"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#fc4384"
+    green: "#b3e33b"
+    yellow: "#ffa727"
+    blue: "#75dff2"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#ff7fac"
+    brightGreen: "#c8ed71"
+    brightYellow: "#ebdf86"
+    brightBlue: "#75dff2"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+  
+# Records, feel free to edit them
+records:
+  - delay: 298
+    content: ^@
+  - delay: 75
+    content: "\e[?1h\e="
+  - delay: 241
+    content: "\e[31;1mParserError: \e[0m\r\n\e[31;1m\e[36;1mLine |\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m  12 | \e[0m while\e[36;1m \e[0m[ \"$i\" -le \"$len\" ]; do\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m\e[0m\e[36;1m\e[0m\e[36;1m     | \e[31;1m      ~\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m\e[0m\e[36;1m\e[0m\e[36;1m\e[31;1m\e[31;1m\e[36;1m     | \e[31;1mMissing opening '(' after keyword 'while'.\e[0m\r\n"

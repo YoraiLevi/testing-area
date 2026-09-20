@@ -5,8 +5,8 @@
   "scenario": "launch-exit",
   "verdict": "working",
   "reason": "",
-  "gif": "assets/terminalizer/macos-zsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35529650511",
+  "gif": "assets/terminalizer/gif/macos-zsh-launch-exit.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35533474643",
   "extra": {
     "tool_version": "latest (npm 0.12.0)",
     "omp_version": "omp/18.2.6"
