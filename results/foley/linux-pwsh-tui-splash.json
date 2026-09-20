@@ -1,11 +1,11 @@
 {
   "tool": "foley",
-  "os": "macos",
-  "shell": "zsh",
+  "os": "linux",
+  "shell": "pwsh",
   "scenario": "tui-splash",
   "verdict": "working",
   "reason": "foley launches and holds the omp TUI (omp --no-session) on a real pty in realtime mode, capturing the splash/onboarding screen; foley finalizes the take at tape end (foley v0.1.0's vtengine cannot encode Ctrl+<letter>, so no interactive Ctrl+C quit is sent)",
-  "gif": "assets/foley/macos-zsh-tui-splash.gif",
+  "gif": "assets/foley/linux-pwsh-tui-splash.gif",
   "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356768",
   "extra": {
     "tool_version": "foley v0.1.0",
