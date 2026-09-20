@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/acast/linux-pwsh-help-tour.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356747",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35528564978",
   "extra": {
     "tool_version": "v0.4.0 (agg v1.9.0)",
     "omp_version": "omp/18.2.6"
