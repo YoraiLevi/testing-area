@@ -3,10 +3,10 @@
   "os": "macos",
   "shell": "zsh",
   "scenario": "launch-exit",
-  "verdict": "working",
-  "reason": "",
-  "gif": "assets/demotape/macos-zsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35528564950",
+  "verdict": "broken",
+  "reason": "no valid GIF produced in CI",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35533474632",
   "extra": {
     "tool_version": "demotape gem 0.0.10",
     "omp_version": "omp/18.2.6"
