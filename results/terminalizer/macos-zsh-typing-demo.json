@@ -3,12 +3,12 @@
   "os": "macos",
   "shell": "zsh",
   "scenario": "typing-demo",
-  "verdict": "broken",
-  "reason": "shell-prompt typing fallback produced no valid GIF in CI",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356745",
+  "verdict": "working",
+  "reason": "shell-prompt typing fallback: terminalizer records a command to completion and cannot inject keystrokes into the omp TUI input box headlessly (scenarios.md S4)",
+  "gif": "assets/terminalizer/macos-zsh-typing-demo.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35528564966",
   "extra": {
-    "tool_version": "latest (npm unknown)",
+    "tool_version": "latest (npm 0.12.0)",
     "omp_version": "omp/18.2.6"
   }
 }
