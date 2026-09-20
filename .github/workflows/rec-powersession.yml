@@ -85,11 +85,11 @@ jobs:
           cast_lines() { if [ -f "$1" ]; then wc -l < "$1" | tr -d ' '; else echo 0; fi; }
 
           # Recorder-level health: did the headline scenario capture a real recording
-          # (valid GIF backed by a cast with actual output events)? PowerSession is
-          # launched with CREATE_NEW_CONSOLE (see drive.py), which lets it record on a
-          # real interactive Windows console (verified locally) -- but NOT on this
-          # headless runner, which has no interactive console session, so its
-          # WriteConsoleW stdout mirror still fails. The broken branch below reports it.
+          # (valid GIF backed by a cast with actual output events)? The self-exiting
+          # `--command` scenarios are launched in a new console with unredirected stdio
+          # (see drive.py) so PowerSession's WriteConsoleW stdout mirror hits a real
+          # console screen buffer instead of the runner's pipe. If that still fails the
+          # broken branch below records the CI reason.
           le_gif="$(find out -type f -name 'windows-pwsh-launch-exit.gif' 2>/dev/null | head -1)"
           if valid_gif "$le_gif" && [ "$(cast_lines casts/windows-pwsh-launch-exit.cast)" -ge 3 ]; then
             RECORDER_OK=1
@@ -98,7 +98,7 @@ jobs:
           fi
           echo "RECORDER_OK=$RECORDER_OK"
 
-          SKIP_REASON="PowerSession v0.1.16 cannot record headlessly on the windows-pwsh runner: its stdout mirror thread calls WriteConsoleW, which fails with HRESULT 0x80070001 ('Incorrect function') and panics at record.rs:270 (cascading to terminal.rs:263 SendError), so only the asciicast header is written (0 output events, no usable GIF). This is a headless-runner limitation: PowerSession records correctly on a real interactive Windows console, but neither a ConPTY (pywinpty/zellij) nor CREATE_NEW_CONSOLE yields a WriteConsoleW-capable screen buffer on the GitHub runner's non-interactive session. See run logs."
+          SKIP_REASON="PowerSession v0.1.16 produced no usable recording on the windows-pwsh runner: its stdout-mirror thread calls WriteConsoleW, which fails with HRESULT 0x80070001 ('Incorrect function') when its stdout is not a real console screen buffer, panicking at record.rs:270 (cascading to terminal.rs:263 SendError) so only the asciicast header is written (0 output events). See run logs."
 
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="windows-pwsh-${scenario}"

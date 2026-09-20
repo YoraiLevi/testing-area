@@ -75,12 +75,17 @@ def record(scenario: str, cast: str) -> int:
            "--command", command_arg]
     print(f"drive: {' '.join(cmd)}", flush=True)
 
-    # CREATE_NEW_CONSOLE gives PowerSession its own console screen buffer so its
-    # stdout-mirror WriteConsoleW (record.rs:270) works on a real interactive Windows
-    # console (verified locally). On a headless CI runner there is no interactive
-    # console session, so WriteConsoleW still fails with HRESULT 0x80070001 there.
-    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                            creationflags=subprocess.CREATE_NEW_CONSOLE)
+    # PowerSession's stdout-mirror thread calls WriteConsoleW, so its stdout MUST be a
+    # real console screen buffer, not the runner's redirected pipe. For the self-exiting
+    # `--command` scenarios we launch it in a brand-new console with NO stdio redirection,
+    # so the new console owns stdout/stderr. (Passing stdin=PIPE would set
+    # STARTF_USESTDHANDLES and force the child to inherit the runner's redirected stdout,
+    # defeating CREATE_NEW_CONSOLE.) typing-demo injects keystrokes, which needs an
+    # inherited stdin pipe and therefore cannot use a detached new console.
+    if steps:
+        proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+    else:
+        proc = subprocess.Popen(cmd, creationflags=subprocess.CREATE_NEW_CONSOLE)
 
     if kill_after is not None:
         def watchdog():
@@ -89,24 +94,24 @@ def record(scenario: str, cast: str) -> int:
             tree_kill(proc.pid)
         threading.Thread(target=watchdog, daemon=True).start()
 
-    def write(data: bytes) -> None:
-        if proc.poll() is not None:
-            return
-        try:
-            proc.stdin.write(data)
-            proc.stdin.flush()
-        except (BrokenPipeError, OSError):
-            pass
-
-    for kind, payload in steps:
-        if kind == "sleep":
-            time.sleep(payload)
-        elif kind == "type":
-            for ch in payload:
-                write(ch.encode("utf-8"))
-                time.sleep(TYPING)
-        elif kind == "send":
-            write(payload)
+    if steps and proc.stdin is not None:
+        def write(data: bytes) -> None:
+            if proc.poll() is not None:
+                return
+            try:
+                proc.stdin.write(data)
+                proc.stdin.flush()
+            except (BrokenPipeError, OSError):
+                pass
+        for kind, payload in steps:
+            if kind == "sleep":
+                time.sleep(payload)
+            elif kind == "type":
+                for ch in payload:
+                    write(ch.encode("utf-8"))
+                    time.sleep(TYPING)
+            elif kind == "send":
+                write(payload)
 
     try:
         rc = proc.wait(timeout=45)
