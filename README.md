@@ -1,59 +1,70 @@
 # Terminal Recorder Trials
 
-**Which terminal recorder actually works, on which OS and shell, for recording a real program
-(here: [Oh My Pi `omp`](https://omp.sh)) — proven in CI, not by popularity.**
+CI bake-off of terminal-to-GIF recorders, filmed against one real TUI program,
+[Oh My Pi (`omp`)](https://omp.sh). Stars do not decide anything: a tool counts as working
+only when a GitHub Actions job on `testing-vhs` committed a GIF for that OS and shell.
 
-Every verdict below is produced by a GitHub Actions run on the `testing-vhs` branch that uploaded a
-GIF artifact. Stars and issue counts never decide the verdict (see
-[`.specify/memory/constitution.md`](.specify/memory/constitution.md), Principles I & II). Design
-lives in [`specs/001-terminal-recorder-trials/`](specs/001-terminal-recorder-trials/).
+Working cells are green CI jobs that committed a GIF under [`assets/`](assets/). Broken cells
+link to the failing run. Not-applicable cells are upstream limits, often with no job at all.
+Design notes live in [`specs/001-terminal-recorder-trials/`](specs/001-terminal-recorder-trials/)
+and the evidence rules in [`.specify/memory/constitution.md`](.specify/memory/constitution.md).
 
-## The two families surveyed
+## Recorder Families
+
+Each recorder drives `omp` by playing a scripted tape or by capturing a live session; several
+support both. The grid's `Family` column uses these same three labels.
 
 ```mermaid
 flowchart LR
-  subgraph F1["Scripted &amp; deterministic (.tape / capture-cmd)"]
+  OMP(["omp: launch-exit + 3 scenarios"]):::c
+  subgraph SCR["Scripted (play a tape / guided)"]
     direction TB
-    VHS["VHS"]:::a
     FOLEY["Foley"]:::a
-    BETA["Betamax"]:::a
-    EVP["EVP"]:::a
-    C2S["console2svg"]:::a
+    BETA["Betamax (joshka)"]:::a
     DT["Demo Tape"]:::a
   end
-  subgraph F2["Interactive capture &amp; replay (.cast / typescript)"]
+  subgraph HYB["Hybrid (tape + live capture)"]
     direction TB
-    ASC["asciinema + agg"]:::b
-    PS["PowerSession-rs + agg"]:::b
-    TZ["Terminalizer"]:::b
+    VHS["VHS"]:::h
+    C2S["console2svg"]:::h
+    EVP["EVP"]:::h
+    ASC["asciinema + agg"]:::h
+    PS["PowerSession-rs + agg"]:::h
+    TZ["Terminalizer"]:::h
+  end
+  subgraph INT["Interactive (live TTY session)"]
+    direction TB
     ACAST["acast"]:::b
     TSVG["termsvg"]:::b
   end
-  OMP(["omp launch + exit\n(+ 3 creative scenarios)"]):::c
-  OMP --> F1
-  OMP --> F2
-  F1 --> GIF["GIF artifact\n(committed to repo)"]:::d
-  F2 --> GIF
+  OMP --> SCR
+  OMP --> HYB
+  OMP --> INT
+  SCR --> GIF["GIF committed under assets/"]:::d
+  HYB --> GIF
+  INT --> GIF
   classDef a fill:#4477AA,color:#fff,stroke:#222
   classDef b fill:#228833,color:#fff,stroke:#222
+  classDef h fill:#AA3377,color:#fff,stroke:#222
   classDef c fill:#CCBB44,color:#111,stroke:#222
-  classDef d fill:#AA3377,color:#fff,stroke:#222
+  classDef d fill:#66CCEE,color:#111,stroke:#222
 ```
 
-## Platform × shell reality
+## Platform and Shell
 
-The real split is **PTY (Unix) vs ConPTY (Windows)**, not bash vs zsh. `pwsh` runs everywhere;
-`bash` on Windows is Git Bash (not WSL) on GitHub runners. Window-screenshot tools (t-rec, ttygif,
-Peek, menyoki) cannot run on headless runners and are excluded with reasons in the ledger below.
+The split that matters is PTY (Linux and macOS) versus ConPTY (Windows), not bash versus zsh.
+The grid runs five cells: linux `{bash, zsh, pwsh}`, macos `zsh`, and windows `pwsh`. Other
+OS and shell pairs are out of scope, not silently failing. Tools that screenshot a desktop
+window cannot run on headless runners, so they sit in the Skipped table below.
 
-## How to read this report
+## How to Read This Report
 
-- The **Capability Grid** cell links to the exact CI run that produced (or failed to produce) the
-  recording.
-- The **Recordings** section embeds the four omp scenarios (`launch-exit`, `help-tour`,
-  `tui-splash`, `typing-demo`) for each working tool.
-- The **Skipped ledger** lists every candidate not evaluated in CI, with the reason (honest coverage,
-  constitution Principle VI).
+- Working and broken grid cells link to their CI run; a bare `➖` is an upstream limit with no job.
+- Four tapes drive each cell: `launch-exit` (start `omp`, quit), `help-tour` (help text),
+  `tui-splash` (the TUI), and `typing-demo` (typed input).
+- Recordings show all four scenarios from one representative working cell (linux-bash when it
+  exists); the other green cells are in the grid and under [`assets/`](assets/).
+- The Skipped table lists every candidate not evaluated in CI, with the reason.
 
 <!-- REPORT:START -->
 
@@ -397,8 +408,8 @@ _Tools discovered beyond the original list and evaluated:_ console2svg, EVP, aca
 [termsvg]: https://github.com/mrmarble/termsvg
 <!-- REPORT:END -->
 
-## Reproduce
+## How to Reproduce
 
-This project is validated in CI only. Trigger a tool via the Actions tab
-(`rec-<tool>` → Run workflow on `testing-vhs`) or push a change under `scenarios/**`. See
-[`specs/001-terminal-recorder-trials/quickstart.md`](specs/001-terminal-recorder-trials/quickstart.md).
+Everything runs in CI. In the Actions tab, run `rec-<tool>` on `testing-vhs`, or push a change
+under that tool's workflow, its `scenarios/` directory, or `scripts/`. See the
+[quickstart](specs/001-terminal-recorder-trials/quickstart.md).
