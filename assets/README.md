@@ -8,7 +8,7 @@ format it supports; files are laid out hierarchically as
 |------|--------|-------|---------|------:|
 | [VHS](vhs/) | hybrid | interactive + scripted | gif · mp4 · webm | 0 |
 | [console2svg](console2svg/) | hybrid | interactive + scripted | svg · gif · mp4 · webm | 0 |
-| [Foley](foley/) | scripted | scripted | gif · mp4 · webm · webp · cast | 0 |
+| [Foley](foley/) | scripted | scripted | gif · mp4 · webm · webp · cast | 72 |
 | [Betamax (joshka)](betamax/) | scripted | scripted | gif · webp · mp4 · webm | 0 |
 | [EVP](evp/) | hybrid | interactive + scripted | gif · svg · svgz | 48 |
 | [Demo Tape](demotape/) | scripted | scripted | gif · mp4 · webm · avi | 0 |
