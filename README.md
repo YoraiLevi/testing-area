@@ -123,9 +123,9 @@ Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Questio
 | `macos-zsh` | [acast][acast] (4/4), [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [Demo Tape][demotape] (4/4), [Foley][foley] (4/4), [termsvg][termsvg] (4/4), [VHS][vhs] (4/4) |
 | `windows-pwsh` | [acast][acast] (4/4), [console2svg][console2svg] (4/4), [PowerSession-rs + agg][powersession] (4/4) |
 
-**Green on every declared cell and scenario:** [acast][acast], [asciinema + agg][asciinema], [Betamax (joshka)][betamax], [console2svg][console2svg], [Demo Tape][demotape], [EVP][evp], [Foley][foley], [PowerSession-rs + agg][powersession], [Terminalizer][terminalizer], [termsvg][termsvg].
+**Green on every declared cell and scenario:** [PowerSession-rs + agg][powersession].
 
-**Partial coverage (working / declared cell-scenarios):** [VHS][vhs] (16/20).
+**Partial coverage (working / declared cell-scenarios):** [acast][acast] (12/20), [asciinema + agg][asciinema] (12/16), [Betamax (joshka)][betamax] (12/16), [console2svg][console2svg] (16/20), [Demo Tape][demotape] (8/16), [EVP][evp] (4/16), [Foley][foley] (12/16), [Terminalizer][terminalizer] (4/20), [termsvg][termsvg] (8/20), [VHS][vhs] (16/20).
 
 
 ### Recordings (per tool: minimal + creative)
