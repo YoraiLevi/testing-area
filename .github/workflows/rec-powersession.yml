@@ -164,7 +164,14 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          rm -rf assets/powersession && mkdir -p assets/powersession results/powersession
+          mkdir -p results/powersession
+          # Rebuild this tool's asset tree ONLY when the run actually produced files;
+          # never wipe last-good committed assets on a zero-artifact (all-cells-failed) run.
+          if find _artifacts -path '*/assets/powersession/*' -type f | grep -q .; then
+            rm -rf assets/powersession; mkdir -p assets/powersession
+          else
+            echo "collect: no assets in _artifacts for powersession; keeping last-good committed files"
+          fi
           find _artifacts -path '*/assets/powersession/*' -type f | while read -r f; do
             rel="${f#*/assets/powersession/}"
             mkdir -p "assets/powersession/$(dirname "$rel")"

@@ -211,7 +211,14 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          rm -rf assets/acast && mkdir -p assets/acast results/acast
+          mkdir -p results/acast
+          # Rebuild this tool's asset tree ONLY when the run actually produced files;
+          # never wipe last-good committed assets on a zero-artifact (all-cells-failed) run.
+          if find _artifacts -path '*/assets/acast/*' -type f | grep -q .; then
+            rm -rf assets/acast; mkdir -p assets/acast
+          else
+            echo "collect: no assets in _artifacts for acast; keeping last-good committed files"
+          fi
           find _artifacts -path '*/assets/acast/*' -type f | while read -r f; do
             rel="${f#*/assets/acast/}"
             mkdir -p "assets/acast/$(dirname "$rel")"

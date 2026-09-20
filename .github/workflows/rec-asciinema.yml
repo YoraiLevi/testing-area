@@ -145,7 +145,14 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          rm -rf assets/asciinema && mkdir -p assets/asciinema results/asciinema
+          mkdir -p results/asciinema
+          # Rebuild this tool's asset tree ONLY when the run actually produced files;
+          # never wipe last-good committed assets on a zero-artifact (all-cells-failed) run.
+          if find _artifacts -path '*/assets/asciinema/*' -type f | grep -q .; then
+            rm -rf assets/asciinema; mkdir -p assets/asciinema
+          else
+            echo "collect: no assets in _artifacts for asciinema; keeping last-good committed files"
+          fi
           find _artifacts -path '*/assets/asciinema/*' -type f | while read -r f; do
             rel="${f#*/assets/asciinema/}"
             mkdir -p "assets/asciinema/$(dirname "$rel")"
