@@ -1,0 +1,7 @@
+{"version":2,"width":110,"height":30,"timestamp":1789933698,"env":{"SHELL":"powershell.exe"}}
+[0.01045083999633789,"o","\u001b[?9001h\u001b[?1004h"]
+[0.12510156631469727,"o","\u001b[?25l\u001b[2J\u001b[m\u001b[H\u001b]0;Administrator: C:\\Program Files\\PowerShell\\7\\pwsh.exe\u0007\u001b[?25h"]
+[0.2796025276184082,"o","\u001b]0;omp\u0007"]
+[0.2901482582092285,"o","omp/18.2.6\r\n"]
+[0.3002908229827881,"o","\u001b]0;Administrator: C:\\Program Files\\PowerShell\\7\\pwsh.exe\u0007"]
+[2.3703646659851074,"o","\u001b[?9001l\u001b[?1004l"]
