@@ -10,7 +10,9 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `cast` — 16 file(s)
 
-Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` does not render inline on GitHub; download to view)
+Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` does not render inline on GitHub).
+
+![asciinema + agg linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
 
 - [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast)
 - [`linux-bash-launch-exit.cast`](cast/linux-bash-launch-exit.cast)
@@ -31,7 +33,7 @@ Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` do
 
 ## `gif` — 16 file(s)
 
-![asciinema + agg gif sample — linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
+![asciinema + agg gif sample: linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
 
 - [`linux-bash-help-tour.gif`](gif/linux-bash-help-tour.gif)
 - [`linux-bash-launch-exit.gif`](gif/linux-bash-launch-exit.gif)

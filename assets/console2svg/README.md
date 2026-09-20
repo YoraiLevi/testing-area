@@ -10,7 +10,9 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `svg` — 20 file(s)
 
-![console2svg svg sample — linux-bash-help-tour.svg](svg/linux-bash-help-tour.svg)
+Sample: [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg) (`svg` does not render inline on GitHub).
+
+![console2svg linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
 
 - [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg)
 - [`linux-bash-launch-exit.svg`](svg/linux-bash-launch-exit.svg)
@@ -35,7 +37,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `gif` — 20 file(s)
 
-![console2svg gif sample — linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
+![console2svg gif sample: linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
 
 - [`linux-bash-help-tour.gif`](gif/linux-bash-help-tour.gif)
 - [`linux-bash-launch-exit.gif`](gif/linux-bash-launch-exit.gif)
@@ -60,7 +62,9 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `mp4` — 20 file(s)
 
-Sample: [`linux-bash-help-tour.mp4`](mp4/linux-bash-help-tour.mp4) (`mp4` does not render inline on GitHub; download to view)
+Sample: [`linux-bash-help-tour.mp4`](mp4/linux-bash-help-tour.mp4) (`mp4` does not render inline on GitHub).
+
+![console2svg linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
 
 - [`linux-bash-help-tour.mp4`](mp4/linux-bash-help-tour.mp4)
 - [`linux-bash-launch-exit.mp4`](mp4/linux-bash-launch-exit.mp4)
@@ -85,7 +89,9 @@ Sample: [`linux-bash-help-tour.mp4`](mp4/linux-bash-help-tour.mp4) (`mp4` does n
 
 ## `webm` — 20 file(s)
 
-Sample: [`linux-bash-help-tour.webm`](webm/linux-bash-help-tour.webm) (`webm` does not render inline on GitHub; download to view)
+Sample: [`linux-bash-help-tour.webm`](webm/linux-bash-help-tour.webm) (`webm` does not render inline on GitHub).
+
+![console2svg linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
 
 - [`linux-bash-help-tour.webm`](webm/linux-bash-help-tour.webm)
 - [`linux-bash-launch-exit.webm`](webm/linux-bash-launch-exit.webm)
