@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "shell-prompt typing fallback: the omp TUI input box cannot be driven headlessly, so the sample prompt is animated at a shell prompt (scenarios.md S4)",
   "gif": "assets/evp/gif/macos-zsh-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35533474545",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35540912345",
   "extra": {
     "svg": "assets/evp/svg/macos-zsh-typing-demo.svg",
     "tool_version": "v0.19.0",
