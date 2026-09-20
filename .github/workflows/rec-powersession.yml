@@ -77,7 +77,7 @@ jobs:
           # Start from a clean slate so this cell's artifact carries ONLY its own fresh
           # files; the checkout brings stale committed results that must not ride along.
           rm -rf results/powersession assets/powersession
-          mkdir -p results/powersession assets/powersession
+          mkdir -p results/powersession assets/powersession/cast assets/powersession/gif
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
 
@@ -105,8 +105,9 @@ jobs:
             gif="$(find out -type f -name "${base}.gif" 2>/dev/null | head -1)"
             lines="$(cast_lines "casts/${base}.cast")"
             if valid_gif "$gif" && [ "$lines" -ge 3 ]; then
-              cp -f "$gif" "assets/powersession/${base}.gif"
-              verdict=working; gifpath="assets/powersession/${base}.gif"
+              [ -f "casts/${base}.cast" ] && cp -f "casts/${base}.cast" "assets/powersession/cast/${base}.cast"
+              cp -f "$gif" "assets/powersession/gif/${base}.gif"
+              verdict=working; gifpath="assets/powersession/gif/${base}.gif"
               case "$scenario" in
                 tui-splash) reason="omp TUI splash captured; PowerSession cannot quit the TUI by keystroke headlessly, so a watchdog tree-killed PowerSession after the splash rendered";;
                 typing-demo) reason="scenarios.md S4 shell-prompt fallback: sample prompt typed at the pwsh prompt (PowerSession cannot inject into the omp TUI input box headlessly)";;
@@ -163,8 +164,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/powersession results/powersession
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/powersession/ \; || true
+          rm -rf assets/powersession && mkdir -p assets/powersession results/powersession
+          find _artifacts -path '*/assets/powersession/*' -type f | while read -r f; do
+            rel="${f#*/assets/powersession/}"
+            mkdir -p "assets/powersession/$(dirname "$rel")"
+            cp -f "$f" "assets/powersession/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/powersession/ \; || true
           echo "=== assets/powersession ==="; ls -la assets/powersession || true
           echo "=== results/powersession ==="; ls -la results/powersession || true

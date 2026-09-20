@@ -108,11 +108,19 @@ jobs:
                 pkill -KILL -f 'omp --no-session' 2>/dev/null || true
               ) &
               watchdog=$!
-              $TIMEOUT betamax run "$tape" --output "$gif" \
+              $TIMEOUT betamax run "$tape" \
+                --output "$gif" \
+                --output "out/${base}.webp" \
+                --output "out/${base}.mp4" \
+                --output "out/${base}.webm" \
                 || echo "  betamax exit=$? for ${scenario}"
               kill "$watchdog" 2>/dev/null || true
             else
-              $TIMEOUT betamax run "$tape" --output "$gif" \
+              $TIMEOUT betamax run "$tape" \
+                --output "$gif" \
+                --output "out/${base}.webp" \
+                --output "out/${base}.mp4" \
+                --output "out/${base}.webm" \
                 || echo "  betamax exit=$? for ${scenario}"
             fi
             echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"
@@ -128,7 +136,8 @@ jobs:
           # files; the checkout brings stale committed results that must not ride along
           # (a stale result poisoning a fresh grid cell is a known VHS-family footgun).
           rm -rf results/betamax assets/betamax
-          mkdir -p results/betamax assets/betamax
+          mkdir -p results/betamax
+          for fmt in gif webp mp4 webm; do mkdir -p "assets/betamax/${fmt}"; done
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           BMV="${BETAMAX_TAG:-betamax-v0.1.21}"
@@ -136,8 +145,10 @@ jobs:
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="out/${base}.gif"
             if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/betamax/${base}.gif"
-              verdict=working; gifpath="assets/betamax/${base}.gif"
+              for ext in gif webp mp4 webm; do
+                [ -f "out/${base}.${ext}" ] && cp -f "out/${base}.${ext}" "assets/betamax/${ext}/${base}.${ext}"
+              done
+              verdict=working; gifpath="assets/betamax/gif/${base}.gif"
               case "$scenario" in
                 tui-splash)  reason="omp TUI ignores headless quit keystrokes; a background SIGINT->SIGTERM->SIGKILL watchdog ends the omp process so Betamax can finalize the splash recording (scenarios.md S3)";;
                 typing-demo) reason="shell-prompt typing fallback: the omp TUI input box cannot be driven headlessly, so the sample prompt is animated at a shell prompt (scenarios.md S4)";;
@@ -193,8 +204,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/betamax results/betamax
-          find _artifacts -type f -name '*.gif' -path '*assets*' -exec cp -f {} assets/betamax/ \; || true
+          rm -rf assets/betamax && mkdir -p assets/betamax results/betamax
+          find _artifacts -path '*/assets/betamax/*' -type f | while read -r f; do
+            rel="${f#*/assets/betamax/}"
+            mkdir -p "assets/betamax/$(dirname "$rel")"
+            cp -f "$f" "assets/betamax/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/betamax/ \; || true
           echo "=== assets/betamax ==="; ls -la assets/betamax || true
           echo "=== results/betamax ==="; ls -la results/betamax || true

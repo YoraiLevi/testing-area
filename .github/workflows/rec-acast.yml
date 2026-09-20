@@ -150,15 +150,16 @@ jobs:
           # Clean slate so this cell's artifact carries ONLY its own fresh files;
           # the checkout brings stale committed results that must not ride along.
           rm -rf results/acast assets/acast
-          mkdir -p results/acast assets/acast
+          mkdir -p results/acast assets/acast/cast assets/acast/gif
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="$(find out -type f -name "${base}.gif" 2>/dev/null | head -1)"
             if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/acast/${base}.gif"
-              verdict=working; reason=""; gifpath="assets/acast/${base}.gif"
+              [ -f "casts/${base}.cast" ] && cp -f "casts/${base}.cast" "assets/acast/cast/${base}.cast"
+              cp -f "$gif" "assets/acast/gif/${base}.gif"
+              verdict=working; reason=""; gifpath="assets/acast/gif/${base}.gif"
               if [ "$scenario" = "tui-splash" ]; then
                 reason="omp TUI splash captured; quit forced via SIGINT->SIGTERM->SIGKILL watchdog (acast cannot quit the TUI by keystroke headlessly)"
               elif [ "$scenario" = "typing-demo" ]; then
@@ -210,8 +211,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/acast results/acast
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/acast/ \; || true
+          rm -rf assets/acast && mkdir -p assets/acast results/acast
+          find _artifacts -path '*/assets/acast/*' -type f | while read -r f; do
+            rel="${f#*/assets/acast/}"
+            mkdir -p "assets/acast/$(dirname "$rel")"
+            cp -f "$f" "assets/acast/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/acast/ \; || true
           echo "=== assets/acast ==="; ls -la assets/acast || true
           echo "=== results/acast ==="; ls -la results/acast || true

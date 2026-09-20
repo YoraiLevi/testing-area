@@ -10,12 +10,24 @@
     {
       "id": "vhs",
       "name": "VHS",
-      "family": "scripted",
+      "family": "hybrid",
+      "modes": {
+        "interactive": true,
+        "scripted": true
+      },
       "pinned_version": "v0.12.0",
-      "native_formats": [
+      "formats": [
         "gif",
         "mp4",
         "webm"
+      ],
+      "native_formats": [
+        "gif",
+        "mp4",
+        "webm",
+        "png",
+        "ascii",
+        "txt"
       ],
       "converter": null,
       "discovered": false,
@@ -32,12 +44,20 @@
     {
       "id": "console2svg",
       "name": "console2svg",
-      "family": "scripted",
+      "family": "hybrid",
+      "modes": {
+        "interactive": true,
+        "scripted": true
+      },
       "pinned_version": "v0.9.3",
-      "native_formats": [
+      "formats": [
         "svg",
         "gif",
-        "mp4"
+        "mp4",
+        "webm"
+      ],
+      "native_formats": [
+        "svg"
       ],
       "converter": "ffmpeg",
       "discovered": true,
@@ -55,11 +75,26 @@
       "id": "foley",
       "name": "Foley",
       "family": "scripted",
+      "modes": {
+        "interactive": false,
+        "scripted": true
+      },
       "pinned_version": "latest",
+      "formats": [
+        "gif",
+        "mp4",
+        "webm",
+        "webp",
+        "cast"
+      ],
       "native_formats": [
         "gif",
         "mp4",
-        "webm"
+        "webm",
+        "webp",
+        "cast",
+        "txt",
+        "png"
       ],
       "converter": null,
       "discovered": false,
@@ -78,14 +113,23 @@
       "id": "betamax",
       "name": "Betamax (joshka)",
       "family": "scripted",
+      "modes": {
+        "interactive": false,
+        "scripted": true
+      },
       "pinned_version": "v0.1.21",
-      "native_formats": [
+      "formats": [
         "gif",
-        "png",
+        "webp",
         "mp4",
         "webm"
       ],
-      "converter": null,
+      "native_formats": [
+        "gif",
+        "png",
+        "webp"
+      ],
+      "converter": "ffmpeg",
       "discovered": false,
       "cells": [
         "linux-bash",
@@ -101,11 +145,21 @@
     {
       "id": "evp",
       "name": "EVP",
-      "family": "scripted",
+      "family": "hybrid",
+      "modes": {
+        "interactive": true,
+        "scripted": true
+      },
       "pinned_version": "latest",
+      "formats": [
+        "gif",
+        "svg",
+        "svgz"
+      ],
       "native_formats": [
         "gif",
-        "svg"
+        "svg",
+        "svgz"
       ],
       "converter": null,
       "discovered": true,
@@ -124,12 +178,18 @@
       "id": "demotape",
       "name": "Demo Tape",
       "family": "scripted",
+      "modes": {
+        "interactive": false,
+        "scripted": true
+      },
       "pinned_version": "0.0.10",
-      "native_formats": [
+      "formats": [
         "gif",
         "mp4",
-        "webm"
+        "webm",
+        "avi"
       ],
+      "native_formats": [],
       "converter": "ffmpeg",
       "discovered": false,
       "cells": [
@@ -146,8 +206,16 @@
     {
       "id": "asciinema",
       "name": "asciinema + agg",
-      "family": "interactive",
+      "family": "hybrid",
+      "modes": {
+        "interactive": true,
+        "scripted": true
+      },
       "pinned_version": "v3.2.1 + agg v1.9.0",
+      "formats": [
+        "cast",
+        "gif"
+      ],
       "native_formats": [
         "cast"
       ],
@@ -167,8 +235,16 @@
     {
       "id": "powersession",
       "name": "PowerSession-rs + agg",
-      "family": "interactive",
+      "family": "hybrid",
+      "modes": {
+        "interactive": true,
+        "scripted": true
+      },
       "pinned_version": "v0.1.16 + agg v1.9.0",
+      "formats": [
+        "cast",
+        "gif"
+      ],
       "native_formats": [
         "cast"
       ],
@@ -188,9 +264,18 @@
     {
       "id": "terminalizer",
       "name": "Terminalizer",
-      "family": "interactive",
+      "family": "hybrid",
+      "modes": {
+        "interactive": true,
+        "scripted": true
+      },
       "pinned_version": "latest",
+      "formats": [
+        "yml",
+        "gif"
+      ],
       "native_formats": [
+        "yml",
         "gif"
       ],
       "converter": null,
@@ -209,10 +294,17 @@
       "id": "acast",
       "name": "acast",
       "family": "interactive",
+      "modes": {
+        "interactive": true,
+        "scripted": false
+      },
       "pinned_version": "v0.4.0",
-      "native_formats": [
+      "formats": [
         "cast",
         "gif"
+      ],
+      "native_formats": [
+        "cast"
       ],
       "converter": "agg",
       "discovered": true,
@@ -230,8 +322,19 @@
       "id": "termsvg",
       "name": "termsvg",
       "family": "interactive",
+      "modes": {
+        "interactive": true,
+        "scripted": false
+      },
       "pinned_version": "v0.11.0",
+      "formats": [
+        "cast",
+        "svg",
+        "gif",
+        "webm"
+      ],
       "native_formats": [
+        "cast",
         "svg",
         "gif"
       ],

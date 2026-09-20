@@ -102,7 +102,8 @@ jobs:
           # Start clean so this cell's artifact carries ONLY its own fresh files; the
           # checkout brings stale committed results that must not ride along.
           rm -rf results/console2svg assets/console2svg
-          mkdir -p results/console2svg assets/console2svg
+          mkdir -p results/console2svg
+          for fmt in svg gif mp4 webm; do mkdir -p "assets/console2svg/${fmt}"; done
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
@@ -114,8 +115,10 @@ jobs:
             esac
             gif="$(find out -type f -name "${base}.gif" 2>/dev/null | head -1)"
             if [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/console2svg/${base}.gif"
-              verdict=working; reason="$note"; gifpath="assets/console2svg/${base}.gif"
+              for ext in svg gif mp4 webm; do
+                [ -f "out/${base}.${ext}" ] && cp -f "out/${base}.${ext}" "assets/console2svg/${ext}/${base}.${ext}"
+              done
+              verdict=working; reason="$note"; gifpath="assets/console2svg/gif/${base}.gif"
             else
               verdict=broken; reason="no valid GIF produced in CI${note:+; $note}"; gifpath=""
             fi
@@ -160,8 +163,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/console2svg results/console2svg
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/console2svg/ \; || true
+          rm -rf assets/console2svg && mkdir -p assets/console2svg results/console2svg
+          find _artifacts -path '*/assets/console2svg/*' -type f | while read -r f; do
+            rel="${f#*/assets/console2svg/}"
+            mkdir -p "assets/console2svg/$(dirname "$rel")"
+            cp -f "$f" "assets/console2svg/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/console2svg/ \; || true
           echo "=== assets/console2svg ==="; ls -la assets/console2svg || true
           echo "=== results/console2svg ==="; ls -la results/console2svg || true

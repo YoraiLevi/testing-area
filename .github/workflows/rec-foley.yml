@@ -63,11 +63,16 @@ jobs:
           for f in scenarios/foley/0*.tape; do
             s="$(basename "$f" .tape)"        # e.g. 01-launch-exit
             scenario="${s#*-}"                # e.g. launch-exit
-            out="out/${CELL}-${scenario}.gif"
-            # foley resolves Output against its own working directory, so the GIF lands
-            # in ./out directly. Inject the per-cell Output + Shell header, then the body.
+            base="${CELL}-${scenario}"
+            out="out/${base}.gif"
+            # foley resolves Output against its own working directory, so the files land
+            # in ./out directly. Inject per-cell Output targets + Shell header, then body.
             {
-              echo "Output ${out}"
+              echo "Output out/${base}.gif"
+              echo "Output out/${base}.mp4"
+              echo "Output out/${base}.webm"
+              echo "Output out/${base}.webp"
+              echo "Output out/${base}.cast"
               echo "Set Shell \"${{ matrix.shell }}\""
               cat "$f"
             } > "tapes/${s}.tape"
@@ -100,7 +105,7 @@ jobs:
           # Start from a clean slate so this cell's artifact carries ONLY its own fresh
           # files; the checkout brings stale committed results that must not ride along.
           rm -rf results/foley assets/foley
-          mkdir -p results/foley assets/foley
+          mkdir -p results/foley assets/foley/gif assets/foley/mp4 assets/foley/webm assets/foley/webp assets/foley/cast
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           FOLEYV="$(foley --version 2>/dev/null | head -1 || echo v0.1.0)"
@@ -109,8 +114,12 @@ jobs:
             base="${CELL}-${scenario}"
             gif="out/${base}.gif"
             if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/foley/${base}.gif"
-              verdict=working; gifpath="assets/foley/${base}.gif"
+              cp -f "$gif" "assets/foley/gif/${base}.gif"
+              for fmt in mp4 webm webp cast; do
+                f="out/${base}.${fmt}"
+                [ -f "$f" ] && cp -f "$f" "assets/foley/${fmt}/${base}.${fmt}"
+              done
+              verdict=working; gifpath="assets/foley/gif/${base}.gif"
               case "$scenario" in
                 tui-splash)  reason="foley launches and holds the omp TUI (omp --no-session) on a real pty in realtime mode, capturing the splash/onboarding screen; foley finalizes the take at tape end (foley v0.1.0's vtengine cannot encode Ctrl+<letter>, so no interactive Ctrl+C quit is sent)" ;;
                 typing-demo) reason="foley types the sample prompt straight into the omp TUI input box without sending it (no shell-prompt fallback needed), in realtime mode; foley finalizes the take at tape end (foley v0.1.0's vtengine cannot encode Ctrl+<letter>, so no Ctrl+C quit is sent)" ;;
@@ -166,8 +175,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/foley results/foley
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/foley/ \; || true
+          rm -rf assets/foley && mkdir -p assets/foley results/foley
+          find _artifacts -path '*/assets/foley/*' -type f | while read -r f; do
+            rel="${f#*/assets/foley/}"
+            mkdir -p "assets/foley/$(dirname "$rel")"
+            cp -f "$f" "assets/foley/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/foley/ \; || true
           echo "=== assets/foley ==="; ls -la assets/foley || true
           echo "=== results/foley ==="; ls -la results/foley || true

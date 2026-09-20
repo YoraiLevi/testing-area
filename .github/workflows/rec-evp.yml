@@ -88,6 +88,7 @@ jobs:
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="out/${base}.gif"
             svg="out/${base}.svg"
+            svgz="out/${base}.svgz"
             tape="tapes/${s}.tape"
             { echo "Set Shell \"${shell_cmd}\""; cat "$f"; } > "$tape"
             echo "== rendering ${scenario} =="
@@ -104,15 +105,16 @@ jobs:
                 pkill -KILL -f 'omp --no-session' 2>/dev/null || true
               ) &
               watchdog=$!
-              $TIMEOUT evp "$tape" --output "$gif" --output "$svg" --log-level info \
+              $TIMEOUT evp "$tape" --output "$gif" --output "$svg" --output "$svgz" --log-level info \
                 || echo "  evp exit=$? for ${scenario}"
               kill "$watchdog" 2>/dev/null || true
             else
-              $TIMEOUT evp "$tape" --output "$gif" --output "$svg" --log-level info \
+              $TIMEOUT evp "$tape" --output "$gif" --output "$svg" --output "$svgz" --log-level info \
                 || echo "  evp exit=$? for ${scenario}"
             fi
             echo "  gif: $(ls -la "$gif" 2>/dev/null || echo MISSING)"
             echo "  svg: $(ls -la "$svg" 2>/dev/null || echo MISSING)"
+            echo "  svgz: $(ls -la "$svgz" 2>/dev/null || echo MISSING)"
           done
           echo "=== out ==="; ls -la out || true
 
@@ -124,7 +126,7 @@ jobs:
           # Start from a clean slate so this cell's artifact carries ONLY its own fresh
           # files; the checkout brings stale committed results that must not ride along.
           rm -rf results/evp assets/evp
-          mkdir -p results/evp assets/evp
+          mkdir -p results/evp assets/evp/gif assets/evp/svg assets/evp/svgz
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           EVPV="${EVP_TAG:-latest}"
@@ -132,11 +134,13 @@ jobs:
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="out/${base}.gif"
             svg="out/${base}.svg"
+            svgz="out/${base}.svgz"
             svgpath=""
             if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/evp/${base}.gif"
-              verdict=working; gifpath="assets/evp/${base}.gif"
-              if [ -f "$svg" ]; then cp -f "$svg" "assets/evp/${base}.svg"; svgpath="assets/evp/${base}.svg"; fi
+              cp -f "$gif" "assets/evp/gif/${base}.gif"
+              verdict=working; gifpath="assets/evp/gif/${base}.gif"
+              if [ -f "$svg" ]; then cp -f "$svg" "assets/evp/svg/${base}.svg"; svgpath="assets/evp/svg/${base}.svg"; fi
+              [ -f "$svgz" ] && cp -f "$svgz" "assets/evp/svgz/${base}.svgz"
               case "$scenario" in
                 tui-splash)  reason="omp TUI ignores headless quit keystrokes; a background SIGINT->SIGTERM->SIGKILL watchdog ends the omp process so EVP can finalize the splash recording (scenarios.md S3)";;
                 typing-demo) reason="shell-prompt typing fallback: the omp TUI input box cannot be driven headlessly, so the sample prompt is animated at a shell prompt (scenarios.md S4)";;
@@ -193,8 +197,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/evp results/evp
-          find _artifacts -type f \( -name '*.gif' -o -name '*.svg' \) -path '*assets*' -exec cp -f {} assets/evp/ \; || true
+          rm -rf assets/evp && mkdir -p assets/evp results/evp
+          find _artifacts -path '*/assets/evp/*' -type f | while read -r f; do
+            rel="${f#*/assets/evp/}"
+            mkdir -p "assets/evp/$(dirname "$rel")"
+            cp -f "$f" "assets/evp/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/evp/ \; || true
           echo "=== assets/evp ==="; ls -la assets/evp || true
           echo "=== results/evp ==="; ls -la results/evp || true

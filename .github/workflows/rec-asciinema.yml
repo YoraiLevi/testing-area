@@ -82,15 +82,16 @@ jobs:
           # Start from a clean slate so this cell's artifact carries ONLY its own fresh
           # files; the checkout brings stale committed results that must not ride along.
           rm -rf results/asciinema assets/asciinema
-          mkdir -p results/asciinema assets/asciinema
+          mkdir -p results/asciinema assets/asciinema/cast assets/asciinema/gif
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="out/${base}.gif"
             if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/asciinema/${base}.gif"
-              verdict=working; gifpath="assets/asciinema/${base}.gif"
+              [ -f "out/${base}.cast" ] && cp -f "out/${base}.cast" "assets/asciinema/cast/${base}.cast"
+              cp -f "$gif" "assets/asciinema/gif/${base}.gif"
+              verdict=working; gifpath="assets/asciinema/gif/${base}.gif"
               case "$scenario" in
                 typing-demo) reason="shell-prompt typing fallback: asciinema cannot inject keystrokes into the omp TUI headlessly (scenarios.md S4)";;
                 *) reason="";;
@@ -144,8 +145,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/asciinema results/asciinema
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/asciinema/ \; || true
+          rm -rf assets/asciinema && mkdir -p assets/asciinema results/asciinema
+          find _artifacts -path '*/assets/asciinema/*' -type f | while read -r f; do
+            rel="${f#*/assets/asciinema/}"
+            mkdir -p "assets/asciinema/$(dirname "$rel")"
+            cp -f "$f" "assets/asciinema/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/asciinema/ \; || true
           echo "=== assets/asciinema ==="; ls -la assets/asciinema || true
           echo "=== results/asciinema ==="; ls -la results/asciinema || true

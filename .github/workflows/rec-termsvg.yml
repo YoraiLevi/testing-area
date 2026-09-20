@@ -91,6 +91,7 @@ jobs:
               termsvg export -f gif -o "out/${base}.gif" "out/${base}.cast" \
                 || echo "gif export failed for $scenario"
               termsvg export -f svg -o "out/${base}.svg" "out/${base}.cast" || true
+              termsvg export -f webm -o "out/${base}.webm" "out/${base}.cast" || true
             else
               echo "no cast recorded for $scenario"
             fi
@@ -106,15 +107,18 @@ jobs:
           # Start clean so this cell's artifact carries ONLY its own fresh files;
           # the checkout brings stale committed results that must not ride along.
           rm -rf results/termsvg assets/termsvg
-          mkdir -p results/termsvg assets/termsvg
+          mkdir -p results/termsvg assets/termsvg/cast assets/termsvg/svg assets/termsvg/gif assets/termsvg/webm
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="out/${base}.gif"
             if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/termsvg/${base}.gif"
-              verdict=working; gifpath="assets/termsvg/${base}.gif"
+              [ -f "out/${base}.cast" ] && cp -f "out/${base}.cast" "assets/termsvg/cast/${base}.cast"
+              [ -f "out/${base}.svg" ] && cp -f "out/${base}.svg" "assets/termsvg/svg/${base}.svg"
+              [ -f "out/${base}.webm" ] && cp -f "out/${base}.webm" "assets/termsvg/webm/${base}.webm"
+              cp -f "$gif" "assets/termsvg/gif/${base}.gif"
+              verdict=working; gifpath="assets/termsvg/gif/${base}.gif"
               if [ "$scenario" = "typing-demo" ]; then
                 reason="omp TUI input not reachable headlessly; per scenarios.md S4, sample prompt typed at the shell prompt (keystroke-animation fallback)"
               else
@@ -167,8 +171,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/termsvg results/termsvg
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/termsvg/ \; || true
+          rm -rf assets/termsvg && mkdir -p assets/termsvg results/termsvg
+          find _artifacts -path '*/assets/termsvg/*' -type f | while read -r f; do
+            rel="${f#*/assets/termsvg/}"
+            mkdir -p "assets/termsvg/$(dirname "$rel")"
+            cp -f "$f" "assets/termsvg/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/termsvg/ \; || true
           echo "=== assets/termsvg ==="; ls -la assets/termsvg || true
           echo "=== results/termsvg ==="; ls -la results/termsvg || true

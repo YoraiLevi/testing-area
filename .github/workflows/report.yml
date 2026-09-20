@@ -48,6 +48,6 @@ jobs:
       - name: Build README report from CI evidence
         run: python scripts/build_report.py
 
-      - name: Commit README
+      - name: Commit README and asset indexes
         run: |
-          bash scripts/commit-artifacts.sh "docs(report): regenerate README" README.md
+          bash scripts/commit-artifacts.sh "docs(report): regenerate README + asset indexes" README.md assets

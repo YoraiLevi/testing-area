@@ -269,16 +269,18 @@ jobs:
           # artifact carries ONLY its own fresh files (the checkout brings committed
           # results/assets that must not ride along).
           rm -rf results/terminalizer assets/terminalizer
-          mkdir -p results/terminalizer assets/terminalizer
+          mkdir -p results/terminalizer assets/terminalizer/gif assets/terminalizer/yml
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           TOOLV="latest (npm $(terminalizer --version 2>/dev/null | head -1 || echo unknown))"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="out/${base}.gif"
+            rec="rec/${base}.yml"
             if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/terminalizer/${base}.gif"
-              verdict=working; gifpath="assets/terminalizer/${base}.gif"
+              cp -f "$gif" "assets/terminalizer/gif/${base}.gif"
+              verdict=working; gifpath="assets/terminalizer/gif/${base}.gif"
+              [ -f "$rec" ] && cp -f "$rec" "assets/terminalizer/yml/${base}.yml"
               case "$scenario" in
                 typing-demo) reason="shell-prompt typing fallback: terminalizer records a command to completion and cannot inject keystrokes into the omp TUI input box headlessly (scenarios.md S4)";;
                 *) reason="";;
@@ -341,8 +343,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/terminalizer results/terminalizer
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/terminalizer/ \; || true
+          rm -rf assets/terminalizer && mkdir -p assets/terminalizer results/terminalizer
+          find _artifacts -path '*/assets/terminalizer/*' -type f | while read -r f; do
+            rel="${f#*/assets/terminalizer/}"
+            mkdir -p "assets/terminalizer/$(dirname "$rel")"
+            cp -f "$f" "assets/terminalizer/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/terminalizer/ \; || true
           echo "=== assets/terminalizer ==="; ls -la assets/terminalizer || true
           echo "=== results/terminalizer ==="; ls -la results/terminalizer || true

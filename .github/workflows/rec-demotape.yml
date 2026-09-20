@@ -96,12 +96,15 @@ jobs:
           # TUI that cannot be quit by keystroke headlessly can never wedge the job.
           # Demo Tape also self-bounds via its --timeout; the watchdog is the backstop.
           render() {   # $1=tape  $2=out  $3=demotape-timeout(s)
-            local tape="$1" out="$2" t="$3"
+            local tape="$1" out="$2" t="$3" outbase="${2%.gif}"
             echo "== rendering $(basename "$tape") -> $out (timeout ${t}s) =="
             demotape run "$tape" \
               --overwrite \
               --shell "${{ matrix.shell }}" \
-              --output-path "$out" \
+              --output-path "${outbase}.gif" \
+              --output-path "${outbase}.mp4" \
+              --output-path "${outbase}.webm" \
+              --output-path "${outbase}.avi" \
               --width 1200 --height 640 --font-size 20 \
               --typing-speed 60ms \
               --timeout "$t" \
@@ -133,15 +136,18 @@ jobs:
           # fresh files; the checkout brings stale committed results/assets that must
           # not ride along and poison verdicts.
           rm -rf results/demotape assets/demotape
-          mkdir -p results/demotape assets/demotape
+          mkdir -p results/demotape
+          for fmt in gif mp4 webm avi; do mkdir -p "assets/demotape/${fmt}"; done
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             gif="out/${base}.gif"
             if [ -f "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/demotape/${base}.gif"
-              verdict=working; gifpath="assets/demotape/${base}.gif"
+              for ext in gif mp4 webm avi; do
+                [ -f "out/${base}.${ext}" ] && cp -f "out/${base}.${ext}" "assets/demotape/${ext}/${base}.${ext}"
+              done
+              verdict=working; gifpath="assets/demotape/gif/${base}.gif"
               case "$scenario" in
                 typing-demo) reason="shell-prompt typing fallback: the sample prompt is typed at the shell prompt (not sent) because omp's TUI input box is not reliably drivable headlessly (scenarios.md S4)";;
                 tui-splash)  reason="interactive omp TUI splash captured via the ttyd PTY; quit driven by Ctrl+C with a background SIGINT->SIGTERM->SIGKILL watchdog backstop";;
@@ -196,8 +202,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/demotape results/demotape
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/demotape/ \; || true
+          rm -rf assets/demotape && mkdir -p assets/demotape results/demotape
+          find _artifacts -path '*/assets/demotape/*' -type f | while read -r f; do
+            rel="${f#*/assets/demotape/}"
+            mkdir -p "assets/demotape/$(dirname "$rel")"
+            cp -f "$f" "assets/demotape/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/demotape/ \; || true
           echo "=== assets/demotape ==="; ls -la assets/demotape || true
           echo "=== results/demotape ==="; ls -la results/demotape || true

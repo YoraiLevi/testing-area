@@ -61,8 +61,11 @@ jobs:
           for f in scenarios/vhs/0*.tape; do
             s="$(basename "$f" .tape)"        # e.g. 01-launch-exit
             scenario="${s#*-}"                # e.g. launch-exit
+            base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
             {
-              echo "Output out/${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}.gif"
+              echo "Output out/${base}.gif"
+              echo "Output out/${base}.mp4"
+              echo "Output out/${base}.webm"
               echo "Set Shell \"${{ matrix.shell }}\""
               cat "$f"
             } > "tapes/${s}.tape"
@@ -107,7 +110,7 @@ jobs:
           # Start from a clean slate so this cell's artifact carries ONLY its own fresh
           # files; the checkout brings stale committed results that must not ride along.
           rm -rf results/vhs assets/vhs
-          mkdir -p results/vhs assets/vhs
+          mkdir -p results/vhs assets/vhs/gif assets/vhs/mp4 assets/vhs/webm
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
@@ -116,8 +119,12 @@ jobs:
             if [ "${{ runner.os }}" = "Windows" ]; then
               verdict=not-applicable; reason="VHS records via ttyd, which has no Windows build (Unix-only); the capture pipeline cannot run on Windows."; gifpath=""
             elif [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
-              cp -f "$gif" "assets/vhs/${base}.gif"
-              verdict=working; reason=""; gifpath="assets/vhs/${base}.gif"
+              cp -f "$gif" "assets/vhs/gif/${base}.gif"
+              for fmt in mp4 webm; do
+                f="$(find . -type f -name "${base}.${fmt}" 2>/dev/null | head -1)"
+                [ -n "$f" ] && cp -f "$f" "assets/vhs/${fmt}/${base}.${fmt}"
+              done
+              verdict=working; reason=""; gifpath="assets/vhs/gif/${base}.gif"
             else
               verdict=broken; reason="no valid GIF produced in CI"; gifpath=""
             fi
@@ -162,8 +169,12 @@ jobs:
 
       - name: Assemble assets and results
         run: |
-          mkdir -p assets/vhs results/vhs
-          find _artifacts -type f -name '*.gif' -exec cp -f {} assets/vhs/ \; || true
+          rm -rf assets/vhs && mkdir -p assets/vhs results/vhs
+          find _artifacts -path '*/assets/vhs/*' -type f | while read -r f; do
+            rel="${f#*/assets/vhs/}"
+            mkdir -p "assets/vhs/$(dirname "$rel")"
+            cp -f "$f" "assets/vhs/$rel"
+          done
           find _artifacts -type f -name '*.json' -path '*results*' -exec cp -f {} results/vhs/ \; || true
           echo "=== assets/vhs ==="; ls -la assets/vhs || true
           echo "=== results/vhs ==="; ls -la results/vhs || true
