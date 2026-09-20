@@ -10,7 +10,7 @@ format it supports; files are laid out hierarchically as
 | [console2svg](console2svg/) | hybrid | interactive + scripted | svg · gif · mp4 · webm | 0 |
 | [Foley](foley/) | scripted | scripted | gif · mp4 · webm · webp · cast | 0 |
 | [Betamax (joshka)](betamax/) | scripted | scripted | gif · webp · mp4 · webm | 0 |
-| [EVP](evp/) | hybrid | interactive + scripted | gif · svg · svgz | 0 |
+| [EVP](evp/) | hybrid | interactive + scripted | gif · svg · svgz | 48 |
 | [Demo Tape](demotape/) | scripted | scripted | gif · mp4 · webm · avi | 0 |
 | [asciinema + agg](asciinema/) | hybrid | interactive + scripted | cast · gif | 0 |
 | [PowerSession-rs + agg](powersession/) | hybrid | interactive + scripted | cast · gif | 8 |
