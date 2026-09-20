@@ -13,7 +13,7 @@ format it supports; files are laid out hierarchically as
 | [EVP](evp/) | hybrid | interactive + scripted | gif · svg · svgz | 0 |
 | [Demo Tape](demotape/) | scripted | scripted | gif · mp4 · webm · avi | 0 |
 | [asciinema + agg](asciinema/) | hybrid | interactive + scripted | cast · gif | 0 |
-| [PowerSession-rs + agg](powersession/) | hybrid | interactive + scripted | cast · gif | 0 |
+| [PowerSession-rs + agg](powersession/) | hybrid | interactive + scripted | cast · gif | 8 |
 | [Terminalizer](terminalizer/) | hybrid | interactive + scripted | yml · gif | 0 |
 | [acast](acast/) | interactive | interactive | cast · gif | 0 |
 | [termsvg](termsvg/) | interactive | interactive | cast · svg · gif · webm | 0 |
