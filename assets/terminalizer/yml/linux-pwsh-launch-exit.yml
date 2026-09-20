@@ -80,21 +80,21 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 311
+  - delay: 284
     content: ^@
-  - delay: 1847
+  - delay: 1306
     content: "\e[?1h\e="
-  - delay: 4607
+  - delay: 2192
     content: "\e[31;1mSet-Variable: \e[0m\r\n\e[31;1m\e[36;1mLine |\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m   5 | \e[0m set \e[36;1m-u\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m\e[0m\e[36;1m\e[0m\e[36;1m     | \e[31;1m     ~~\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m\e[0m\e[36;1m\e[0m\e[36;1m\e[31;1m\e[31;1m\e[36;1m     | \e[31;1mA parameter cannot be found that matches parameter name 'u'.\e[0m\r\n"
-  - delay: 18
+  - delay: 17
     content: "$ omp --version\r\n\e[?1h\e=\e]0;\a"
-  - delay: 80
+  - delay: 77
     content: "omp/18.2.6\r\n"
   - delay: 6
     content: "\e[?1h\e=\e]0;\a"
   - delay: 2013
     content: "\e[?1h\e=\e]0;\a"
-  - delay: 19
+  - delay: 12
     content: "$ exit\r\n\e[?1h\e=\e]0;\a"
-  - delay: 1015
+  - delay: 1011
     content: "\e[?1h\e=\e]0;\a"
