@@ -3,10 +3,10 @@
   "os": "linux",
   "shell": "pwsh",
   "scenario": "launch-exit",
-  "verdict": "working",
-  "reason": "",
-  "gif": "assets/betamax/linux-pwsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35528564960",
+  "verdict": "broken",
+  "reason": "no valid GIF produced in CI",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35533474667",
   "extra": {
     "tool_version": "betamax-v0.1.21",
     "omp_version": "omp/18.2.6"
