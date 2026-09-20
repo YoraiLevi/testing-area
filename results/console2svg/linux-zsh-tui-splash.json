@@ -1,11 +1,11 @@
 {
   "tool": "console2svg",
-  "os": "macos",
+  "os": "linux",
   "shell": "zsh",
   "scenario": "tui-splash",
   "verdict": "working",
   "reason": "omp TUI captured headlessly via console2svg --timeout (splash/onboarding screen)",
-  "gif": "assets/console2svg/macos-zsh-tui-splash.gif",
+  "gif": "assets/console2svg/linux-zsh-tui-splash.gif",
   "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356760",
   "extra": {
     "tool_version": "v0.9.3",

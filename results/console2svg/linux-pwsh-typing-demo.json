@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "console2svg has no headless TUI input driver; sample prompt animated as a typed command line via -c (shell-prompt fallback per scenarios.md)",
   "gif": "assets/console2svg/linux-pwsh-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35525379941",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356760",
   "extra": {
     "tool_version": "v0.9.3",
     "omp_version": "omp/18.2.6"
