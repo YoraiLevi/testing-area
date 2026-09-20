@@ -3,10 +3,10 @@
   "os": "windows",
   "shell": "pwsh",
   "scenario": "typing-demo",
-  "verdict": "broken",
-  "reason": "PowerSession shell-prompt typing fallback produced no valid GIF in CI; see run logs",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35524971979",
+  "verdict": "working",
+  "reason": "scenarios.md S4 shell-prompt fallback: sample prompt typed at the pwsh prompt (PowerSession cannot inject into the omp TUI input box headlessly)",
+  "gif": "assets/powersession/windows-pwsh-typing-demo.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35525379965",
   "extra": {
     "tool_version": "v0.1.16 (agg v1.9.0)",
     "omp_version": "omp/18.2.6"
