@@ -85,6 +85,7 @@ def grid(tools: dict, idx: dict) -> str:
     # Per-cell reasons collected in grid iteration order (tools in file order,
     # cells sorted); the index becomes the cell's `<sup>N</sup>` marker.
     notes: list[str] = []
+    ne_used = False
     for t in tools["tools"]:
         unsupported = t.get("unsupported", {})
         fmts = " · ".join(t.get("formats", []))
@@ -92,47 +93,46 @@ def grid(tools: dict, idx: dict) -> str:
         for c in cells:
             rec = idx.get((t["id"], c, headline))
             if rec is None:
-                # No CI run for this cell: genuinely unsupported upstream vs. simply
-                # outside the sampled matrix are distinct, honest states.
+                # No CI run for this cell: an upstream limit (➖) and simply outside the
+                # grid's OS/shell matrix (⬜) are distinct, honest states.
                 if c in unsupported:
-                    notes.append(f"**{t['name']} · `{c}`** — {unsupported[c]}")
+                    notes.append(f"**{t['name']} · `{c}`**: {unsupported[c]}")
                     row.append(f"➖<sup>{len(notes)}</sup>")
                 else:
                     row.append("⬜")
+                    ne_used = True
                 continue
             verdict = rec.get("verdict")
             glyph = VERDICT_GLYPH.get(verdict, "⬜")
             run = rec.get("run_url")
             cell_md = f"[{glyph}]({run})" if run else glyph
-            # Any cell that ran in CI and did not succeed (a hard failure, or a
-            # genuine platform limitation) is flagged with its reason in the notes.
+            # Any cell that ran and did not succeed (hard failure or platform limit) is
+            # flagged with its reason in the numbered notes.
             if verdict in ("broken", "skipped", "not-applicable") and rec.get("reason"):
-                notes.append(f"**{t['name']} · `{c}`** — {rec['reason']}")
+                notes.append(f"**{t['name']} · `{c}`**: {rec['reason']}")
                 cell_md += f"<sup>{len(notes)}</sup>"
             row.append(cell_md)
         rows.append("| " + " | ".join(row) + " |")
-    legend = "\nLegend: ✅ working · ❌ broken · ➖ not applicable · ⬜ not evaluated\n"
+    legend = ("\nLegend: ✅ working · ❌ broken · ➖ not applicable"
+              + (" · ⬜ not evaluated" if ne_used else "") + "\n")
     na_body = (
-        "The recorder cannot target this OS/shell: the upstream project publishes no build"
-        " for it, or a hard dependency is platform-specific (ttyd and libghostty-vt are"
-        " Unix-only; PowerSession-rs is Windows-only). Cells with a specific cause carry"
-        " their own numbered note below."
+        "The recorder cannot target this OS/shell: the upstream project ships no build for it,"
+        " or a hard dependency is platform-specific (ttyd and libghostty-vt are Unix-only;"
+        " PowerSession-rs is Windows-only). A cell with a specific cause carries its own"
+        " numbered note below."
     )
-    ne_body = (
-        "This OS/shell was outside the sampled matrix for this recorder. The shell axis"
-        " (bash/zsh/pwsh) was sampled rather than run exhaustively, so the tool may still"
-        " work here; no CI run exists, so no verdict is claimed."
-    )
-    block = ["**Grid notes**", "",
-             f"- **➖ not applicable** — {na_body}",
-             f"- **⬜ not evaluated** — {ne_body}"]
+    block = ["**Grid notes**", "", f"- **➖ not applicable.** {na_body}"]
+    if ne_used:
+        block.append(
+            "- **⬜ not evaluated.** No CI run exists for this OS/shell, so no verdict is claimed."
+        )
     if notes:
         block.append("")
         block.extend(f"{i}. {n}" for i, n in enumerate(notes, 1))
     block.append("")
     notes_md = "\n".join(block)
     return (
-        "### Capability Grid — headline scenario `launch-exit`\n\n"
+        "### Capability Grid (headline scenario `launch-exit`)\n\n"
         + "\n".join(rows) + "\n" + legend + "\n" + notes_md
     )
 
@@ -159,7 +159,7 @@ def recordings(tools: dict, idx: dict) -> str:
         if gifs:
             sections.append((t, chosen, gifs))
 
-    out = ["### Recordings (per tool: minimal + creative)", ""]
+    out = ["### Recordings (one representative cell per tool)", ""]
     if not sections:
         out.append("_No working recordings committed yet. Trigger the `rec-*` workflows._")
         out.append("")
@@ -182,7 +182,7 @@ def recordings(tools: dict, idx: dict) -> str:
 
 
 def ledger(tools: dict) -> str:
-    out = ["### Skipped / Not Evaluated (honest coverage)", "",
+    out = ["### Skipped Tools", "",
            "| Tool | Reason skipped for CI-GIF evaluation |",
            "|------|--------------------------------------|"]
     for s in tools["skipped"]:
@@ -206,29 +206,37 @@ def analysis(tools: dict, idx: dict) -> str:
                 cells.append(c)
     cells.sort()
 
-    # Per-tool: how many (cell, scenario) pairs are working.
-    tool_working = {}
+    # Per-tool tallies. A not-applicable cell (an upstream limit) is NOT a coverage
+    # failure, so it is kept out of the denominator; "attempted" counts only the cells
+    # the tool actually ran (working or broken). This stops a Unix-only tool that omits
+    # Windows from outscoring one that declares Windows and records it not-applicable.
+    tally = {}
     for t in tools["tools"]:
-        n = sum(
-            1
-            for c in t["cells"]
-            for s in scen
-            if idx.get((t["id"], c, s), {}).get("verdict") == "working"
-        )
-        tool_working[t["id"]] = (n, len(t["cells"]) * len(scen))
+        working = attempted = na = 0
+        for c in t["cells"]:
+            for s in scen:
+                v = idx.get((t["id"], c, s), {}).get("verdict")
+                if v == "working":
+                    working += 1
+                    attempted += 1
+                elif v in ("broken", "skipped"):
+                    attempted += 1
+                elif v == "not-applicable":
+                    na += 1
+        tally[t["id"]] = (working, attempted, na)
 
     out = [
-        "### Analysis & Recommendations",
+        "### What To Use",
         "",
-        "Reader: an engineer choosing a terminal recorder to capture `omp` in CI. Question: which"
-        " tool reliably produces a GIF on each OS/shell? Every claim below is counted from committed"
-        " CI result records, not reputation.",
+        "Counted from committed CI results, not reputation. A not-applicable cell (no upstream"
+        " build for that OS/shell) is excluded from a tool's score, so a Unix-only tool is not"
+        " marked down for skipping Windows.",
         "",
-        "**Per-cell recommendation** — tools whose headline `launch-exit` GIF is green in that cell,"
-        " ordered by how many of the four scenarios they land:",
+        "**Per cell**, recorders whose headline `launch-exit` GIF is green, ordered by how many"
+        " of the four scenarios they land:",
         "",
-        "| Cell | Working recorders (working scenarios / 4) |",
-        "|------|-------------------------------------------|",
+        "| Cell | Working recorders (scenarios / 4) |",
+        "|------|-----------------------------------|",
     ]
     for c in cells:
         ranked = []
@@ -242,23 +250,28 @@ def analysis(tools: dict, idx: dict) -> str:
         out.append(f"| `{c}` | {listing} |")
     out.append("")
 
-    # Full-house tools (every declared cell x scenario working).
     def link(t):
         return f"[{t['name']}][{t['id']}]"
-    full = [t for t in tools["tools"] if tool_working[t["id"]][0] == tool_working[t["id"]][1] and tool_working[t["id"]][1] > 0]
-    partial = [t for t in tools["tools"] if 0 < tool_working[t["id"]][0] < tool_working[t["id"]][1]]
-    none = [t for t in tools["tools"] if tool_working[t["id"]][0] == 0]
+
+    def frag(t):
+        w, a, na = tally[t["id"]]
+        suffix = f", {na} N/A" if na else ""
+        return f"{link(t)} ({w}/{a}{suffix})"
+
+    full = [t for t in tools["tools"]
+            if tally[t["id"]][1] > 0 and tally[t["id"]][0] == tally[t["id"]][1]]
+    partial = [t for t in tools["tools"] if 0 < tally[t["id"]][0] < tally[t["id"]][1]]
+    none = [t for t in tools["tools"] if tally[t["id"]][0] == 0]
     if full:
-        out.append("**Green on every declared cell and scenario:** "
-                   + ", ".join(link(t) for t in sorted(full, key=lambda t: t["name"].lower())) + ".")
+        out.append("**Green on every cell they target:** "
+                   + ", ".join(frag(t) for t in sorted(full, key=lambda t: t["name"].lower())) + ".")
         out.append("")
     if partial:
-        frag = ", ".join(f"{link(t)} ({tool_working[t['id']][0]}/{tool_working[t['id']][1]})"
-                         for t in sorted(partial, key=lambda t: t["name"].lower()))
-        out.append("**Partial coverage (working / declared cell-scenarios):** " + frag + ".")
+        out.append("**Attempted and failed at least one cell:** "
+                   + ", ".join(frag(t) for t in sorted(partial, key=lambda t: t["name"].lower())) + ".")
         out.append("")
     if none:
-        out.append("**No working GIF in CI (honest skip/broken):** "
+        out.append("**No working GIF in CI:** "
                    + ", ".join(link(t) for t in sorted(none, key=lambda t: t["name"].lower())) + ".")
         out.append("")
     return "\n".join(out)
@@ -281,6 +294,21 @@ def _modes_str(t: dict) -> str:
     parts = [name for name, on in (("interactive", m.get("interactive")),
                                    ("scripted", m.get("scripted"))) if on]
     return " + ".join(parts) if parts else "—"
+
+
+# Formats GitHub renders inline in Markdown via ![](path); others are linked only.
+EMBEDDABLE = {"gif", "png", "webp", "svg", "jpg", "jpeg", "apng"}
+# Prefer a visually rich scenario for the single representative sample.
+_SCENARIO_PREF = ("help-tour", "typing-demo", "tui-splash", "launch-exit")
+
+
+def _representative(files):
+    """Pick one representative file per format, favouring a busy scenario."""
+    for pref in _SCENARIO_PREF:
+        for name in files:
+            if pref in name:
+                return name
+    return files[0] if files else None
 
 
 def asset_readmes(tools: dict) -> None:
@@ -333,6 +361,16 @@ def asset_readmes(tools: dict) -> None:
             files = fmt_files[fmt]
             lines.append(f"## `{fmt}` — {len(files)} file(s)")
             lines.append("")
+            rep = _representative(files)
+            if rep and fmt in EMBEDDABLE:
+                lines.append(f"![{t['name']} {fmt} sample — {rep}]({fmt}/{rep})")
+                lines.append("")
+            elif rep:
+                lines.append(
+                    f"Sample: [`{rep}`]({fmt}/{rep}) "
+                    f"(`{fmt}` does not render inline on GitHub; download to view)"
+                )
+                lines.append("")
             if files:
                 lines.extend(f"- [`{name}`]({fmt}/{name})" for name in files)
             else:
@@ -347,12 +385,13 @@ def asset_readmes(tools: dict) -> None:
 def build_section(tools: dict, idx: dict) -> str:
     grid_md = grid(tools, idx)
     parts = [
-        "_Generated by `scripts/build_report.py` from CI evidence. Verdicts come only from"
-        " green runs on `testing-vhs` (constitution Principles I & II)._",
-        "",
-        badges(tools),
+        "_Generated by `scripts/build_report.py` from committed CI results on `testing-vhs`."
+        " Working = a green job that committed a GIF; ❌ = a run that failed to; ➖ = an upstream"
+        " limit (often no job). Stars never decide a verdict (constitution I & II)._",
         "",
         grid_md,
+        "",
+        badges(tools),
         "",
         analysis(tools, idx),
         "",
