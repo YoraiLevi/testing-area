@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "shell-prompt typing fallback: the sample prompt is typed at the shell prompt (not sent) because omp's TUI input box is not reliably drivable headlessly (scenarios.md S4)",
   "gif": "assets/demotape/macos-zsh-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35527356791",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35528564950",
   "extra": {
     "tool_version": "demotape gem 0.0.10",
     "omp_version": "omp/18.2.6"
