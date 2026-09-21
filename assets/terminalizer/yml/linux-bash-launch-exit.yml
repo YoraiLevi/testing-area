@@ -80,9 +80,9 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 149
+  - delay: 294
     content: "$ omp --version\r\n^@"
-  - delay: 41
+  - delay: 100
     content: "omp/18.2.7\r\n"
-  - delay: 2010
+  - delay: 2017
     content: "$ exit\r\n"
