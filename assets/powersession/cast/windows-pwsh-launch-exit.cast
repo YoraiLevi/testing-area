@@ -1,7 +1,6 @@
-{"version":2,"width":110,"height":30,"timestamp":1789973001,"env":{"SHELL":"powershell.exe"}}
-[0.015949249267578125,"o","\u001b[?9001h\u001b[?1004h"]
-[0.19382500648498535,"o","\u001b[?25l\u001b[2J\u001b[m\u001b[H\u001b]0;Administrator: C:\\Program Files\\PowerShell\\7\\pwsh.exe\u0007\u001b[?25h"]
-[0.4162931442260742,"o","\u001b]0;omp\u0007"]
-[0.43705105781555176,"o","omp/18.2.7\r\n"]
-[0.44864726066589355,"o","\u001b]0;Administrator: C:\\Program Files\\PowerShell\\7\\pwsh.exe\u0007"]
-[2.5419492721557617,"o","\u001b[?9001l\u001b[?1004l"]
+{"version":2,"width":110,"height":30,"timestamp":1789973683,"env":{"SHELL":"powershell.exe"}}
+[0.013170719146728516,"o","\u001b[?9001h\u001b[?1004h"]
+[0.14791512489318848,"o","\u001b[?25l\u001b[2J\u001b[m\u001b[H\u001b]0;Administrator: C:\\Program Files\\PowerShell\\7\\pwsh.exe\u0007\u001b[?25h"]
+[0.3430657386779785,"o","\u001b]0;omp\u0007"]
+[0.36325764656066895,"o","omp/18.2.7\r\n\u001b]0;Administrator: C:\\Program Files\\PowerShell\\7\\pwsh.exe\u0007"]
+[2.4561405181884766,"o","\u001b[?9001l\u001b[?1004l"]
