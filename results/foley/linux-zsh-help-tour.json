@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/foley/gif/linux-zsh-help-tour.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35570461301",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35576002555",
   "extra": {
     "tool_version": "foley v0.1.0",
     "omp_version": "omp/18.2.7"
