@@ -6,9 +6,9 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/vhs/gif/linux-pwsh-tui-splash.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35550134845",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35576002550",
   "extra": {
     "tool_version": "v0.11.0",
-    "omp_version": "omp/18.2.6"
+    "omp_version": "omp/18.2.7"
   }
 }
