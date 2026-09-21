@@ -1,8 +1,7 @@
-{"version":3,"term":{"cols":100,"rows":24},"timestamp":1789984654,"command":"/usr/bin/pwsh scenarios/asciinema/01-launch-exit.sh","env":{"SHELL":"/bin/bash"}}
-[3.838, "o", "\u001b[31;1mSet-Variable: \u001b[0m\r\n"]
-[0.000, "o", "\u001b[31;1m\u001b[36;1mLine |\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m   4 | \u001b[0m set \u001b[36;1m-u\u001b[0m\r\n"]
-[0.000, "o", "\u001b[31;1m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m     | \u001b[31;1m     ~~\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[31;1m\u001b[31;1m\u001b[36;1m     | \u001b[31;1mA parameter cannot be found that matches parameter name 'u'.\u001b[0m\r\n"]
-[0.018, "o", "$ omp --version\r\n"]
-[0.078, "o", "omp/18.2.7\r\n"]
-[2.031, "o", "$ exit\r\n"]
-[1.071, "x", "0"]
+{"version":3,"term":{"cols":100,"rows":24},"timestamp":1789992380,"command":"/usr/bin/pwsh scenarios/asciinema/01-launch-exit.sh","env":{"SHELL":"/bin/bash"}}
+[8.304, "o", "\u001b[31;1mSet-Variable: \u001b[0m\r\n"]
+[0.000, "o", "\u001b[31;1m\u001b[36;1mLine |\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m   4 | \u001b[0m set \u001b[36;1m-u\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m     | \u001b[31;1m     ~~\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[31;1m\u001b[31;1m\u001b[36;1m     | \u001b[31;1mA parameter cannot be found that matches parameter name 'u'.\u001b[0m\r\n"]
+[0.026, "o", "$ omp --version\r\n"]
+[0.063, "o", "omp/18.2.7\r\n"]
+[2.017, "o", "$ exit\r\n"]
+[1.047, "x", "0"]
