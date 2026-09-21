@@ -3,6 +3,16 @@
 CI bake-off of terminal-to-GIF recorders against one TUI, [Oh My Pi (`omp`)](https://omp.sh).
 A cell counts as working only when a `testing-vhs` GitHub Actions job committed a GIF.
 
+## Launch Video
+
+[![Terminal Recorder Trials launch video](brag-output/brag.jpg)](brag-output/brag.mp4)
+
+A 21-second, voice-narrated brag:
+type `omp --version`, then watch 11 terminal-to-GIF recorders face 5 platforms and 4
+scenarios in CI.
+Every green cell is a committed GIF, not a screenshot.
+[Watch `brag.mp4`](brag-output/brag.mp4) (poster: [`brag.jpg`](brag-output/brag.jpg)).
+
 ## CI Status
 
 <!-- BADGES:START -->
