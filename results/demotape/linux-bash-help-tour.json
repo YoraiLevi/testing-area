@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/demotape/gif/linux-bash-help-tour.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35576002511",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35583538860",
   "extra": {
     "tool_version": "demotape gem 0.0.10",
     "omp_version": "omp/18.2.7"
