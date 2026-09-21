@@ -80,73 +80,75 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 279
-    content: "$ ^D\b\b"
-  - delay: 1093
+  - delay: 390
+    content: "^D\b\b"
+  - delay: 47
+    content: '$ '
+  - delay: 1262
     content: e
-  - delay: 183
+  - delay: 283
     content: x
-  - delay: 198
+  - delay: 276
     content: p
-  - delay: 140
-    content: l
-  - delay: 164
-    content: a
-  - delay: 197
-    content: i
-  - delay: 184
-    content: 'n'
-  - delay: 196
-    content: ' '
-  - delay: 172
-    content: w
-  - delay: 206
-    content: h
-  - delay: 152
-    content: a
-  - delay: 166
-    content: t
-  - delay: 199
-    content: ' '
-  - delay: 198
-    content: t
-  - delay: 166
-    content: h
-  - delay: 180
-    content: i
-  - delay: 163
-    content: s
-  - delay: 151
-    content: ' '
-  - delay: 195
-    content: r
-  - delay: 188
-    content: e
   - delay: 146
-    content: p
-  - delay: 188
-    content: o
-  - delay: 186
-    content: s
-  - delay: 161
+    content: l
+  - delay: 281
+    content: a
+  - delay: 154
     content: i
-  - delay: 167
-    content: t
-  - delay: 201
-    content: o
-  - delay: 203
-    content: r
-  - delay: 145
-    content: 'y'
-  - delay: 201
+  - delay: 267
+    content: 'n'
+  - delay: 270
     content: ' '
-  - delay: 169
-    content: d
-  - delay: 182
-    content: o
+  - delay: 254
+    content: w
+  - delay: 150
+    content: h
+  - delay: 194
+    content: a
+  - delay: 251
+    content: t
+  - delay: 179
+    content: ' '
+  - delay: 213
+    content: t
   - delay: 143
-    content: e
-  - delay: 203
+    content: h
+  - delay: 244
+    content: i
+  - delay: 218
     content: s
-  - delay: 2237
+  - delay: 174
+    content: ' '
+  - delay: 232
+    content: r
+  - delay: 244
+    content: e
+  - delay: 134
+    content: p
+  - delay: 144
+    content: o
+  - delay: 217
+    content: s
+  - delay: 266
+    content: i
+  - delay: 209
+    content: t
+  - delay: 156
+    content: o
+  - delay: 237
+    content: r
+  - delay: 140
+    content: 'y'
+  - delay: 163
+    content: ' '
+  - delay: 152
+    content: d
+  - delay: 210
+    content: o
+  - delay: 269
+    content: e
+  - delay: 229
+    content: s
+  - delay: 2362
     content: "\r\n"

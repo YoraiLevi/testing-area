@@ -80,9 +80,9 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 279
+  - delay: 276
     content: ^@
-  - delay: 77
+  - delay: 75
     content: "\e[?1h\e="
-  - delay: 252
+  - delay: 254
     content: "\e[31;1mParserError: \e[0m\r\n\e[31;1m\e[36;1mLine |\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m  13 | \e[0m   sleep 5\e[36;1m\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m\e[0m\e[36;1m\e[0m\e[36;1m     | \e[31;1m          ~\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m\e[0m\e[36;1m\e[0m\e[36;1m\e[31;1m\e[31;1m\e[36;1m     | \e[31;1mMissing closing ')' in expression.\e[0m\r\n"
