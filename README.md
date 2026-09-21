@@ -6,6 +6,18 @@ A cell counts as working only when a `testing-vhs` GitHub Actions job committed 
 ## CI Status
 
 <!-- BADGES:START -->
+
+[![VHS](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-vhs.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-vhs.yml)
+[![console2svg](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-console2svg.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-console2svg.yml)
+[![Foley](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-foley.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-foley.yml)
+[![Betamax (joshka)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-betamax.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-betamax.yml)
+[![EVP](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-evp.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-evp.yml)
+[![Demo Tape](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-demotape.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-demotape.yml)
+[![asciinema + agg](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-asciinema.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-asciinema.yml)
+[![PowerSession-rs + agg](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-powersession.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-powersession.yml)
+[![Terminalizer](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-terminalizer.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-terminalizer.yml)
+[![acast](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-acast.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-acast.yml)
+[![termsvg](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-termsvg.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-termsvg.yml)
 <!-- BADGES:END -->
 
 ## Recorder Families
@@ -49,6 +61,30 @@ The grid is the `launch-exit` tape (start `omp`, quit); each cell also runs `hel
 <!-- REPORT:START -->
 
 _Generated from committed CI results on `testing-vhs`._
+
+### Recordings
+
+Each tool's recordings, one sample per output format, live on its asset page.
+
+**Jump to a recording:** [VHS](assets/vhs/README.md) · [console2svg](assets/console2svg/README.md) · [Foley](assets/foley/README.md) · [Betamax (joshka)](assets/betamax/README.md) · [EVP](assets/evp/README.md) · [Demo Tape](assets/demotape/README.md) · [asciinema + agg](assets/asciinema/README.md) · [PowerSession-rs + agg](assets/powersession/README.md) · [Terminalizer](assets/terminalizer/README.md) · [acast](assets/acast/README.md) · [termsvg](assets/termsvg/README.md)
+
+
+### Output Formats (which tools support each)
+
+Pick a format, then open any linked tool's asset page to see that format.
+
+| Format | Count | Tools |
+|--------|------:|-------|
+| `gif` | 11 | [VHS](assets/vhs/README.md), [console2svg](assets/console2svg/README.md), [Foley](assets/foley/README.md), [Betamax (joshka)](assets/betamax/README.md), [EVP](assets/evp/README.md), [Demo Tape](assets/demotape/README.md), [asciinema + agg](assets/asciinema/README.md), [PowerSession-rs + agg](assets/powersession/README.md), [Terminalizer](assets/terminalizer/README.md), [acast](assets/acast/README.md), [termsvg](assets/termsvg/README.md) |
+| `webm` | 6 | [VHS](assets/vhs/README.md), [console2svg](assets/console2svg/README.md), [Foley](assets/foley/README.md), [Betamax (joshka)](assets/betamax/README.md), [Demo Tape](assets/demotape/README.md), [termsvg](assets/termsvg/README.md) |
+| `cast` | 5 | [Foley](assets/foley/README.md), [asciinema + agg](assets/asciinema/README.md), [PowerSession-rs + agg](assets/powersession/README.md), [acast](assets/acast/README.md), [termsvg](assets/termsvg/README.md) |
+| `mp4` | 5 | [VHS](assets/vhs/README.md), [console2svg](assets/console2svg/README.md), [Foley](assets/foley/README.md), [Betamax (joshka)](assets/betamax/README.md), [Demo Tape](assets/demotape/README.md) |
+| `svg` | 3 | [console2svg](assets/console2svg/README.md), [EVP](assets/evp/README.md), [termsvg](assets/termsvg/README.md) |
+| `webp` | 2 | [Foley](assets/foley/README.md), [Betamax (joshka)](assets/betamax/README.md) |
+| `avi` | 1 | [Demo Tape](assets/demotape/README.md) |
+| `svgz` | 1 | [EVP](assets/evp/README.md) |
+| `yml` | 1 | [Terminalizer](assets/terminalizer/README.md) |
+
 
 ### Capability Grid (headline scenario `launch-exit`)
 
@@ -101,13 +137,6 @@ Headline `launch-exit` green, ranked by how many of the four tapes landed.
 **Attempted and failed at least one cell:** [acast][acast] (17/20), [Terminalizer][terminalizer] (16/20), [termsvg][termsvg] (12/16).
 
 
-### Recordings
-
-Each tool's recordings, one sample per output format, live on its asset page.
-
-**Jump to a recording:** [VHS](assets/vhs/README.md) · [console2svg](assets/console2svg/README.md) · [Foley](assets/foley/README.md) · [Betamax (joshka)](assets/betamax/README.md) · [EVP](assets/evp/README.md) · [Demo Tape](assets/demotape/README.md) · [asciinema + agg](assets/asciinema/README.md) · [PowerSession-rs + agg](assets/powersession/README.md) · [Terminalizer](assets/terminalizer/README.md) · [acast](assets/acast/README.md) · [termsvg](assets/termsvg/README.md)
-
-
 ### Skipped Tools
 
 | Tool | Reason skipped for CI-GIF evaluation |
@@ -132,21 +161,6 @@ Each tool's recordings, one sample per output format, live on its asset page.
 | Peek | GUI app, archived 2025; not headless. |
 
 _Tools discovered beyond the original list and evaluated:_ console2svg, EVP, acast, termsvg.
-
-
-### CI Status
-
-[![VHS](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-vhs.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-vhs.yml)
-[![console2svg](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-console2svg.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-console2svg.yml)
-[![Foley](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-foley.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-foley.yml)
-[![Betamax (joshka)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-betamax.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-betamax.yml)
-[![EVP](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-evp.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-evp.yml)
-[![Demo Tape](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-demotape.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-demotape.yml)
-[![asciinema + agg](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-asciinema.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-asciinema.yml)
-[![PowerSession-rs + agg](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-powersession.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-powersession.yml)
-[![Terminalizer](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-terminalizer.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-terminalizer.yml)
-[![acast](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-acast.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-acast.yml)
-[![termsvg](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-termsvg.yml/badge.svg?branch=testing-vhs)](https://github.com/YoraiLevi/testing-area/actions/workflows/rec-termsvg.yml)
 
 
 [vhs]: https://github.com/charmbracelet/vhs
