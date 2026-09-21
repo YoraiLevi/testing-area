@@ -297,8 +297,9 @@ def _modes_str(t: dict) -> str:
     return " + ".join(parts) if parts else "—"
 
 
-# Formats GitHub reliably inline-renders in Markdown via ![](path). svg is flaky and
-# mp4/webm/avi/cast/svgz/yml never inline, so those are linked with a gif preview instead.
+# Formats GitHub reliably inline-renders in Markdown via ![](path). mp4/webm/avi/cast/svgz/yml
+# never inline, so those are linked with a gif preview instead. svg is inlined natively by
+# request: GitHub can render repo SVGs blank, so the .svg link is kept beneath as a fallback.
 INLINE = {"gif", "webp", "png", "apng", "jpg", "jpeg"}
 # Prefer a visually rich scenario for the single representative sample.
 _SCENARIO_PREF = ("help-tour", "typing-demo", "tui-splash", "launch-exit")
@@ -366,6 +367,14 @@ def asset_readmes(tools: dict) -> None:
             rep = _representative(files)
             if rep and fmt in INLINE:
                 lines.append(f"![{t['name']} {fmt} sample: {rep}]({fmt}/{rep})")
+                lines.append("")
+            elif rep and fmt == "svg":
+                lines.append(f"![{t['name']} svg sample: {rep}](svg/{rep})")
+                lines.append("")
+                lines.append(
+                    f"Sample file (shown above; if the SVG renders blank, open it "
+                    f"directly): [`{rep}`](svg/{rep})."
+                )
                 lines.append("")
             elif rep:
                 lines.append(

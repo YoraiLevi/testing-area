@@ -10,9 +10,9 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `svg` — 20 file(s)
 
-Sample: [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg) (`svg` does not render inline on GitHub).
+![console2svg svg sample: linux-bash-help-tour.svg](svg/linux-bash-help-tour.svg)
 
-![console2svg linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
+Sample file (shown above; if the SVG renders blank, open it directly): [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg).
 
 - [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg)
 - [`linux-bash-launch-exit.svg`](svg/linux-bash-launch-exit.svg)

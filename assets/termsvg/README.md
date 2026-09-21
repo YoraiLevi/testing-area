@@ -29,9 +29,9 @@ Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` do
 
 ## `svg` — 12 file(s)
 
-Sample: [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg) (`svg` does not render inline on GitHub).
+![termsvg svg sample: linux-bash-help-tour.svg](svg/linux-bash-help-tour.svg)
 
-![termsvg linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
+Sample file (shown above; if the SVG renders blank, open it directly): [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg).
 
 - [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg)
 - [`linux-bash-launch-exit.svg`](svg/linux-bash-launch-exit.svg)
