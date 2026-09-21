@@ -47,15 +47,15 @@ text { letter-spacing: 1px; fill: #dddddd;  }
 </tspan></text><text y="477" class="h"><set attributeName="visibility" to="visible" begin="t.begin+1.92" end="t.end"/><tspan x="20 31 42 53 64 75 86 97 108 119 130 141 152 163 174 185" class="b">Useful Commands:
 </tspan></text><text y="499" class="h"><set attributeName="visibility" to="visible" begin="t.begin+1.92" end="t.end"/><tspan x="20 31 42 53 64 75 86 97 108 119 130 141 152 163 174 185 196 207 218 229 240 251 262 273 284 295 306 317 328 339 350 361 372 383 394 405 416 427 438 449 460 471 482 493 504 515 526 537 548 559 570 581 592 603 614 625 636 647 658 669 680 691 702 713 724 735 746 757 768 779 790 801 812 823 834 845 856 867 878 889 900 911 922 933 944 955 966 977 988">  omp agents unpack           - Export bundled subagents to ~/.omp/agent/agents (default)
 </tspan></text><text y="521" class="h"><set attributeName="visibility" to="visible" begin="t.begin+1.92" end="t.end"/><tspan x="20 31 42 53 64 75 86 97 108 119 130 141 152 163 174 185 196 207 218 229 240 251 262 273 284 295 306 317 328 339 350 361 372 383 394 405 416 427 438 449 460 471 482 493 504 515 526 537 548 559 570 581 592 603 614 625 636 647 658 669 680 691 702 713 724 735 746 757 768 779 790 801 812">  omp agents unpack --project - Export bundled subagents to ./.omp/agents
-</tspan></text><text y="543" class="h"><set attributeName="visibility" to="visible" begin="t.begin+1.94" end="t.end"/><tspan x="20 31" class="h"><set attributeName="visibility" to="visible" begin="t.begin+1.94" end="t.begin+5.06"/>$ 
+</tspan></text><text y="543" class="h"><set attributeName="visibility" to="visible" begin="t.begin+1.92" end="t.end"/><tspan x="20 31" class="h"><set attributeName="visibility" to="visible" begin="t.begin+1.92" end="t.begin+5.06"/>$ 
 </tspan><tspan x="20 31 42 53 64 75" class="h"><set attributeName="visibility" to="visible" begin="t.begin+5.06" end="t.end"/>$ exit
 </tspan><tspan x="42" class="h"><set attributeName="visibility" to="visible" begin="t.begin+4.82" end="t.begin+5.06"/>e
 </tspan><tspan x="53" class="h"><set attributeName="visibility" to="visible" begin="t.begin+4.9" end="t.begin+5.06"/>x
 </tspan><tspan x="64" class="h"><set attributeName="visibility" to="visible" begin="t.begin+4.98" end="t.begin+5.06"/>i
 </tspan></text><rect width="11" height="22" fill="#dddddd" fill-opacity="0.7" class="h">
-  <animate attributeName="x" calcMode="discrete" values="97;42;53;64;75;86;97;108;119;130;141;152;20;42;53;64;75;86" keyTimes="0;0.0039;0.1012;0.1167;0.1323;0.1479;0.1634;0.179;0.1946;0.2101;0.2257;0.2412;0.3541;0.3774;0.9377;0.9533;0.9689;0.9844" dur="5.14" begin="t.begin" fill="freeze"/>
+  <animate attributeName="x" calcMode="discrete" values="97;42;53;64;75;86;97;108;119;130;141;152;20;42;53;64;75;86" keyTimes="0;0.0039;0.1012;0.1167;0.1323;0.1479;0.1634;0.179;0.1946;0.2101;0.2257;0.2412;0.3541;0.3735;0.9377;0.9533;0.9689;0.9844" dur="5.14" begin="t.begin" fill="freeze"/>
   <animate attributeName="y" calcMode="discrete" values="20;42;526" keyTimes="0;0.3541;0.3735" dur="5.14" begin="t.begin" fill="freeze"/>
-  <animate attributeName="visibility" calcMode="discrete" values="visible;hidden;visible;hidden;visible;hidden;visible;hidden;visible" keyTimes="0;0.4942;0.5525;0.6109;0.6693;0.7276;0.786;0.8444;0.9027" dur="5.14" begin="t.begin" fill="freeze"/>
+  <animate attributeName="visibility" calcMode="discrete" values="visible;hidden;visible;hidden;visible;hidden;visible;hidden;visible" keyTimes="0;0.4903;0.5486;0.607;0.6654;0.7237;0.7821;0.8405;0.8988" dur="5.14" begin="t.begin" fill="freeze"/>
 </rect>
 
 </svg>
