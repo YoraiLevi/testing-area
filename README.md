@@ -56,10 +56,10 @@ _Generated from committed CI results on `testing-vhs`._
 | [EVP][evp]<br><sub>gif · svg · svgz</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253567) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253567) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253567) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253567) | ➖<sup>4</sup> |
 | [Demo Tape][demotape]<br><sub>gif · mp4 · webm · avi</sub> | scripted | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253379) | ➖<sup>5</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253379) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253379) | ➖<sup>6</sup> |
 | [asciinema + agg][asciinema]<br><sub>cast · gif</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253441) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253441) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253441) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253441) | ➖<sup>7</sup> |
-| [PowerSession-rs + agg][powersession]<br><sub>cast · gif</sub> | hybrid | ➖<sup>8</sup> | ➖<sup>9</sup> | ➖<sup>10</sup> | ➖<sup>11</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253460) |
-| [Terminalizer][terminalizer]<br><sub>yml · gif</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392)<sup>12</sup> |
+| [PowerSession-rs + agg][powersession]<br><sub>cast · gif</sub> | hybrid | ➖<sup>8</sup> | ➖<sup>8</sup> | ➖<sup>8</sup> | ➖<sup>8</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253460) |
+| [Terminalizer][terminalizer]<br><sub>yml · gif</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392)<sup>9</sup> |
 | [acast][acast]<br><sub>cast · gif</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) |
-| [termsvg][termsvg]<br><sub>cast · svg · gif · webm</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450)<sup>13</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | ➖<sup>14</sup> |
+| [termsvg][termsvg]<br><sub>cast · svg · gif · webm</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450)<sup>10</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | ➖<sup>11</sup> |
 
 Legend: ✅ working · ❌ broken · ➖ not applicable
 
@@ -74,13 +74,10 @@ Legend: ✅ working · ❌ broken · ➖ not applicable
 5. **Demo Tape · `linux-pwsh`**: Demo Tape's --shell flag accepts only bash, zsh, or fish; PowerShell is not a supported shell.
 6. **Demo Tape · `windows-pwsh`**: Demo Tape captures through ttyd, which is Unix-only; there is no Windows recording path.
 7. **asciinema + agg · `windows-pwsh`**: The asciinema CLI is Unix-only; Windows capture is out of scope (PowerSession-rs is the Windows-native alternative).
-8. **PowerSession-rs + agg · `linux-bash`**: PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.
-9. **PowerSession-rs + agg · `linux-pwsh`**: PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.
-10. **PowerSession-rs + agg · `linux-zsh`**: PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.
-11. **PowerSession-rs + agg · `macos-zsh`**: PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.
-12. **Terminalizer · `windows-pwsh`**: terminalizer is installed and its CLI runs and the config is found and passed, but 'record' fails on Windows with a blank-path ENOENT ('File not found') when spawning the pty recording session headlessly; no valid GIF produced
-13. **termsvg · `linux-pwsh`**: no valid GIF produced in CI
-14. **termsvg · `windows-pwsh`**: termsvg's record command imports syscall.SIGWINCH (POSIX-only); the record subcommand does not compile on Windows.
+8. **PowerSession-rs + agg · `linux-bash`, `linux-pwsh`, `linux-zsh`, `macos-zsh`**: PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.
+9. **Terminalizer · `windows-pwsh`**: terminalizer is installed and its CLI runs and the config is found and passed, but 'record' fails on Windows with a blank-path ENOENT ('File not found') when spawning the pty recording session headlessly; no valid GIF produced
+10. **termsvg · `linux-pwsh`**: no valid GIF produced in CI
+11. **termsvg · `windows-pwsh`**: termsvg's record command imports syscall.SIGWINCH (POSIX-only); the record subcommand does not compile on Windows.
 
 
 ### What To Use
@@ -100,227 +97,9 @@ Headline `launch-exit` green, ranked by how many of the four tapes landed.
 
 ### Recordings
 
-**Jump to a recording:** [VHS](#rec-vhs) · [console2svg](#rec-console2svg) · [Foley](#rec-foley) · [Betamax (joshka)](#rec-betamax) · [EVP](#rec-evp) · [Demo Tape](#rec-demotape) · [asciinema + agg](#rec-asciinema) · [PowerSession-rs + agg](#rec-powersession) · [Terminalizer](#rec-terminalizer) · [acast](#rec-acast) · [termsvg](#rec-termsvg)
+Each tool's recordings, one sample per output format, live on its asset page.
 
-<a id="rec-vhs"></a>
-
-#### VHS (`linux-bash`)
-
-**launch-exit**
-
-![VHS launch-exit](assets/vhs/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![VHS help-tour](assets/vhs/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![VHS tui-splash](assets/vhs/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![VHS typing-demo](assets/vhs/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-console2svg"></a>
-
-#### console2svg (`linux-bash`)
-
-**launch-exit**
-
-![console2svg launch-exit](assets/console2svg/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![console2svg help-tour](assets/console2svg/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![console2svg tui-splash](assets/console2svg/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![console2svg typing-demo](assets/console2svg/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-foley"></a>
-
-#### Foley (`linux-bash`)
-
-**launch-exit**
-
-![Foley launch-exit](assets/foley/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![Foley help-tour](assets/foley/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![Foley tui-splash](assets/foley/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![Foley typing-demo](assets/foley/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-betamax"></a>
-
-#### Betamax (joshka) (`linux-bash`)
-
-**launch-exit**
-
-![Betamax (joshka) launch-exit](assets/betamax/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![Betamax (joshka) help-tour](assets/betamax/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![Betamax (joshka) tui-splash](assets/betamax/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![Betamax (joshka) typing-demo](assets/betamax/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-evp"></a>
-
-#### EVP (`linux-bash`)
-
-**launch-exit**
-
-![EVP launch-exit](assets/evp/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![EVP help-tour](assets/evp/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![EVP tui-splash](assets/evp/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![EVP typing-demo](assets/evp/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-demotape"></a>
-
-#### Demo Tape (`linux-bash`)
-
-**launch-exit**
-
-![Demo Tape launch-exit](assets/demotape/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![Demo Tape help-tour](assets/demotape/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![Demo Tape tui-splash](assets/demotape/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![Demo Tape typing-demo](assets/demotape/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-asciinema"></a>
-
-#### asciinema + agg (`linux-bash`)
-
-**launch-exit**
-
-![asciinema + agg launch-exit](assets/asciinema/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![asciinema + agg help-tour](assets/asciinema/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![asciinema + agg tui-splash](assets/asciinema/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![asciinema + agg typing-demo](assets/asciinema/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-powersession"></a>
-
-#### PowerSession-rs + agg (`windows-pwsh`)
-
-**launch-exit**
-
-![PowerSession-rs + agg launch-exit](assets/powersession/gif/windows-pwsh-launch-exit.gif)
-
-**help-tour**
-
-![PowerSession-rs + agg help-tour](assets/powersession/gif/windows-pwsh-help-tour.gif)
-
-**tui-splash**
-
-![PowerSession-rs + agg tui-splash](assets/powersession/gif/windows-pwsh-tui-splash.gif)
-
-**typing-demo**
-
-![PowerSession-rs + agg typing-demo](assets/powersession/gif/windows-pwsh-typing-demo.gif)
-
-<a id="rec-terminalizer"></a>
-
-#### Terminalizer (`linux-bash`)
-
-**launch-exit**
-
-![Terminalizer launch-exit](assets/terminalizer/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![Terminalizer help-tour](assets/terminalizer/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![Terminalizer tui-splash](assets/terminalizer/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![Terminalizer typing-demo](assets/terminalizer/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-acast"></a>
-
-#### acast (`linux-bash`)
-
-**launch-exit**
-
-![acast launch-exit](assets/acast/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![acast help-tour](assets/acast/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![acast tui-splash](assets/acast/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![acast typing-demo](assets/acast/gif/linux-bash-typing-demo.gif)
-
-<a id="rec-termsvg"></a>
-
-#### termsvg (`linux-bash`)
-
-**launch-exit**
-
-![termsvg launch-exit](assets/termsvg/gif/linux-bash-launch-exit.gif)
-
-**help-tour**
-
-![termsvg help-tour](assets/termsvg/gif/linux-bash-help-tour.gif)
-
-**tui-splash**
-
-![termsvg tui-splash](assets/termsvg/gif/linux-bash-tui-splash.gif)
-
-**typing-demo**
-
-![termsvg typing-demo](assets/termsvg/gif/linux-bash-typing-demo.gif)
+**Jump to a recording:** [VHS](assets/vhs/README.md) · [console2svg](assets/console2svg/README.md) · [Foley](assets/foley/README.md) · [Betamax (joshka)](assets/betamax/README.md) · [EVP](assets/evp/README.md) · [Demo Tape](assets/demotape/README.md) · [asciinema + agg](assets/asciinema/README.md) · [PowerSession-rs + agg](assets/powersession/README.md) · [Terminalizer](assets/terminalizer/README.md) · [acast](assets/acast/README.md) · [termsvg](assets/termsvg/README.md)
 
 
 ### Skipped Tools
