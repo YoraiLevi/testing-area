@@ -6,7 +6,7 @@
   "verdict": "broken",
   "reason": "terminalizer is installed and its CLI runs and the config is found and passed, but 'record' fails on Windows with a blank-path ENOENT ('File not found') when spawning the pty recording session headlessly; no valid GIF produced",
   "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35570461361",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35576002579",
   "extra": {
     "tool_version": "latest (npm 0.12.0)",
     "omp_version": "omp/18.2.7"

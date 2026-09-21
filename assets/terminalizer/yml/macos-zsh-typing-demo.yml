@@ -80,75 +80,75 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 194
+  - delay: 253
     content: "^D\b\b"
-  - delay: 20
+  - delay: 8
     content: '$ '
-  - delay: 1024
+  - delay: 1094
     content: e
-  - delay: 183
+  - delay: 142
     content: x
-  - delay: 164
+  - delay: 168
     content: p
-  - delay: 205
+  - delay: 186
     content: l
-  - delay: 169
+  - delay: 133
     content: a
-  - delay: 226
+  - delay: 177
     content: i
   - delay: 204
     content: 'n'
-  - delay: 280
+  - delay: 158
     content: ' '
-  - delay: 140
+  - delay: 153
     content: w
-  - delay: 129
+  - delay: 167
     content: h
-  - delay: 259
+  - delay: 182
     content: a
-  - delay: 141
+  - delay: 193
     content: t
-  - delay: 231
+  - delay: 206
     content: ' '
-  - delay: 276
+  - delay: 174
     content: t
-  - delay: 155
+  - delay: 140
     content: h
-  - delay: 239
+  - delay: 152
     content: i
-  - delay: 176
+  - delay: 204
     content: s
-  - delay: 242
+  - delay: 134
     content: ' '
-  - delay: 231
+  - delay: 206
     content: r
-  - delay: 250
+  - delay: 162
     content: e
-  - delay: 177
+  - delay: 170
     content: p
-  - delay: 172
+  - delay: 212
     content: o
-  - delay: 150
+  - delay: 187
     content: s
-  - delay: 276
+  - delay: 163
     content: i
   - delay: 133
     content: t
+  - delay: 132
+    content: o
   - delay: 136
-    content: o
-  - delay: 210
     content: r
-  - delay: 247
+  - delay: 135
     content: 'y'
-  - delay: 216
-    content: ' '
-  - delay: 161
-    content: d
   - delay: 142
+    content: ' '
+  - delay: 171
+    content: d
+  - delay: 168
     content: o
-  - delay: 150
+  - delay: 198
     content: e
-  - delay: 233
+  - delay: 159
     content: s
-  - delay: 2244
+  - delay: 2174
     content: "\r\n"

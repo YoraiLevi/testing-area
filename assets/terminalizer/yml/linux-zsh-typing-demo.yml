@@ -80,73 +80,73 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 208
+  - delay: 272
     content: $ ^@
-  - delay: 998
+  - delay: 996
     content: e
-  - delay: 123
+  - delay: 124
     content: x
   - delay: 123
     content: p
-  - delay: 123
+  - delay: 124
     content: l
   - delay: 124
     content: a
-  - delay: 123
+  - delay: 124
     content: i
-  - delay: 123
+  - delay: 124
     content: 'n'
-  - delay: 123
-    content: ' '
   - delay: 124
+    content: ' '
+  - delay: 123
     content: w
-  - delay: 123
+  - delay: 124
     content: h
-  - delay: 123
+  - delay: 124
     content: a
-  - delay: 123
+  - delay: 124
     content: t
   - delay: 124
     content: ' '
   - delay: 123
     content: t
-  - delay: 123
+  - delay: 124
     content: h
   - delay: 124
     content: i
   - delay: 123
     content: s
-  - delay: 123
+  - delay: 124
     content: ' '
-  - delay: 123
+  - delay: 124
     content: r
   - delay: 124
     content: e
   - delay: 123
     content: p
-  - delay: 123
+  - delay: 124
     content: o
   - delay: 124
     content: s
   - delay: 123
     content: i
-  - delay: 123
+  - delay: 124
     content: t
-  - delay: 123
-    content: o
   - delay: 124
+    content: o
+  - delay: 123
     content: r
-  - delay: 123
+  - delay: 125
     content: 'y'
-  - delay: 123
-    content: ' '
   - delay: 124
+    content: ' '
+  - delay: 123
     content: d
-  - delay: 123
+  - delay: 124
     content: o
-  - delay: 123
+  - delay: 124
     content: e
   - delay: 124
     content: s
-  - delay: 2123
+  - delay: 2124
     content: "\r\n"
