@@ -8,7 +8,7 @@
 
 Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
-## `cast` — 12 file(s)
+## `cast` — 13 file(s)
 
 ![termsvg cast sample: linux-bash-help-tour.cast](cast/linux-bash-help-tour.cast)
 
@@ -16,6 +16,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`linux-bash-launch-exit.cast`](cast/linux-bash-launch-exit.cast)
 - [`linux-bash-tui-splash.cast`](cast/linux-bash-tui-splash.cast)
 - [`linux-bash-typing-demo.cast`](cast/linux-bash-typing-demo.cast)
+- [`linux-pwsh-launch-exit.cast`](cast/linux-pwsh-launch-exit.cast)
 - [`linux-zsh-help-tour.cast`](cast/linux-zsh-help-tour.cast)
 - [`linux-zsh-launch-exit.cast`](cast/linux-zsh-launch-exit.cast)
 - [`linux-zsh-tui-splash.cast`](cast/linux-zsh-tui-splash.cast)
@@ -25,7 +26,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`macos-zsh-tui-splash.cast`](cast/macos-zsh-tui-splash.cast)
 - [`macos-zsh-typing-demo.cast`](cast/macos-zsh-typing-demo.cast)
 
-## `svg` — 12 file(s)
+## `svg` — 13 file(s)
 
 ![termsvg svg sample: linux-bash-help-tour.svg](svg/linux-bash-help-tour.svg)
 
@@ -33,6 +34,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`linux-bash-launch-exit.svg`](svg/linux-bash-launch-exit.svg)
 - [`linux-bash-tui-splash.svg`](svg/linux-bash-tui-splash.svg)
 - [`linux-bash-typing-demo.svg`](svg/linux-bash-typing-demo.svg)
+- [`linux-pwsh-launch-exit.svg`](svg/linux-pwsh-launch-exit.svg)
 - [`linux-zsh-help-tour.svg`](svg/linux-zsh-help-tour.svg)
 - [`linux-zsh-launch-exit.svg`](svg/linux-zsh-launch-exit.svg)
 - [`linux-zsh-tui-splash.svg`](svg/linux-zsh-tui-splash.svg)
@@ -42,7 +44,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`macos-zsh-tui-splash.svg`](svg/macos-zsh-tui-splash.svg)
 - [`macos-zsh-typing-demo.svg`](svg/macos-zsh-typing-demo.svg)
 
-## `gif` — 12 file(s)
+## `gif` — 13 file(s)
 
 ![termsvg gif sample: linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
 
@@ -50,6 +52,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`linux-bash-launch-exit.gif`](gif/linux-bash-launch-exit.gif)
 - [`linux-bash-tui-splash.gif`](gif/linux-bash-tui-splash.gif)
 - [`linux-bash-typing-demo.gif`](gif/linux-bash-typing-demo.gif)
+- [`linux-pwsh-launch-exit.gif`](gif/linux-pwsh-launch-exit.gif)
 - [`linux-zsh-help-tour.gif`](gif/linux-zsh-help-tour.gif)
 - [`linux-zsh-launch-exit.gif`](gif/linux-zsh-launch-exit.gif)
 - [`linux-zsh-tui-splash.gif`](gif/linux-zsh-tui-splash.gif)
@@ -59,7 +62,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`macos-zsh-tui-splash.gif`](gif/macos-zsh-tui-splash.gif)
 - [`macos-zsh-typing-demo.gif`](gif/macos-zsh-typing-demo.gif)
 
-## `webm` — 12 file(s)
+## `webm` — 13 file(s)
 
 ![termsvg webm sample: linux-bash-help-tour.webm](webm/linux-bash-help-tour.webm)
 
@@ -67,6 +70,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`linux-bash-launch-exit.webm`](webm/linux-bash-launch-exit.webm)
 - [`linux-bash-tui-splash.webm`](webm/linux-bash-tui-splash.webm)
 - [`linux-bash-typing-demo.webm`](webm/linux-bash-typing-demo.webm)
+- [`linux-pwsh-launch-exit.webm`](webm/linux-pwsh-launch-exit.webm)
 - [`linux-zsh-help-tour.webm`](webm/linux-zsh-help-tour.webm)
 - [`linux-zsh-launch-exit.webm`](webm/linux-zsh-launch-exit.webm)
 - [`linux-zsh-tui-splash.webm`](webm/linux-zsh-tui-splash.webm)
