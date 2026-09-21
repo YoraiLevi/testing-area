@@ -6,7 +6,7 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/console2svg/gif/windows-pwsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35567181044",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35569668200",
   "extra": {
     "tool_version": "v0.9.3",
     "omp_version": "omp/18.2.7"
