@@ -80,31 +80,31 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 280
+  - delay: 282
     content: $ ^@
   - delay: 995
     content: e
-  - delay: 124
+  - delay: 125
     content: x
   - delay: 124
     content: p
-  - delay: 125
+  - delay: 124
     content: l
-  - delay: 123
+  - delay: 124
     content: a
   - delay: 124
     content: i
   - delay: 124
     content: 'n'
-  - delay: 125
+  - delay: 124
     content: ' '
   - delay: 124
     content: w
-  - delay: 123
+  - delay: 124
     content: h
   - delay: 125
     content: a
-  - delay: 123
+  - delay: 124
     content: t
   - delay: 124
     content: ' '
@@ -114,15 +114,15 @@ records:
     content: h
   - delay: 124
     content: i
-  - delay: 124
+  - delay: 125
     content: s
-  - delay: 123
+  - delay: 125
     content: ' '
   - delay: 124
     content: r
   - delay: 124
     content: e
-  - delay: 125
+  - delay: 124
     content: p
   - delay: 124
     content: o
@@ -134,11 +134,11 @@ records:
     content: t
   - delay: 124
     content: o
-  - delay: 125
+  - delay: 124
     content: r
   - delay: 124
     content: 'y'
-  - delay: 124
+  - delay: 125
     content: ' '
   - delay: 124
     content: d
@@ -146,7 +146,7 @@ records:
     content: o
   - delay: 124
     content: e
-  - delay: 124
+  - delay: 125
     content: s
   - delay: 2124
     content: "\r\n"
