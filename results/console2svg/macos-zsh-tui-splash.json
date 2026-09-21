@@ -3,10 +3,10 @@
   "os": "macos",
   "shell": "zsh",
   "scenario": "tui-splash",
-  "verdict": "working",
-  "reason": "omp TUI captured headlessly via console2svg --timeout (splash/onboarding screen)",
-  "gif": "assets/console2svg/gif/macos-zsh-tui-splash.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35570461324",
+  "verdict": "broken",
+  "reason": "no valid GIF produced in CI; omp TUI captured headlessly via console2svg --timeout (splash/onboarding screen)",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35576002610",
   "extra": {
     "tool_version": "v0.9.3",
     "omp_version": "omp/18.2.7"

@@ -3,10 +3,10 @@
   "os": "macos",
   "shell": "zsh",
   "scenario": "typing-demo",
-  "verdict": "working",
-  "reason": "console2svg has no headless TUI input driver; sample prompt animated as a typed command line via -c (shell-prompt fallback per scenarios.md)",
-  "gif": "assets/console2svg/gif/macos-zsh-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35570461324",
+  "verdict": "broken",
+  "reason": "no valid GIF produced in CI; console2svg has no headless TUI input driver; sample prompt animated as a typed command line via -c (shell-prompt fallback per scenarios.md)",
+  "gif": null,
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35576002610",
   "extra": {
     "tool_version": "v0.9.3",
     "omp_version": "omp/18.2.7"
