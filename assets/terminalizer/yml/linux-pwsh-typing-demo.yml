@@ -80,9 +80,9 @@ config:
   
 # Records, feel free to edit them
 records:
-  - delay: 292
+  - delay: 281
     content: ^@
-  - delay: 88
+  - delay: 73
     content: "\e[?1h\e="
-  - delay: 262
+  - delay: 235
     content: "\e[31;1mParserError: \e[0m\r\n\e[31;1m\e[36;1mLine |\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m  12 | \e[0m while\e[36;1m \e[0m[ \"$i\" -le \"$len\" ]; do\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m\e[0m\e[36;1m\e[0m\e[36;1m     | \e[31;1m      ~\e[0m\r\n\e[31;1m\e[36;1m\e[36;1m\e[0m\e[36;1m\e[0m\e[36;1m\e[31;1m\e[31;1m\e[36;1m     | \e[31;1mMissing opening '(' after keyword 'while'.\e[0m\r\n"
