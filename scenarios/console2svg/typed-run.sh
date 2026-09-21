@@ -1,18 +1,25 @@
 #!/usr/bin/env bash
-# Animate a command being typed at a prompt, run it, then hold the final screen.
+# Animate a command being typed at a prompt, run it, replay its output gradually,
+# then hold the final screen with a blinking cursor.
 #
-# console2svg records terminal *changes* over time. A fast, non-interactive command
-# (omp --version / --help) flushes its output and exits before console2svg's capture
-# loop samples a populated screen, so on Linux the capture collapses to a single empty
-# frame ("$ <cmd>" with no output at all). Typing the command out with per-key sleeps
-# and then holding the result gives console2svg genuine time-varying, populated content,
-# so every platform produces a real multi-frame animation that shows the command output.
+# console2svg's video mode records the terminal *as it changes over time*. On Linux a
+# fast, non-interactive command (omp --version / --help, echo) writes all of its output
+# in a single instant burst and then exits, and that burst is dropped: the capture is an
+# empty terminal (verified on Ubuntu with console2svg 0.9.3). Three things fix it:
+#   1. Type the command out with per-key sleeps so the prompt line is recorded.
+#   2. Capture the command output, then re-emit it one line at a time with a small delay
+#      so it renders progressively and console2svg records it (a burst is not recorded,
+#      gradual output is). FORCE_COLOR is set by console2svg, so ANSI colour survives.
+#   3. Hold the final screen with a blinking block cursor. A screen that goes fully
+#      static right after the output is dropped, so the blink keeps it changing (and
+#      being sampled) while the output stays visible above it.
 #
 # Usage: typed-run.sh <command> [args...]
 set -u
 
-CPS="${TYPED_CPS:-0.04}"   # seconds per character while "typing"
-HOLD="${TYPED_HOLD:-1.0}"  # seconds to hold the final screen after the command finishes
+CPS="${TYPED_CPS:-0.04}"     # seconds per character while "typing" the command
+LPS="${TYPED_LPS:-0.10}"     # seconds between output lines while replaying the result
+BLINKS="${TYPED_BLINKS:-4}"  # blink cycles holding the final screen (each ~0.3s)
 
 cmd="$*"
 printf '$ '
@@ -21,5 +28,18 @@ for (( i = 0; i < ${#cmd}; i++ )); do
   sleep "$CPS"
 done
 printf '\n'
-eval "$cmd"
-sleep "$HOLD"
+
+out="$(eval "$cmd" 2>&1)"
+if [ -n "$out" ]; then
+  while IFS= read -r line; do
+    printf '%s\n' "$line"
+    sleep "$LPS"
+  done <<< "$out"
+fi
+
+for (( b = 0; b < BLINKS; b++ )); do
+  printf '\033[7m \033[0m'   # inverse-video block: a visible cursor
+  sleep 0.15
+  printf '\b \b'             # erase it
+  sleep 0.15
+done
