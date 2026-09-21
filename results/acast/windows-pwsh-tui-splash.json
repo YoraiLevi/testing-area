@@ -3,10 +3,10 @@
   "os": "windows",
   "shell": "pwsh",
   "scenario": "tui-splash",
-  "verdict": "broken",
-  "reason": "acast (v0.4.0) + agg (v1.9.0) produced no valid GIF for this cell in CI; see run logs",
-  "gif": null,
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35583538857",
+  "verdict": "working",
+  "reason": "omp TUI splash captured; quit forced via SIGINT->SIGTERM->SIGKILL watchdog (acast cannot quit the TUI by keystroke headlessly)",
+  "gif": "assets/acast/gif/windows-pwsh-tui-splash.gif",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35586114253",
   "extra": {
     "tool_version": "v0.4.0 (agg v1.9.0)",
     "omp_version": "omp/18.2.7"
