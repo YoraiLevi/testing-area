@@ -58,7 +58,7 @@ _Generated from committed CI results on `testing-vhs`._
 | [asciinema + agg][asciinema]<br><sub>cast · gif</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253441) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253441) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253441) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253441) | ➖<sup>7</sup> |
 | [PowerSession-rs + agg][powersession]<br><sub>cast · gif</sub> | hybrid | ➖<sup>8</sup> | ➖<sup>8</sup> | ➖<sup>8</sup> | ➖<sup>8</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35549444552) |
 | [Terminalizer][terminalizer]<br><sub>yml · gif</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35544253392)<sup>9</sup> |
-| [acast][acast]<br><sub>cast · gif</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253440) |
+| [acast][acast]<br><sub>cast · gif</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35549444704) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35549444704) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35549444704) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35549444704) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35549444704) |
 | [termsvg][termsvg]<br><sub>cast · svg · gif · webm</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450)<sup>10</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35544253450) | ➖<sup>11</sup> |
 
 Legend: ✅ working · ❌ broken · ➖ not applicable
@@ -87,12 +87,12 @@ Headline `launch-exit` green, ranked by how many of the four tapes landed.
 | Cell | Working recorders (scenarios / 4) |
 |------|-----------------------------------|
 | `linux-bash` · `linux-zsh` · `macos-zsh` | [acast][acast] (4/4), [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [Demo Tape][demotape] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [termsvg][termsvg] (4/4), [VHS][vhs] (4/4) |
-| `linux-pwsh` | [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [VHS][vhs] (4/4), [acast][acast] (2/4) |
+| `linux-pwsh` | [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [VHS][vhs] (4/4), [acast][acast] (3/4) |
 | `windows-pwsh` | [acast][acast] (4/4), [console2svg][console2svg] (4/4), [PowerSession-rs + agg][powersession] (4/4) |
 
 **Green on every cell they target:** [asciinema + agg][asciinema] (16/16), [Betamax (joshka)][betamax] (16/16), [console2svg][console2svg] (20/20), [Demo Tape][demotape] (12/12), [EVP][evp] (16/16), [Foley][foley] (16/16), [PowerSession-rs + agg][powersession] (4/4), [VHS][vhs] (16/16, 4 N/A).
 
-**Attempted and failed at least one cell:** [acast][acast] (18/20), [Terminalizer][terminalizer] (16/20), [termsvg][termsvg] (12/16).
+**Attempted and failed at least one cell:** [acast][acast] (19/20), [Terminalizer][terminalizer] (16/20), [termsvg][termsvg] (12/16).
 
 
 ### Recordings
