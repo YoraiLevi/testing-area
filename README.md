@@ -50,7 +50,7 @@ _Generated from committed CI results on `testing-vhs`._
 | Tool | Family | linux-bash | linux-pwsh | linux-zsh | macos-zsh | windows-pwsh |
 |------|--------|:--:|:--:|:--:|:--:|:--:|
 | [VHS][vhs]<br><sub>gif · mp4 · webm</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002550) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002550) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002550) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002550) | [➖](https://github.com/YoraiLevi/testing-area/actions/runs/35576002550)<sup>1</sup> |
-| [console2svg][console2svg]<br><sub>svg · gif · mp4 · webm</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35570461324) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35570461324) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35570461324) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35570461324) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35570461324) |
+| [console2svg][console2svg]<br><sub>svg · gif · mp4 · webm</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002610) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002610) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002610) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002610) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002610) |
 | [Foley][foley]<br><sub>gif · mp4 · webm · webp · cast</sub> | scripted | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002555) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002555) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002555) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002555) | ➖<sup>2</sup> |
 | [Betamax (joshka)][betamax]<br><sub>gif · webp · mp4 · webm</sub> | scripted | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002541) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002541) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002541) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002541) | ➖<sup>3</sup> |
 | [EVP][evp]<br><sub>gif · svg · svgz</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002624) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002624) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002624) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35576002624) | ➖<sup>4</sup> |
@@ -86,13 +86,14 @@ Headline `launch-exit` green, ranked by how many of the four tapes landed.
 
 | Cell | Working recorders (scenarios / 4) |
 |------|-----------------------------------|
-| `linux-bash` · `linux-zsh` · `macos-zsh` | [acast][acast] (4/4), [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [Demo Tape][demotape] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [termsvg][termsvg] (4/4), [VHS][vhs] (4/4) |
+| `linux-bash` · `linux-zsh` | [acast][acast] (4/4), [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [Demo Tape][demotape] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [termsvg][termsvg] (4/4), [VHS][vhs] (4/4) |
 | `linux-pwsh` | [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [VHS][vhs] (4/4), [acast][acast] (2/4) |
+| `macos-zsh` | [acast][acast] (4/4), [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [Demo Tape][demotape] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [termsvg][termsvg] (4/4), [VHS][vhs] (4/4), [console2svg][console2svg] (2/4) |
 | `windows-pwsh` | [acast][acast] (4/4), [console2svg][console2svg] (4/4), [PowerSession-rs + agg][powersession] (4/4) |
 
-**Green on every cell they target:** [asciinema + agg][asciinema] (16/16), [Betamax (joshka)][betamax] (16/16), [console2svg][console2svg] (20/20), [Demo Tape][demotape] (12/12), [EVP][evp] (16/16), [Foley][foley] (16/16), [PowerSession-rs + agg][powersession] (4/4), [VHS][vhs] (16/16, 4 N/A).
+**Green on every cell they target:** [asciinema + agg][asciinema] (16/16), [Betamax (joshka)][betamax] (16/16), [Demo Tape][demotape] (12/12), [EVP][evp] (16/16), [Foley][foley] (16/16), [PowerSession-rs + agg][powersession] (4/4), [VHS][vhs] (16/16, 4 N/A).
 
-**Attempted and failed at least one cell:** [acast][acast] (18/20), [Terminalizer][terminalizer] (16/20), [termsvg][termsvg] (12/16).
+**Attempted and failed at least one cell:** [acast][acast] (18/20), [console2svg][console2svg] (18/20), [Terminalizer][terminalizer] (16/20), [termsvg][termsvg] (12/16).
 
 
 ### Recordings
