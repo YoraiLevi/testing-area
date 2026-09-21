@@ -111,6 +111,10 @@ jobs:
           # files; the checkout brings stale committed results that must not ride along.
           rm -rf results/vhs assets/vhs
           mkdir -p results/vhs assets/vhs/gif assets/vhs/mp4 assets/vhs/webm
+          # The step runs under -e -o pipefail, so a `find <dir>` whose <dir> is
+          # missing exits 1 and aborts. Guarantee both search roots exist (empty on
+          # Windows / a failed render) so find always exits 0 and yields no match.
+          mkdir -p tapes/out out
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
