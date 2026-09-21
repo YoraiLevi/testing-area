@@ -84,7 +84,19 @@ def grid(tools: dict, idx: dict) -> str:
     rows = [header, sep]
     # Per-cell reasons collected in grid iteration order (tools in file order,
     # cells sorted); the index becomes the cell's `<sup>N</sup>` marker.
-    notes: list[str] = []
+    # Notes are deduped by (tool, reason): cells sharing a cause collapse into one
+    # numbered note listing every affected cell, not repeated identical text.
+    note_num: dict[tuple[str, str], int] = {}
+    note_cells: dict[tuple[str, str], list[str]] = {}
+
+    def mark(tool_name: str, cell: str, reason: str) -> int:
+        key = (tool_name, reason)
+        if key not in note_num:
+            note_num[key] = len(note_num) + 1
+            note_cells[key] = []
+        note_cells[key].append(cell)
+        return note_num[key]
+
     ne_used = False
     for t in tools["tools"]:
         unsupported = t.get("unsupported", {})
@@ -96,8 +108,7 @@ def grid(tools: dict, idx: dict) -> str:
                 # No CI run for this cell: an upstream limit (➖) and simply outside the
                 # grid's OS/shell matrix (⬜) are distinct, honest states.
                 if c in unsupported:
-                    notes.append(f"**{t['name']} · `{c}`**: {unsupported[c]}")
-                    row.append(f"➖<sup>{len(notes)}</sup>")
+                    row.append(f"➖<sup>{mark(t['name'], c, unsupported[c])}</sup>")
                 else:
                     row.append("⬜")
                     ne_used = True
@@ -109,8 +120,7 @@ def grid(tools: dict, idx: dict) -> str:
             # Any cell that ran and did not succeed (hard failure or platform limit) is
             # flagged with its reason in the numbered notes.
             if verdict in ("broken", "skipped", "not-applicable") and rec.get("reason"):
-                notes.append(f"**{t['name']} · `{c}`**: {rec['reason']}")
-                cell_md += f"<sup>{len(notes)}</sup>"
+                cell_md += f"<sup>{mark(t['name'], c, rec['reason'])}</sup>"
             row.append(cell_md)
         rows.append("| " + " | ".join(row) + " |")
     legend = ("\nLegend: ✅ working · ❌ broken · ➖ not applicable"
@@ -121,9 +131,11 @@ def grid(tools: dict, idx: dict) -> str:
         block.append(
             "- **⬜ not evaluated.** No CI run exists for this OS/shell, so no verdict is claimed."
         )
-    if notes:
+    if note_num:
         block.append("")
-        block.extend(f"{i}. {n}" for i, n in enumerate(notes, 1))
+        for (tool_name, reason), num in note_num.items():
+            cs = ", ".join(f"`{c}`" for c in note_cells[(tool_name, reason)])
+            block.append(f"{num}. **{tool_name} · {cs}**: {reason}")
     block.append("")
     notes_md = "\n".join(block)
     return (
@@ -133,46 +145,32 @@ def grid(tools: dict, idx: dict) -> str:
 
 
 def recordings(tools: dict, idx: dict) -> str:
+    """Point readers at each tool's asset page instead of embedding GIFs here.
+
+    The samples live in assets/<tool>/README.md (one per output format), so the
+    main report stays small and every format is viewable in one place.
+    """
     scen = tools["scenarios"]
     pref = ["linux-bash", "linux-zsh", "macos-zsh", "linux-pwsh", "windows-pwsh"]
-    # First resolve which tools have an embeddable recording set and where.
-    sections = []  # (tool, chosen_cell, [(scenario, gif), ...])
+    have = []  # tools with at least one committed working recording
     for t in tools["tools"]:
-        chosen = None
         for c in pref + t["cells"]:
-            if idx.get((t["id"], c, "launch-exit"), {}).get("verdict") == "working":
-                chosen = c
+            if idx.get((t["id"], c, "launch-exit"), {}).get("verdict") != "working":
+                continue
+            if any(idx.get((t["id"], c, s), {}).get("verdict") == "working"
+                   and idx.get((t["id"], c, s), {}).get("gif") for s in scen):
+                have.append(t)
                 break
-        if chosen is None:
-            continue
-        gifs = [
-            (s, idx[(t["id"], chosen, s)]["gif"])
-            for s in scen
-            if idx.get((t["id"], chosen, s), {}).get("verdict") == "working"
-            and idx.get((t["id"], chosen, s), {}).get("gif")
-        ]
-        if gifs:
-            sections.append((t, chosen, gifs))
-
     out = ["### Recordings", ""]
-    if not sections:
+    if not have:
         out.append("_No working recordings committed yet. Trigger the `rec-*` workflows._")
         out.append("")
         return "\n".join(out)
-    # Table of contents so readers can jump straight to a tool's GIFs.
-    toc = " · ".join(f"[{t['name']}](#rec-{t['id']})" for t, _c, _g in sections)
+    toc = " · ".join(f"[{t['name']}](assets/{t['id']}/README.md)" for t in have)
+    out.append("Each tool's recordings, one sample per output format, live on its asset page.")
+    out.append("")
     out.append(f"**Jump to a recording:** {toc}")
     out.append("")
-    for t, chosen, gifs in sections:
-        out.append(f'<a id="rec-{t["id"]}"></a>')
-        out.append("")
-        out.append(f"#### {t['name']} (`{chosen}`)")
-        out.append("")
-        for s, gif in gifs:
-            out.append(f"**{s}**")
-            out.append("")
-            out.append(f"![{t['name']} {s}]({gif})")
-            out.append("")
     return "\n".join(out)
 
 
