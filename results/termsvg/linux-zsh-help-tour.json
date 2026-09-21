@@ -6,9 +6,9 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/termsvg/gif/linux-zsh-help-tour.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35549444540",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35567181032",
   "extra": {
     "tool_version": "v0.11.0",
-    "omp_version": "omp/18.2.6"
+    "omp_version": "omp/18.2.7"
   }
 }
