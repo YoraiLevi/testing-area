@@ -15,5 +15,5 @@ format it supports; files are laid out hierarchically as
 | [asciinema + agg](asciinema/) | hybrid | interactive + scripted | cast · gif | 32 |
 | [PowerSession-rs + agg](powersession/) | hybrid | interactive + scripted | cast · gif | 8 |
 | [Terminalizer](terminalizer/) | hybrid | interactive + scripted | yml · gif | 32 |
-| [acast](acast/) | interactive | interactive | cast · gif | 38 |
+| [acast](acast/) | interactive | interactive | cast · gif | 36 |
 | [termsvg](termsvg/) | interactive | interactive | cast · svg · gif · webm | 48 |
