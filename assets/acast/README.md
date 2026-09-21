@@ -8,7 +8,7 @@
 
 Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
-## `cast` — 18 file(s)
+## `cast` — 17 file(s)
 
 Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` does not render inline on GitHub).
 
@@ -19,7 +19,6 @@ Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` do
 - [`linux-bash-tui-splash.cast`](cast/linux-bash-tui-splash.cast)
 - [`linux-bash-typing-demo.cast`](cast/linux-bash-typing-demo.cast)
 - [`linux-pwsh-help-tour.cast`](cast/linux-pwsh-help-tour.cast)
-- [`linux-pwsh-launch-exit.cast`](cast/linux-pwsh-launch-exit.cast)
 - [`linux-zsh-help-tour.cast`](cast/linux-zsh-help-tour.cast)
 - [`linux-zsh-launch-exit.cast`](cast/linux-zsh-launch-exit.cast)
 - [`linux-zsh-tui-splash.cast`](cast/linux-zsh-tui-splash.cast)
@@ -33,7 +32,7 @@ Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` do
 - [`windows-pwsh-tui-splash.cast`](cast/windows-pwsh-tui-splash.cast)
 - [`windows-pwsh-typing-demo.cast`](cast/windows-pwsh-typing-demo.cast)
 
-## `gif` — 18 file(s)
+## `gif` — 17 file(s)
 
 ![acast gif sample: linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
 
@@ -42,7 +41,6 @@ Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` do
 - [`linux-bash-tui-splash.gif`](gif/linux-bash-tui-splash.gif)
 - [`linux-bash-typing-demo.gif`](gif/linux-bash-typing-demo.gif)
 - [`linux-pwsh-help-tour.gif`](gif/linux-pwsh-help-tour.gif)
-- [`linux-pwsh-launch-exit.gif`](gif/linux-pwsh-launch-exit.gif)
 - [`linux-zsh-help-tour.gif`](gif/linux-zsh-help-tour.gif)
 - [`linux-zsh-launch-exit.gif`](gif/linux-zsh-launch-exit.gif)
 - [`linux-zsh-tui-splash.gif`](gif/linux-zsh-tui-splash.gif)
