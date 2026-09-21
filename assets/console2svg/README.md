@@ -8,7 +8,7 @@
 
 Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
-## `svg` — 18 file(s)
+## `svg` — 20 file(s)
 
 ![console2svg svg sample: linux-bash-help-tour.svg](svg/linux-bash-help-tour.svg)
 
@@ -26,12 +26,14 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`linux-zsh-typing-demo.svg`](svg/linux-zsh-typing-demo.svg)
 - [`macos-zsh-help-tour.svg`](svg/macos-zsh-help-tour.svg)
 - [`macos-zsh-launch-exit.svg`](svg/macos-zsh-launch-exit.svg)
+- [`macos-zsh-tui-splash.svg`](svg/macos-zsh-tui-splash.svg)
+- [`macos-zsh-typing-demo.svg`](svg/macos-zsh-typing-demo.svg)
 - [`windows-pwsh-help-tour.svg`](svg/windows-pwsh-help-tour.svg)
 - [`windows-pwsh-launch-exit.svg`](svg/windows-pwsh-launch-exit.svg)
 - [`windows-pwsh-tui-splash.svg`](svg/windows-pwsh-tui-splash.svg)
 - [`windows-pwsh-typing-demo.svg`](svg/windows-pwsh-typing-demo.svg)
 
-## `gif` — 18 file(s)
+## `gif` — 20 file(s)
 
 ![console2svg gif sample: linux-bash-help-tour.gif](gif/linux-bash-help-tour.gif)
 
@@ -49,12 +51,14 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`linux-zsh-typing-demo.gif`](gif/linux-zsh-typing-demo.gif)
 - [`macos-zsh-help-tour.gif`](gif/macos-zsh-help-tour.gif)
 - [`macos-zsh-launch-exit.gif`](gif/macos-zsh-launch-exit.gif)
+- [`macos-zsh-tui-splash.gif`](gif/macos-zsh-tui-splash.gif)
+- [`macos-zsh-typing-demo.gif`](gif/macos-zsh-typing-demo.gif)
 - [`windows-pwsh-help-tour.gif`](gif/windows-pwsh-help-tour.gif)
 - [`windows-pwsh-launch-exit.gif`](gif/windows-pwsh-launch-exit.gif)
 - [`windows-pwsh-tui-splash.gif`](gif/windows-pwsh-tui-splash.gif)
 - [`windows-pwsh-typing-demo.gif`](gif/windows-pwsh-typing-demo.gif)
 
-## `mp4` — 18 file(s)
+## `mp4` — 20 file(s)
 
 ![console2svg mp4 sample: linux-bash-help-tour.mp4](mp4/linux-bash-help-tour.mp4)
 
@@ -72,12 +76,14 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`linux-zsh-typing-demo.mp4`](mp4/linux-zsh-typing-demo.mp4)
 - [`macos-zsh-help-tour.mp4`](mp4/macos-zsh-help-tour.mp4)
 - [`macos-zsh-launch-exit.mp4`](mp4/macos-zsh-launch-exit.mp4)
+- [`macos-zsh-tui-splash.mp4`](mp4/macos-zsh-tui-splash.mp4)
+- [`macos-zsh-typing-demo.mp4`](mp4/macos-zsh-typing-demo.mp4)
 - [`windows-pwsh-help-tour.mp4`](mp4/windows-pwsh-help-tour.mp4)
 - [`windows-pwsh-launch-exit.mp4`](mp4/windows-pwsh-launch-exit.mp4)
 - [`windows-pwsh-tui-splash.mp4`](mp4/windows-pwsh-tui-splash.mp4)
 - [`windows-pwsh-typing-demo.mp4`](mp4/windows-pwsh-typing-demo.mp4)
 
-## `webm` — 18 file(s)
+## `webm` — 20 file(s)
 
 ![console2svg webm sample: linux-bash-help-tour.webm](webm/linux-bash-help-tour.webm)
 
@@ -95,6 +101,8 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 - [`linux-zsh-typing-demo.webm`](webm/linux-zsh-typing-demo.webm)
 - [`macos-zsh-help-tour.webm`](webm/macos-zsh-help-tour.webm)
 - [`macos-zsh-launch-exit.webm`](webm/macos-zsh-launch-exit.webm)
+- [`macos-zsh-tui-splash.webm`](webm/macos-zsh-tui-splash.webm)
+- [`macos-zsh-typing-demo.webm`](webm/macos-zsh-typing-demo.webm)
 - [`windows-pwsh-help-tour.webm`](webm/windows-pwsh-help-tour.webm)
 - [`windows-pwsh-launch-exit.webm`](webm/windows-pwsh-launch-exit.webm)
 - [`windows-pwsh-tui-splash.webm`](webm/windows-pwsh-tui-splash.webm)
