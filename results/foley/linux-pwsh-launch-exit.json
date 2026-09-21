@@ -6,9 +6,9 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/foley/gif/linux-pwsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35549444495",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35567181024",
   "extra": {
     "tool_version": "foley v0.1.0",
-    "omp_version": "omp/18.2.6"
+    "omp_version": "omp/18.2.7"
   }
 }
