@@ -3,6 +3,11 @@
 CI bake-off of terminal-to-GIF recorders against one TUI, [Oh My Pi (`omp`)](https://omp.sh).
 A cell counts as working only when a `testing-vhs` GitHub Actions job committed a GIF.
 
+## CI Status
+
+<!-- BADGES:START -->
+<!-- BADGES:END -->
+
 ## Recorder Families
 
 ```mermaid

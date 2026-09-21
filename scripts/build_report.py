@@ -22,6 +22,8 @@ README = ROOT / "README.md"
 TOOLS_JSON = ROOT / "scripts" / "tools.json"
 START = "<!-- REPORT:START -->"
 END = "<!-- REPORT:END -->"
+BADGES_START = "<!-- BADGES:START -->"
+BADGES_END = "<!-- BADGES:END -->"
 
 REPO = os.environ.get("GITHUB_REPOSITORY", "YoraiLevi/testing-area")
 SERVER = os.environ.get("GITHUB_SERVER_URL", "https://github.com")
@@ -62,13 +64,14 @@ def index(results: list[dict]) -> dict:
 
 
 def badges(tools: dict) -> str:
-    lines = ["### CI Status", ""]
+    """Just the per-tool CI status badge row; the heading lives in the static README."""
+    lines = []
     for t in tools["tools"]:
         wf = f"rec-{t['id']}.yml"
         url = f"{SERVER}/{REPO}/actions/workflows/{wf}"
         badge = f"{url}/badge.svg?branch={BRANCH}"
         lines.append(f"[![{t['name']}]({badge})]({url})")
-    return "\n".join(lines) + "\n"
+    return "\n".join(lines)
 
 
 def grid(tools: dict, idx: dict) -> str:
@@ -170,6 +173,32 @@ def recordings(tools: dict, idx: dict) -> str:
     out.append("Each tool's recordings, one sample per output format, live on its asset page.")
     out.append("")
     out.append(f"**Jump to a recording:** {toc}")
+    out.append("")
+    return "\n".join(out)
+
+
+def formats_grid(tools: dict) -> str:
+    """Table mapping each output format to the tools that produce it.
+
+    Answers 'I want <format>: which tools support it?' at a glance. Tool names link to
+    their asset page so the reader can jump straight to a sample of that format.
+    """
+    fmt_tools: dict = {}
+    for t in tools["tools"]:
+        for f in t["formats"]:
+            fmt_tools.setdefault(f, []).append(t)
+    ordered = sorted(fmt_tools.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+    out = [
+        "### Output Formats (which tools support each)",
+        "",
+        "Pick a format, then open any linked tool's asset page to see that format.",
+        "",
+        "| Format | Count | Tools |",
+        "|--------|------:|-------|",
+    ]
+    for fmt, ts in ordered:
+        links = ", ".join(f"[{t['name']}](assets/{t['id']}/README.md)" for t in ts)
+        out.append(f"| `{fmt}` | {len(ts)} | {links} |")
     out.append("")
     return "\n".join(out)
 
@@ -376,37 +405,46 @@ def asset_readmes(tools: dict) -> None:
 
 
 def build_section(tools: dict, idx: dict) -> str:
-    grid_md = grid(tools, idx)
     parts = [
         "_Generated from committed CI results on `testing-vhs`._",
         "",
-        grid_md,
+        recordings(tools, idx),
+        "",
+        formats_grid(tools),
+        "",
+        grid(tools, idx),
         "",
         analysis(tools, idx),
         "",
-        recordings(tools, idx),
-        "",
         ledger(tools),
-        "",
-        badges(tools),
         "",
         refs(tools),
     ]
     return "\n".join(parts)
 
 
+def _replace_between(text: str, start: str, end: str, body: str):
+    """Return text with the region between the start/end markers replaced by body,
+    or None when either marker is absent."""
+    if start in text and end in text:
+        return text.split(start)[0] + start + "\n\n" + body + "\n" + end + text.split(end)[1]
+    return None
+
+
 def main() -> int:
     tools = load_tools()
     idx = index(load_results())
-    section = build_section(tools, idx)
     text = README.read_text(encoding="utf-8") if README.exists() else ""
-    if START in text and END in text:
-        pre = text.split(START)[0]
-        post = text.split(END)[1]
-        new = pre + START + "\n\n" + section + "\n" + END + post
+    updated = _replace_between(text, BADGES_START, BADGES_END, badges(tools))
+    if updated is not None:
+        text = updated
+    section = build_section(tools, idx)
+    updated = _replace_between(text, START, END, section)
+    if updated is not None:
+        text = updated
     else:
-        new = text.rstrip() + "\n\n" + START + "\n\n" + section + "\n" + END + "\n"
-    README.write_text(new, encoding="utf-8")
+        text = text.rstrip() + "\n\n" + START + "\n\n" + section + "\n" + END + "\n"
+    README.write_text(text, encoding="utf-8")
     asset_readmes(tools)
     print("build_report: README updated")
     return 0
