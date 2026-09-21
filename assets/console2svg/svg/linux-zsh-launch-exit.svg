@@ -184,7 +184,7 @@
 </g>
 <g display="none">
 <animate attributeName="display" values="none;inline;none" keyTimes="0;0.294118;0.352941" dur="1.7s" calcMode="discrete" repeatCount="indefinite"/>
-<rect class="u" y="18" width="8.4" height="18" fill="#d4d4d4" opacity="0.65"/>
+<rect class="u" x="126" width="8.4" height="18" fill="#d4d4d4" opacity="0.65"/>
 </g>
 <g display="none">
 <animate attributeName="display" values="none;inline;none" keyTimes="0;0.352941;0.411765" dur="1.7s" calcMode="discrete" repeatCount="indefinite"/>

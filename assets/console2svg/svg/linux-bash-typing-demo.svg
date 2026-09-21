@@ -72,8 +72,8 @@
 </g>
 <g id="c2r10" class="c2 c"><use href="#c2r9"/>
 <g transform="translate(142.8)">
-<use href="#c2e2"/>
-<text class="aa w" y="14" textLength="33.6">at t</text>
+<rect width="16.8" height="18" id="c2e4" fill="#1e1e1e" stroke="#1e1e1e" stroke-width="2" vector-effect="non-scaling-stroke"/>
+<text class="aa" y="14" textLength="16.8">at</text>
 </g>
 </g>
 <g id="c2r11" class="c2 c">
@@ -133,7 +133,7 @@
 <g id="c2r21" class="c2 c"><use href="#c2r1"/>
 <g>
 <use href="#c2e1"/>
-<rect class="q" width="8.4" height="18" id="c2e4" fill="#d4d4d4" stroke="#d4d4d4" stroke-width="2" vector-effect="non-scaling-stroke"/>
+<rect class="q" width="8.4" height="18" id="c2e5" fill="#d4d4d4" stroke="#d4d4d4" stroke-width="2" vector-effect="non-scaling-stroke"/>
 </g>
 </g>
 </defs>
@@ -285,7 +285,7 @@
 </g>
 <g display="none">
 <animate attributeName="display" values="none;inline;none" keyTimes="0;0.259259;0.296296" dur="2.7s" calcMode="discrete" repeatCount="indefinite"/>
-<rect class="u" x="176.4" width="8.4" height="18" fill="#d4d4d4" opacity="0.65"/>
+<rect class="u" x="168" width="8.4" height="18" fill="#d4d4d4" opacity="0.65"/>
 </g>
 <g display="none">
 <animate attributeName="display" values="none;inline;none" keyTimes="0;0.296296;0.333333" dur="2.7s" calcMode="discrete" repeatCount="indefinite"/>
