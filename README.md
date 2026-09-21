@@ -109,8 +109,8 @@ Pick a format, then open any linked tool's asset page to see that format.
 | [asciinema + agg][asciinema]<br><sub>cast · gif</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584231) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584231) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584231) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584231) | ➖<sup>7</sup> |
 | [PowerSession-rs + agg][powersession]<br><sub>cast · gif</sub> | hybrid | ➖<sup>8</sup> | ➖<sup>8</sup> | ➖<sup>8</sup> | ➖<sup>8</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584306) |
 | [Terminalizer][terminalizer]<br><sub>yml · gif</sub> | hybrid | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584339) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584339) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584339) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584339) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35597584339)<sup>9</sup> |
-| [acast][acast]<br><sub>cast · gif</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114253) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114253) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114253) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114253) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114253) |
-| [termsvg][termsvg]<br><sub>cast · svg · gif · webm</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114246) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35586114246)<sup>10</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114246) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114246) | ➖<sup>11</sup> |
+| [acast][acast]<br><sub>cast · gif</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584272) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35597584272)<sup>10</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584272) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584272) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35597584272) |
+| [termsvg][termsvg]<br><sub>cast · svg · gif · webm</sub> | interactive | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114246) | [❌](https://github.com/YoraiLevi/testing-area/actions/runs/35586114246)<sup>11</sup> | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114246) | [✅](https://github.com/YoraiLevi/testing-area/actions/runs/35586114246) | ➖<sup>12</sup> |
 
 Legend: ✅ working · ❌ broken · ➖ not applicable
 
@@ -127,8 +127,9 @@ Legend: ✅ working · ❌ broken · ➖ not applicable
 7. **asciinema + agg · `windows-pwsh`**: The asciinema CLI is Unix-only; Windows capture is out of scope (PowerSession-rs is the Windows-native alternative).
 8. **PowerSession-rs + agg · `linux-bash`, `linux-pwsh`, `linux-zsh`, `macos-zsh`**: PowerSession-rs is a Windows-only recorder (Win32 ConPTY); it does not run on Unix.
 9. **Terminalizer · `windows-pwsh`**: terminalizer is installed and its CLI runs and the config is found and passed, but 'record' fails on Windows with a blank-path ENOENT ('File not found') when spawning the pty recording session headlessly; no valid GIF produced
-10. **termsvg · `linux-pwsh`**: no valid GIF produced in CI
-11. **termsvg · `windows-pwsh`**: termsvg's record command imports syscall.SIGWINCH (POSIX-only); the record subcommand does not compile on Windows.
+10. **acast · `linux-pwsh`**: acast (v0.4.0) + agg (v1.9.0) produced no valid GIF for this cell in CI; see run logs
+11. **termsvg · `linux-pwsh`**: no valid GIF produced in CI
+12. **termsvg · `windows-pwsh`**: termsvg's record command imports syscall.SIGWINCH (POSIX-only); the record subcommand does not compile on Windows.
 
 
 ### What To Use
@@ -138,7 +139,7 @@ Headline `launch-exit` green, ranked by how many of the four tapes landed.
 | Cell | Working recorders (scenarios / 4) |
 |------|-----------------------------------|
 | `linux-bash` · `linux-zsh` · `macos-zsh` | [acast][acast] (4/4), [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [Demo Tape][demotape] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [termsvg][termsvg] (4/4), [VHS][vhs] (4/4) |
-| `linux-pwsh` | [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [VHS][vhs] (4/4), [acast][acast] (2/4) |
+| `linux-pwsh` | [asciinema + agg][asciinema] (4/4), [Betamax (joshka)][betamax] (4/4), [console2svg][console2svg] (4/4), [EVP][evp] (4/4), [Foley][foley] (4/4), [Terminalizer][terminalizer] (4/4), [VHS][vhs] (4/4) |
 | `windows-pwsh` | [acast][acast] (4/4), [console2svg][console2svg] (4/4), [PowerSession-rs + agg][powersession] (4/4) |
 
 **Green on every cell they target:** [asciinema + agg][asciinema] (16/16), [Betamax (joshka)][betamax] (16/16), [console2svg][console2svg] (20/20), [Demo Tape][demotape] (12/12), [EVP][evp] (16/16), [Foley][foley] (16/16), [PowerSession-rs + agg][powersession] (4/4), [VHS][vhs] (16/16, 4 N/A).
