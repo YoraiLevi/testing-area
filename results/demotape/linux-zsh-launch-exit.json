@@ -6,9 +6,9 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/demotape/gif/linux-zsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35549444562",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35567181070",
   "extra": {
     "tool_version": "demotape gem 0.0.10",
-    "omp_version": "omp/18.2.6"
+    "omp_version": "omp/18.2.7"
   }
 }
