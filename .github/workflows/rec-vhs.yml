@@ -115,13 +115,16 @@ jobs:
           OMPV="$(omp --version 2>/dev/null | head -1 || echo unknown)"
           for scenario in launch-exit help-tour tui-splash typing-demo; do
             base="${{ matrix.cell_os }}-${{ matrix.shell }}-${scenario}"
-            gif="$(find . -type f -name "${base}.gif" 2>/dev/null | head -1)"
+            # Scope to vhs's own render output (tapes/out, where VHS resolves the
+            # Output path). Searching '.' also matched committed assets/console2svg
+            # gifs of the same base name, so vhs silently served console2svg's files.
+            gif="$(find tapes/out out -type f -name "${base}.gif" 2>/dev/null | head -1)"
             if [ "${{ runner.os }}" = "Windows" ]; then
               verdict=not-applicable; reason="VHS records via ttyd, which has no Windows build (Unix-only); the capture pipeline cannot run on Windows."; gifpath=""
             elif [ -n "$gif" ] && python scripts/validate_gif.py "$gif" >/dev/null 2>&1; then
               cp -f "$gif" "assets/vhs/gif/${base}.gif"
               for fmt in mp4 webm; do
-                f="$(find . -type f -name "${base}.${fmt}" 2>/dev/null | head -1)"
+                f="$(find tapes/out out -type f -name "${base}.${fmt}" 2>/dev/null | head -1)"
                 [ -n "$f" ] && cp -f "$f" "assets/vhs/${fmt}/${base}.${fmt}"
               done
               verdict=working; reason=""; gifpath="assets/vhs/gif/${base}.gif"
