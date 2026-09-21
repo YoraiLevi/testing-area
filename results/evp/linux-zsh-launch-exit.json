@@ -6,10 +6,10 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/evp/gif/linux-zsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35549444531",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35567181087",
   "extra": {
     "svg": "assets/evp/svg/linux-zsh-launch-exit.svg",
     "tool_version": "v0.19.0",
-    "omp_version": "omp/18.2.6"
+    "omp_version": "omp/18.2.7"
   }
 }
