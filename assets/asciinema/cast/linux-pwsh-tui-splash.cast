@@ -1,3 +1,3 @@
-{"version":3,"term":{"cols":100,"rows":24},"timestamp":1789982994,"command":"/usr/bin/pwsh scenarios/asciinema/03-tui-splash.sh","env":{"SHELL":"/bin/bash"}}
-[0.250, "o", "\u001b[31;1mParserError: \u001b[0m\r\n\u001b[31;1m\u001b[36;1mLine |\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m  12 | \u001b[0m   sleep 5\u001b[36;1m\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m     | \u001b[31;1m          ~\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[31;1m\u001b[31;1m\u001b[36;1m     | \u001b[31;1mMissing closing ')' in expression.\u001b[0m\r\n"]
-[0.034, "x", "1"]
+{"version":3,"term":{"cols":100,"rows":24},"timestamp":1789984665,"command":"/usr/bin/pwsh scenarios/asciinema/03-tui-splash.sh","env":{"SHELL":"/bin/bash"}}
+[0.305, "o", "\u001b[31;1mParserError: \u001b[0m\r\n\u001b[31;1m\u001b[36;1mLine |\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m  12 | \u001b[0m   sleep 5\u001b[36;1m\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m     | \u001b[31;1m          ~\u001b[0m\r\n\u001b[31;1m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[31;1m\u001b[31;1m\u001b[36;1m     | \u001b[31;1mMissing closing ')' in expression.\u001b[0m\r\n"]
+[0.040, "x", "1"]
