@@ -5,6 +5,11 @@
 # pipeline (native output is SVG; the output extension selects the format). We run the
 # capture once per format so each scenario emits svg, gif, mp4, and webm.
 #
+# S1/S2/S4 run their (fast, non-interactive) command through typed-run.sh, which types
+# the command out and holds the result. Without it, console2svg's Linux capture of an
+# instant command is a single empty frame (the command exits before capture samples the
+# output); the typed animation makes the capture populated and genuinely multi-frame.
+#
 # Usage: render.sh <cell_os> <shell>
 set -u
 
@@ -16,6 +21,10 @@ CELL_OS="${1:?cell_os required}"
 SHELL_LABEL="${2:?shell required}"
 W=100
 H=24
+FPS=10                 # capture frame rate for the typed scenarios (keeps GIF size modest)
+BG="#12141c"           # solid background: a gradient window frame bloats the GIF palette
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TYPED="$SCRIPT_DIR/typed-run.sh"
 
 mkdir -p out
 
@@ -39,31 +48,33 @@ td="${CELL_OS}-${SHELL_LABEL}-typing-demo"
 # format (svg native; gif/mp4/webm via the bundled ffmpeg pipeline).
 FORMATS="svg gif mp4 webm"
 
-# S1 launch-exit: run omp --version, let it exit cleanly, hold the last frame.
+# S1 launch-exit: type `omp --version`, run it, hold. The typed animation keeps the PTY
+# populated over time so the capture is a real animation showing the version output
+# (a bare `omp --version` exits before capture and renders as one empty frame on Linux).
 for ext in $FORMATS; do
-  run capture -v -c -d macos -w "$W" -h "$H" --sleep 1 \
-    -o "out/${le}.${ext}" -- omp --version || true
+  run capture -v -d macos --background "$BG" -w "$W" -h "$H" --fps "$FPS" \
+    -o "out/${le}.${ext}" -- bash "$TYPED" omp --version || true
 done
 
-# S2 help-tour: colored, long output from omp --help.
+# S2 help-tour: same typed-run wrapper over `omp --help` (long, colored output).
 for ext in $FORMATS; do
-  run capture -v -c -d macos -w "$W" -h "$H" --sleep 1 \
-    -o "out/${ht}.${ext}" -- omp --help || true
+  run capture -v -d macos --background "$BG" -w "$W" -h "$H" --fps "$FPS" \
+    -o "out/${ht}.${ext}" -- bash "$TYPED" omp --help || true
 done
 
 # S3 tui-splash: launch the omp TUI headlessly; it never self-exits, so --timeout
-# stops the capture after the splash/onboarding screen has rendered.
+# stops the capture after the splash/onboarding screen has rendered. Already animated
+# by the live TUI, so it keeps the plain capture (no typed-run wrapper).
 for ext in $FORMATS; do
   run capture -v -d macos -w "$W" -h "$H" --timeout 6 --sleep 0.5 \
     -o "out/${ts}.${ext}" -- omp --no-session || true
 done
 
-# S4 typing-demo: console2svg cannot inject keystrokes into an already-running TUI
-# headlessly, so per scenarios.md we fall back to keystroke animation at a shell
-# prompt: `-c` animates the sample prompt being typed as a command line.
+# S4 typing-demo: console2svg cannot inject keystrokes into the running omp TUI
+# headlessly, so per scenarios.md we animate the sample prompt at a shell prompt.
 for ext in $FORMATS; do
-  run capture -v -c -d macos -w "$W" -h "$H" --sleep 1.5 \
-    -o "out/${td}.${ext}" -- echo "explain what this repository does" || true
+  run capture -v -d macos --background "$BG" -w "$W" -h "$H" --fps "$FPS" \
+    -o "out/${td}.${ext}" -- bash "$TYPED" echo "explain what this repository does" || true
 done
 
 echo "=== gifs (path size) ==="
