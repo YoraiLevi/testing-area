@@ -33,8 +33,6 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ![EVP svg sample: linux-bash-help-tour.svg](svg/linux-bash-help-tour.svg)
 
-Sample file (shown above; if the SVG renders blank, open it directly): [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg).
-
 - [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg)
 - [`linux-bash-launch-exit.svg`](svg/linux-bash-launch-exit.svg)
 - [`linux-bash-tui-splash.svg`](svg/linux-bash-tui-splash.svg)
@@ -54,9 +52,7 @@ Sample file (shown above; if the SVG renders blank, open it directly): [`linux-b
 
 ## `svgz` — 16 file(s)
 
-Sample: [`linux-bash-help-tour.svgz`](svgz/linux-bash-help-tour.svgz) (`svgz` does not render inline on GitHub).
-
-![EVP linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
+![EVP svgz sample: linux-bash-help-tour.svgz](svgz/linux-bash-help-tour.svgz)
 
 - [`linux-bash-help-tour.svgz`](svgz/linux-bash-help-tour.svgz)
 - [`linux-bash-launch-exit.svgz`](svgz/linux-bash-launch-exit.svgz)

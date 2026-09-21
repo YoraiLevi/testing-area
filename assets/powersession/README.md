@@ -10,9 +10,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `cast` — 4 file(s)
 
-Sample: [`windows-pwsh-help-tour.cast`](cast/windows-pwsh-help-tour.cast) (`cast` does not render inline on GitHub).
-
-![PowerSession-rs + agg windows-pwsh-help-tour (gif preview of the same cell)](gif/windows-pwsh-help-tour.gif)
+![PowerSession-rs + agg cast sample: windows-pwsh-help-tour.cast](cast/windows-pwsh-help-tour.cast)
 
 - [`windows-pwsh-help-tour.cast`](cast/windows-pwsh-help-tour.cast)
 - [`windows-pwsh-launch-exit.cast`](cast/windows-pwsh-launch-exit.cast)

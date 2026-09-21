@@ -10,9 +10,7 @@ Files are named `<cell>-<scenario>.<ext>` within each format directory.
 
 ## `cast` — 12 file(s)
 
-Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` does not render inline on GitHub).
-
-![termsvg linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
+![termsvg cast sample: linux-bash-help-tour.cast](cast/linux-bash-help-tour.cast)
 
 - [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast)
 - [`linux-bash-launch-exit.cast`](cast/linux-bash-launch-exit.cast)
@@ -30,8 +28,6 @@ Sample: [`linux-bash-help-tour.cast`](cast/linux-bash-help-tour.cast) (`cast` do
 ## `svg` — 12 file(s)
 
 ![termsvg svg sample: linux-bash-help-tour.svg](svg/linux-bash-help-tour.svg)
-
-Sample file (shown above; if the SVG renders blank, open it directly): [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg).
 
 - [`linux-bash-help-tour.svg`](svg/linux-bash-help-tour.svg)
 - [`linux-bash-launch-exit.svg`](svg/linux-bash-launch-exit.svg)
@@ -65,9 +61,7 @@ Sample file (shown above; if the SVG renders blank, open it directly): [`linux-b
 
 ## `webm` — 12 file(s)
 
-Sample: [`linux-bash-help-tour.webm`](webm/linux-bash-help-tour.webm) (`webm` does not render inline on GitHub).
-
-![termsvg linux-bash-help-tour (gif preview of the same cell)](gif/linux-bash-help-tour.gif)
+![termsvg webm sample: linux-bash-help-tour.webm](webm/linux-bash-help-tour.webm)
 
 - [`linux-bash-help-tour.webm`](webm/linux-bash-help-tour.webm)
 - [`linux-bash-launch-exit.webm`](webm/linux-bash-launch-exit.webm)
