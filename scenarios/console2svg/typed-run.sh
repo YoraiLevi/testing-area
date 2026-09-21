@@ -20,6 +20,7 @@ set -u
 CPS="${TYPED_CPS:-0.04}"     # seconds per character while "typing" the command
 LPS="${TYPED_LPS:-0.10}"     # seconds between output lines while replaying the result
 BLINKS="${TYPED_BLINKS:-4}"  # blink cycles holding the final screen (each ~0.3s)
+MAX="${TYPED_MAXLINES:-20}"  # cap replayed output lines (a screen is ~24 rows)
 
 cmd="$*"
 printf '$ '
@@ -31,9 +32,15 @@ printf '\n'
 
 out="$(eval "$cmd" 2>&1)"
 if [ -n "$out" ]; then
+  n=0
   while IFS= read -r line; do
     printf '%s\n' "$line"
     sleep "$LPS"
+    n=$(( n + 1 ))
+    if [ "$n" -ge "$MAX" ]; then
+      printf '\033[2m...\033[0m\n'   # elide the rest of long output
+      break
+    fi
   done <<< "$out"
 fi
 
