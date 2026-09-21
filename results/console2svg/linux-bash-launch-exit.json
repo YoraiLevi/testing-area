@@ -6,9 +6,9 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/console2svg/gif/linux-bash-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35549444571",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35567181044",
   "extra": {
     "tool_version": "v0.9.3",
-    "omp_version": "omp/18.2.6"
+    "omp_version": "omp/18.2.7"
   }
 }
