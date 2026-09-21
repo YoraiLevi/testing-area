@@ -1,0 +1,1 @@
+Terminal Recorder Trials puts all 11 terminal-to-GIF recorders on trial in CI, across 5 platforms and 4 scenarios. Every green cell is a real GIF committed by a GitHub Actions run, not a screenshot. 161 working cells, 9 output formats, one honest answer.
