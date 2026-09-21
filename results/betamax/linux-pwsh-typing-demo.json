@@ -6,9 +6,9 @@
   "verdict": "working",
   "reason": "shell-prompt typing fallback: the omp TUI input box cannot be driven headlessly, so the sample prompt is animated at a shell prompt (scenarios.md S4)",
   "gif": "assets/betamax/gif/linux-pwsh-typing-demo.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35549444488",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35567181010",
   "extra": {
     "tool_version": "betamax-v0.1.21",
-    "omp_version": "omp/18.2.6"
+    "omp_version": "omp/18.2.7"
   }
 }

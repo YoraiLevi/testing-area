@@ -6,9 +6,9 @@
   "verdict": "working",
   "reason": "",
   "gif": "assets/betamax/gif/macos-zsh-launch-exit.gif",
-  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35549444488",
+  "run_url": "https://github.com/YoraiLevi/testing-area/actions/runs/35567181010",
   "extra": {
     "tool_version": "betamax-v0.1.21",
-    "omp_version": "omp/18.2.6"
+    "omp_version": "omp/18.2.7"
   }
 }
